@@ -21,10 +21,15 @@
             </intent-filter>
         </activity>
 
-        <!-- Add the following activity declaration for SignUpActivity -->
         <activity
             android:name=".SignUpActivity"
             android:label="Sign Up">
+        </activity>
+
+        <!-- Add the following activity declaration for HomeActivity -->
+        <activity
+            android:name=".HomeActivity"
+            android:label="Home">
         </activity>
 
     </application>

@@ -9,6 +9,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseUser;
+
 public class SignUpActivity extends AppCompatActivity {
 
     private EditText signupEmailEditText;
@@ -17,10 +21,14 @@ public class SignUpActivity extends AppCompatActivity {
     private Button signupConfirmButton;
     private TextView signInTextView;
 
+    private FirebaseAuth mAuth;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
+
+        mAuth = FirebaseAuth.getInstance();
 
         signupEmailEditText = findViewById(R.id.signupEmailEditText);
         signupPasswordEditText = findViewById(R.id.signupPasswordEditText);
@@ -31,25 +39,37 @@ public class SignUpActivity extends AppCompatActivity {
         signupConfirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Get user input from EditText fields
                 String email = signupEmailEditText.getText().toString();
                 String password = signupPasswordEditText.getText().toString();
                 String confirmPassword = signupConfirmPasswordEditText.getText().toString();
 
-                // TODO: Add your sign-up logic here
+                if (!password.equals(confirmPassword)) {
+                    Toast.makeText(SignUpActivity.this, "Passwords do not match", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
-                // Display a toast message
-                Toast.makeText(SignUpActivity.this, "Sign up clicked", Toast.LENGTH_SHORT).show();
+                mAuth.createUserWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(SignUpActivity.this, task -> {
+                            if (task.isSuccessful()) {
+                                FirebaseUser user = mAuth.getCurrentUser();
+                                Toast.makeText(SignUpActivity.this, "Registration successful", Toast.LENGTH_SHORT).show();
+                                // Add your navigation logic here, maybe to a new activity/dashboard.
+                            } else {
+                                if (task.getException() instanceof FirebaseAuthUserCollisionException) {
+                                    Toast.makeText(SignUpActivity.this, "Email is already registered", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(SignUpActivity.this, "Registration failed", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
             }
         });
 
-        // Set an OnClickListener for the "Already have an account? Sign in" TextView
         signInTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Navigate to the main activity (sign-in page)
-                Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
-                startActivity(intent);
+                startActivity(new Intent(SignUpActivity.this, MainActivity.class));
+                finish();
             }
         });
     }
