@@ -2,6 +2,8 @@
 package com.example.healthcoach;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -23,6 +25,10 @@ public class HomeActivity extends AppCompatActivity {
     public void logout(View view) {
         FirebaseAuth.getInstance().signOut();
         // Navigate back to the login page (MainActivity)
-        finish();
+        startActivity(new Intent(HomeActivity.this, MainActivity.class));
+        finish(); // Close the current activity
     }
+
+
+
 }

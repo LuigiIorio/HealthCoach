@@ -61,11 +61,15 @@ public class MainActivity extends AppCompatActivity {
                             if (task.isSuccessful()) {
                                 FirebaseUser user = mAuth.getCurrentUser();
                                 Toast.makeText(MainActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
-                                // Add your navigation logic here, maybe to a new activity/dashboard.
+                                // Navigate to the HomeActivity
+                                Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+                                startActivity(intent);
                             } else {
                                 Toast.makeText(MainActivity.this, "Login failed", Toast.LENGTH_SHORT).show();
                             }
                         });
+
+
             }
         });
 
@@ -94,9 +98,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void signInWithGoogle() {
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
+        // Clear any previously cached account information
+        mGoogleSignInClient.signOut().addOnCompleteListener(this, task -> {
+            if (task.isSuccessful()) {
+                // Intent to start the Google Sign-In process
+                Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+                startActivityForResult(signInIntent, RC_SIGN_IN);
+            } else {
+                Toast.makeText(MainActivity.this, "Failed to sign out of previous account", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

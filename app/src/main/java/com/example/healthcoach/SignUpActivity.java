@@ -53,7 +53,8 @@ public class SignUpActivity extends AppCompatActivity {
                             if (task.isSuccessful()) {
                                 FirebaseUser user = mAuth.getCurrentUser();
                                 Toast.makeText(SignUpActivity.this, "Registration successful", Toast.LENGTH_SHORT).show();
-                                // Add your navigation logic here, maybe to a new activity/dashboard.
+                                Intent intent = new Intent(SignUpActivity.this, HomeActivity.class);
+                                startActivity(intent);
                             } else {
                                 if (task.getException() instanceof FirebaseAuthUserCollisionException) {
                                     Toast.makeText(SignUpActivity.this, "Email is already registered", Toast.LENGTH_SHORT).show();
