@@ -8,6 +8,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.example.healthcoach.R;
+
 
 public class SignUpActivity extends AppCompatActivity {
 
@@ -30,29 +32,21 @@ public class SignUpActivity extends AppCompatActivity {
 
         signupConfirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
+                // Get user input from EditText fields
                 String email = signupEmailEditText.getText().toString();
                 String password = signupPasswordEditText.getText().toString();
                 String confirmPassword = signupConfirmPasswordEditText.getText().toString();
 
-                if (password.equals(confirmPassword)) {
-                    // Here you can implement your sign-up logic.
-                    // For now, let's just show a toast message.
-                    Toast.makeText(SignUpActivity.this, "Sign-up successful!\nEmail: " + email + "\nPassword: " + password, Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(SignUpActivity.this, "Passwords do not match", Toast.LENGTH_SHORT).show();
-                }
+                // TODO: Add your sign-up logic here
+
+                // Display a toast message
+                Toast.makeText(SignUpActivity.this, "Sign up clicked", Toast.LENGTH_SHORT).show();
             }
         });
 
-        signInTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Navigate back to the login page.
-                Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
-                startActivity(intent);
-                finish(); // Close the sign-up activity to prevent going back.
-            }
-        });
+        // Other code and initialization
     }
+
+    // Other methods and code
 }
