@@ -5,46 +5,45 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
-    tools:context=".MainActivity">
+    tools:context=".SignUpActivity">
 
     <EditText
-        android:id="@+id/emailEditText"
+        android:id="@+id/signupEmailEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Email"
         android:layout_marginTop="32dp"/>
 
     <EditText
-        android:id="@+id/passwordEditText"
+        android:id="@+id/signupPasswordEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Password"
-        android:layout_below="@id/emailEditText"
+        android:layout_below="@id/signupEmailEditText"
+        android:layout_marginTop="16dp"/>
+
+    <EditText
+        android:id="@+id/signupConfirmPasswordEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Confirm Password"
+        android:layout_below="@id/signupPasswordEditText"
         android:layout_marginTop="16dp"/>
 
     <Button
-        android:id="@+id/loginButton"
+        android:id="@+id/signupConfirmButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Login"
-        android:layout_below="@id/passwordEditText"
+        android:text="Confirm"
+        android:layout_below="@id/signupConfirmPasswordEditText"
         android:layout_marginTop="32dp"/>
 
     <TextView
-        android:id="@+id/forgotPasswordTextView"
+        android:id="@+id/signInTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Forgot Password?"
-        android:layout_below="@id/loginButton"
-        android:layout_marginTop="16dp"
-        android:layout_centerHorizontal="true"/>
-
-    <TextView
-        android:id="@+id/signUpTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Don't have an account? Sign Up"
-        android:layout_below="@id/forgotPasswordTextView"
+        android:text="Already have an account? Sign In!"
+        android:layout_below="@id/signupConfirmButton"
         android:layout_marginTop="16dp"
         android:layout_centerHorizontal="true"/>
 
