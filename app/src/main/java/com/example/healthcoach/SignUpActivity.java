@@ -8,8 +8,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.example.healthcoach.R;
-
 
 public class SignUpActivity extends AppCompatActivity {
 
@@ -45,8 +43,14 @@ public class SignUpActivity extends AppCompatActivity {
             }
         });
 
-        // Other code and initialization
+        // Set an OnClickListener for the "Already have an account? Sign in" TextView
+        signInTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Navigate to the main activity (sign-in page)
+                Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
     }
-
-    // Other methods and code
 }
