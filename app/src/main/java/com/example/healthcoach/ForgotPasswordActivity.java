@@ -18,6 +18,9 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     private EditText emailEditText;
     private Button resetButton;
 
+
+    //trying to push this onto github
+
     private FirebaseAuth mAuth;
 
     @Override
