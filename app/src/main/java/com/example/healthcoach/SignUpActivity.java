@@ -43,6 +43,11 @@ public class SignUpActivity extends AppCompatActivity {
                 String password = signupPasswordEditText.getText().toString();
                 String confirmPassword = signupConfirmPasswordEditText.getText().toString();
 
+                if (email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+                    Toast.makeText(SignUpActivity.this, "Email and password are required", Toast.LENGTH_SHORT).show();
+                    return; // Don't proceed with login
+                }
+
                 if (!password.equals(confirmPassword)) {
                     Toast.makeText(SignUpActivity.this, "Passwords do not match", Toast.LENGTH_SHORT).show();
                     return;

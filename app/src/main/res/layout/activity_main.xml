@@ -30,21 +30,21 @@
         android:layout_below="@id/passwordEditText"
         android:layout_marginTop="32dp"/>
 
-    <TextView
-        android:id="@+id/forgotPasswordTextView"
+    <Button
+        android:id="@+id/forgotPasswordButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Forgot Password?"
         android:layout_below="@id/loginButton"
-        android:layout_marginTop="16dp"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"/>
 
     <TextView
         android:id="@+id/signUpTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Don't have an account? Sign Up"
-        android:layout_below="@id/forgotPasswordTextView"
+        android:layout_below="@id/forgotPasswordButton"
         android:layout_marginTop="16dp"
         android:layout_centerHorizontal="true"/>
 
@@ -55,6 +55,5 @@
         android:layout_below="@id/passwordEditText"
         android:layout_marginTop="211dp"
         android:text="Login with Google" />
-
 
 </RelativeLayout>

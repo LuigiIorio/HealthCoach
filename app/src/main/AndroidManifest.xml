@@ -26,10 +26,15 @@
             android:label="Sign Up">
         </activity>
 
-        <!-- Add the following activity declaration for HomeActivity -->
         <activity
             android:name=".HomeActivity"
             android:label="Home">
+        </activity>
+
+        <!-- Add the following activity declaration for ForgotPasswordActivity -->
+        <activity
+            android:name=".ForgotPasswordActivity"
+            android:label="Forgot Password">
         </activity>
 
     </application>
