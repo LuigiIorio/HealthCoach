@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private GoogleSignInClient mGoogleSignInClient;
     private static final int RC_SIGN_IN = 9001;
 
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -108,23 +109,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-        // Set up "View Fitness Data" button click listener
-        Button viewFitnessDataButton = findViewById(R.id.viewFitnessDataButton);
-        viewFitnessDataButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Navigate to the FitnessSubscriptionActivity
-                Intent intent = new Intent(MainActivity.this, FitnessSubscriptionActivity.class);
-                startActivity(intent);
-            }
-        });
     }
-
-
-
-
-
 
     private void signInWithGoogle() {
         // Clear any previously cached account information

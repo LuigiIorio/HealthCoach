@@ -2,7 +2,6 @@ package com.example.healthcoach;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -48,13 +47,13 @@ public class HomeActivity extends AppCompatActivity {
             item -> {
                 Fragment selectedFragment;
                 switch (item.getItemId()) {
-                    case R.id.navigation_screen1:
+                    case R.id.navigation_home:
                         selectedFragment = fragment1;
                         break;
-                    case R.id.navigation_screen2:
+                    case R.id.navigation_journal:
                         selectedFragment = fragment2;
                         break;
-                    case R.id.navigation_screen3:
+                    case R.id.navigation_profile:
                         selectedFragment = fragment3;
                         break;
                     default:
