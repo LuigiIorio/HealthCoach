@@ -9,6 +9,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import android.widget.TextView;
 
+import com.example.healthcoach.R;
+
 public class FragmentScreen3 extends Fragment {
 
     @Nullable
