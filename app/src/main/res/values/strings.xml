@@ -1,9 +1,7 @@
 <resources>
-    <string name="app_name">HealthCoach</string>
-    <string name="asalamu_aleikum">Asalamu Aleikum</string>
-    <string name="Cri">Il mio amico CriPiace10</string>
-    <string name="logout">Logout</string>
-    <string name="hi_baby">Hi baby</string>
 
+    <string name="app_name">HealthCoach</string>
+    <string name="logout">Logout</string>
+    <string name="select_activity">Select activity</string>
 
 </resources>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="activity_suggestions">
+        <item>Running</item>
+        <item>Walking</item>
+        <item>Cycling</item>
+    </string-array>
+</resources>

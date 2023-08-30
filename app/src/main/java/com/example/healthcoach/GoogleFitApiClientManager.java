@@ -2,6 +2,7 @@ package com.example.healthcoach;
 
 import android.content.Context;
 import android.content.res.AssetManager;
+
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -41,6 +42,8 @@ public class GoogleFitApiClientManager {
                     .requestEmail()
                     .requestScopes(new Scope("https://www.googleapis.com/auth/fitness.activity.read"))
                     .requestScopes(new Scope("https://www.googleapis.com/auth/fitness.activity.write"))
+                    .requestScopes(new Scope("https://www.googleapis.com/auth/fitness.nutrition.read"))
+                    .requestScopes(new Scope("https://www.googleapis.com/auth/fitness.nutrition.write"))
                     .build();
 
             return GoogleSignIn.getClient(context, gso);

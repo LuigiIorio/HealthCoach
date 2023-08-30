@@ -11,4 +11,28 @@
         android:text="Welcome to Screen 2"
         android:textSize="18sp"/>
 
+    <AutoCompleteTextView
+        android:id="@+id/activityAutoCompleteTextView"
+        android:layout_below="@id/messageTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/select_activity"/>
+
+    <Button
+        android:id="@+id/submitButton"
+        android:layout_below="@id/activityAutoCompleteTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Submit"/>
+
+    <!-- Add a TextView to display the recorded activities -->
+    <TextView
+        android:id="@+id/journalTextView"
+        android:layout_below="@id/submitButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:textSize="16sp"/>
+
 </RelativeLayout>
+
