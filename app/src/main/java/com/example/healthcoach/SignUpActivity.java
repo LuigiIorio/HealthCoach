@@ -2,7 +2,6 @@ package com.example.healthcoach;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -30,7 +29,6 @@ public class SignUpActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
 
-    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,10 +74,21 @@ public class SignUpActivity extends AppCompatActivity {
                             if (task.isSuccessful()) {
                                 FirebaseUser firebaseUser = mAuth.getCurrentUser();
 
-                                // Create a User object with the additional information
-                                User user = new User(email, age, gender, weight, height, birthdate);
+                                // Create a UserEntity object with the additional information
+                                UserEntity userEntity = new UserEntity(email, age, gender, birthdate, weight, height);
 
-                                // Store the user's additional information in the database or appropriate storage
+                                // Insert user data into the Room database using a background thread
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        // Initialize the Room database
+                                        AppDatabase appDatabase = AppDatabase.getInstance(getApplicationContext());
+                                        UserDao userDao = appDatabase.userDao();
+
+                                        // Insert user data into the Room database
+                                        userDao.insert(userEntity);
+                                    }
+                                }).start();
 
                                 Toast.makeText(SignUpActivity.this, "Registration successful", Toast.LENGTH_SHORT).show();
 

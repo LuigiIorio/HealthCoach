@@ -16,6 +16,8 @@ public interface UserDao {
     @Query("SELECT * FROM users")
     LiveData<List<UserEntity>> getAllUsers();
 
+    @Query("SELECT * FROM users WHERE email = :email")
+    LiveData<UserEntity> getSelectedUser(String email);
+
     // Add more query methods as needed
 }
-
