@@ -36,12 +36,15 @@ public class HomeActivity extends AppCompatActivity {
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(navListener);
 
-        // Set the initial fragment to display
+        // Add the code to inflate the FragmentScreen1 fragment here
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.fragment_container, fragment3, "3").hide(fragment3)
-                .add(R.id.fragment_container, fragment2, "2").hide(fragment2)
                 .add(R.id.fragment_container, fragment1, "1").commit();
     }
+
+
+
+
+
 
     private final BottomNavigationView.OnNavigationItemSelectedListener navListener =
             item -> {
@@ -76,3 +79,6 @@ public class HomeActivity extends AppCompatActivity {
         finish(); // Close the current activity
     }
 }
+
+
+

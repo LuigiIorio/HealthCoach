@@ -11,4 +11,16 @@
         android:text="Welcome to Screen 1"
         android:textSize="18sp"/>
 
+
+
+
+    <Button
+        android:id="@+id/addNutritionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/messageTextView"
+        android:text="Add Nutrition Data"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"/>
+
 </RelativeLayout>

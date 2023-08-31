@@ -83,6 +83,8 @@ public class FragmentScreen2 extends Fragment {
     }
 
 
+
+
     private void requestGoogleFitPermissions() {
         GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(requireContext());
         if (googleSignInAccount != null) {
