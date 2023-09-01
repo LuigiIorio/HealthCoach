@@ -11,12 +11,28 @@
         android:text="Welcome to Screen 1"
         android:textSize="18sp"/>
 
-    <Button
-        android:id="@+id/addNutritionButton"
-        android:layout_width="wrap_content"
+    <EditText
+        android:id="@+id/waterIntakeEditText"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/messageTextView"
-        android:text="Add Nutrition Data"
+        android:hint="Water Intake" />
+
+    <Button
+        android:id="@+id/addWaterIntakeButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/waterIntakeEditText"
+        android:text="Add Water Intake"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"/>
+
+    <TextView
+        android:id="@+id/waterIntakeTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/addWaterIntakeButton"
+        android:text="0 ml"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"/>
 
