@@ -14,4 +14,12 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/item_user" />
 
+    <TextView
+        android:id="@+id/messageTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Welcome to Screen 3"
+        android:textSize="18sp"/>
+
+
 </LinearLayout>
