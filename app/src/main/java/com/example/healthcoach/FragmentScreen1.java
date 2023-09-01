@@ -1,5 +1,9 @@
 package com.example.healthcoach;
 
+
+
+
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,10 +46,6 @@ public class FragmentScreen1 extends Fragment {
 
         Button addNutritionButton = view.findViewById(R.id.addNutritionButton);
         addNutritionButton.setOnClickListener(new View.OnClickListener() {
-
-
-
-
 
             @Override
             public void onClick(View v) {

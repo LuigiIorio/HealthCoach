@@ -32,13 +32,13 @@ public class HomeActivity extends AppCompatActivity {
         // Set initial active fragment
         activeFragment = fragment1;
 
+        // Add the code to inflate the FragmentScreen2 fragment here
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.fragment_container, fragment2, "2").commit();
+
         // Add the code for bottom navigation view setup here
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(navListener);
-
-        // Add the code to inflate the FragmentScreen1 fragment here
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.fragment_container, fragment1, "1").commit();
     }
 
 
@@ -79,6 +79,3 @@ public class HomeActivity extends AppCompatActivity {
         finish(); // Close the current activity
     }
 }
-
-
-
