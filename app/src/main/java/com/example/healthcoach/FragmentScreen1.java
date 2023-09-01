@@ -26,6 +26,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.concurrent.TimeUnit;
 
+
 public class FragmentScreen1 extends Fragment {
 
     private static final int GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = 1;
@@ -34,6 +35,8 @@ public class FragmentScreen1 extends Fragment {
     private EditText waterIntakeEditText;
     private Button addWaterIntakeButton;
     private TextView waterIntakeTextView;
+
+    private float totalWaterIntake;
 
     @Nullable
     @Override
@@ -59,49 +62,58 @@ public class FragmentScreen1 extends Fragment {
                     // Get the water intake amount from the edit text
                     String waterIntakeString = waterIntakeEditText.getText().toString();
 
-                    // Convert the water intake amount to a float
-                    float waterIntake = Float.parseFloat(waterIntakeString);
+                    // If the water intake string is empty, do nothing
+                    if (waterIntakeString.isEmpty()) {
+                        return;
+                    }
 
-                    // Create a DataSource object for the TYPE_WATER_CONSUMED data type
-                    DataSource waterConsumptionDataSource = new DataSource.Builder()
-                            .setAppPackageName(getActivity())
-                            .setDataType(DataType.TYPE_HYDRATION)
-                            .setType(DataSource.TYPE_RAW)
-                            .build();
+                    // Try to convert the water intake string to a float
+                    float waterIntake;
+                    try {
+                        waterIntake = Float.parseFloat(waterIntakeString);
+                    } catch (NumberFormatException e) {
+                        // The water intake string is not a float, show an error message
+                        waterIntakeTextView.setText("Please enter a valid number");
+                        return;
+                    }
 
-                    // Create a DataPoint object
-                    DataPoint waterConsumptionDataPoint = DataPoint.builder(waterConsumptionDataSource)
-                            .setTimestamp(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
-                            .setField(Field.FIELD_VOLUME, waterIntake)
-                            .build();
+                    // Update the total water intake
+                    synchronized (this) {
+                        totalWaterIntake = waterIntake + totalWaterIntake;
+                    }
 
-                    // Create a DataSet object and add the DataPoint to it
-                    DataSet dataSet = DataSet.builder(waterConsumptionDataSource)
-                            .add(waterConsumptionDataPoint)
-                            .build();
-
-                    // Insert the DataSet into Google Fit
-                    Fitness.getHistoryClient(getActivity(), googleSignInAccount)
-                            .insertData(dataSet)
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    // Data inserted successfully
-                                    waterIntakeTextView.setText(waterIntakeString + " ml added");
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    // Handle failure
-                                }
-                            });
+                    // Update the water intake text view
+                    waterIntakeTextView.setText(String.valueOf(totalWaterIntake) + " ml");
                 } else {
                     // Handle the case where googleSignInAccount is null
                 }
             }
         });
 
+        // Set retain instance
+        setRetainInstance(true);
+
+        if (savedInstanceState != null) {
+            // Restore the total water intake from the saved instance state
+            totalWaterIntake = savedInstanceState.getFloat("totalWaterIntake");
+        }
+
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // Set the water intake text view to the total water intake
+        waterIntakeTextView.setText(String.valueOf(totalWaterIntake) + " ml");
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // Save the total water intake to the saved instance state
+        outState.putFloat("totalWaterIntake", totalWaterIntake);
     }
 }
