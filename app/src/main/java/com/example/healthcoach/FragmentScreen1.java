@@ -10,27 +10,14 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.healthcoach.interfaces.WaterIntakeRepository;
+import com.example.healthcoach.recordingapi.Hydration;
 import com.example.healthcoach.viewmodel.WaterIntakeViewModel;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.fitness.Fitness;
-import com.google.android.gms.fitness.FitnessOptions;
-import com.google.android.gms.fitness.HistoryClient;
-import com.google.android.gms.fitness.data.DataPoint;
-import com.google.android.gms.fitness.data.DataSet;
-import com.google.android.gms.fitness.data.DataSource;
-import com.google.android.gms.fitness.data.DataType;
-import com.google.android.gms.fitness.data.Field;
-import java.util.Calendar;
-import java.util.concurrent.TimeUnit;
 
 public class FragmentScreen1 extends Fragment {
-
-    // Google Fit components
-    private GoogleSignInAccount googleSignInAccount;
-    private HistoryClient historyClient;
 
     // UI Components
     private EditText waterIntakeEditText;
@@ -43,7 +30,14 @@ public class FragmentScreen1 extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        viewModel = new ViewModelProvider(requireActivity()).get(WaterIntakeViewModel.class);
+
+        WaterIntakeRepository hydrationRepository = new Hydration(getActivity());
+        viewModel = new ViewModelProvider(requireActivity(), new ViewModelProvider.Factory() {
+            @Override
+            public <T extends ViewModel> T create(Class<T> modelClass) {
+                return (T) new WaterIntakeViewModel(hydrationRepository);
+            }
+        }).get(WaterIntakeViewModel.class);
     }
 
     @Nullable
@@ -55,70 +49,29 @@ public class FragmentScreen1 extends Fragment {
         addWaterIntakeButton = view.findViewById(R.id.addWaterIntakeButton);
         waterIntakeTextView = view.findViewById(R.id.waterIntakeTextView);
 
-        // Initialize GoogleSignInAccount and HistoryClient
-        googleSignInAccount = GoogleSignIn.getAccountForExtension(getActivity(), FitnessOptions.builder()
-                .addDataType(DataType.TYPE_HYDRATION, FitnessOptions.ACCESS_WRITE)
-                .build());
-        historyClient = Fitness.getHistoryClient(getActivity(), googleSignInAccount);
+        // Observe the LiveData
+        viewModel.getTotalWaterIntake().observe(getViewLifecycleOwner(), intake -> {
+            waterIntakeTextView.setText(String.valueOf(intake) + " ml");
+        });
 
         addWaterIntakeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (googleSignInAccount != null) {
-                    String waterIntakeString = waterIntakeEditText.getText().toString();
-                    if (waterIntakeString.isEmpty()) return;
+                String waterIntakeString = waterIntakeEditText.getText().toString();
+                if (waterIntakeString.isEmpty()) return;
 
-                    float waterIntake;
-                    try {
-                        waterIntake = Float.parseFloat(waterIntakeString);
-                    } catch (NumberFormatException e) {
-                        waterIntakeTextView.setText("Please enter a valid number");
-                        return;
-                    }
-
-                    viewModel.addWater(waterIntake);
-                    waterIntakeTextView.setText(String.valueOf(viewModel.getTotalWaterIntake()) + " ml");
-                    insertWaterIntakeData(waterIntake);
+                float waterIntake;
+                try {
+                    waterIntake = Float.parseFloat(waterIntakeString);
+                } catch (NumberFormatException e) {
+                    waterIntakeTextView.setText("Please enter a valid number");
+                    return;
                 }
+
+                viewModel.addWater(waterIntake);
             }
         });
 
         return view;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        waterIntakeTextView.setText(String.valueOf(viewModel.getTotalWaterIntake()) + " ml");
-    }
-
-    private void insertWaterIntakeData(float waterIntake) {
-        if (googleSignInAccount != null) {
-            DataSource dataSource = new DataSource.Builder()
-                    .setAppPackageName(getActivity())
-                    .setDataType(DataType.TYPE_HYDRATION)
-                    .setType(DataSource.TYPE_RAW)
-                    .build();
-
-            Calendar cal = Calendar.getInstance();
-            cal.setTimeInMillis(System.currentTimeMillis());
-
-            DataPoint dataPoint = DataPoint.builder(dataSource)
-                    .setField(Field.FIELD_VOLUME, waterIntake)
-                    .setTimeInterval(cal.getTimeInMillis(), cal.getTimeInMillis(), TimeUnit.MILLISECONDS)
-                    .build();
-
-            DataSet dataSet = DataSet.builder(dataSource)
-                    .add(dataPoint)
-                    .build();
-
-            historyClient.insertData(dataSet)
-                    .addOnSuccessListener(aVoid -> {
-                        // Handle success
-                    })
-                    .addOnFailureListener(e -> {
-                        // Handle failure
-                    });
-        }
     }
 }

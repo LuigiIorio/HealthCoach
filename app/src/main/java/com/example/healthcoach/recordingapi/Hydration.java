@@ -3,74 +3,66 @@ package com.example.healthcoach.recordingapi;
 import android.content.Context;
 import android.util.Log;
 
+import com.example.healthcoach.interfaces.WaterIntakeRepository;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessOptions;
-import com.google.android.gms.fitness.RecordingClient;
+import com.google.android.gms.fitness.HistoryClient;
 import com.google.android.gms.fitness.data.DataSource;
 import com.google.android.gms.fitness.data.DataType;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.fitness.data.DataPoint;
+import com.google.android.gms.fitness.data.DataSet;
+import com.google.android.gms.fitness.data.Field;
 
-public class Hydration {
+import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
-    private static final String HYDRATION_DATA_TYPE = "com.google.hydration";
+public class Hydration implements WaterIntakeRepository {
 
     private GoogleSignInAccount googleSignInAccount;
     private DataSource dataSource;
+    private Context context;
+    private HistoryClient historyClient;
 
     public Hydration(Context context) {
+        this.context = context;
+
         FitnessOptions fitnessOptions = FitnessOptions.builder()
                 .addDataType(DataType.TYPE_HYDRATION, FitnessOptions.ACCESS_WRITE)
                 .build();
 
         googleSignInAccount = GoogleSignIn.getAccountForExtension(context, fitnessOptions);
 
-        // Create a Fitness recording client
-        RecordingClient recordingClient = Fitness.getRecordingClient(context, googleSignInAccount);
-
-        // Create a DataSource for hydration
         dataSource = new DataSource.Builder()
                 .setAppPackageName(context.getPackageName())
                 .setDataType(DataType.TYPE_HYDRATION)
                 .setType(DataSource.TYPE_RAW)
-                .setStreamName("HydrationRecorderStream") // Unique stream name
                 .build();
 
-        // Subscribe to the data source
-        recordingClient.subscribe(dataSource)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("Hydration", "Hydration recording started");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(Exception e) {
-                        Log.e("Hydration", "Failed to start hydration recording", e);
-                    }
-                });
+        historyClient = Fitness.getHistoryClient(context, googleSignInAccount);
     }
 
-    public void stopRecording(Context context) {
-        // Create a Fitness recording client
-        RecordingClient recordingClient = Fitness.getRecordingClient(context, googleSignInAccount);
+    @Override
+    public void insertWaterIntake(float waterIntake) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(System.currentTimeMillis());
 
-        // Unsubscribe from the data source
-        recordingClient.unsubscribe(dataSource)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("Hydration", "Hydration recording stopped");
-                    }
+        DataPoint dataPoint = DataPoint.builder(dataSource)
+                .setField(Field.FIELD_VOLUME, waterIntake)
+                .setTimeInterval(cal.getTimeInMillis(), cal.getTimeInMillis(), TimeUnit.MILLISECONDS)
+                .build();
+
+        DataSet dataSet = DataSet.builder(dataSource)
+                .add(dataPoint)
+                .build();
+
+        historyClient.insertData(dataSet)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("Hydration", "Hydration data inserted successfully");
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(Exception e) {
-                        Log.e("Hydration", "Failed to stop hydration recording", e);
-                    }
+                .addOnFailureListener(e -> {
+                    Log.e("Hydration", "Failed to insert hydration data", e);
                 });
     }
 }
