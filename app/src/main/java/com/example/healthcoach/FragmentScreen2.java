@@ -7,38 +7,31 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessOptions;
-import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
-import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.data.Session;
 import com.google.android.gms.fitness.request.DataReadRequest;
 import com.google.android.gms.fitness.request.SessionInsertRequest;
-
 import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-
-
 public class FragmentScreen2 extends Fragment {
 
     private static final int GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = 1;
     private FitnessOptions fitnessOptions;
-    private AutoCompleteTextView activityAutoCompleteTextView;
+    private Spinner activitySpinner;
     private Button submitButton;
     private TextView journalTextView;
 
@@ -49,16 +42,18 @@ public class FragmentScreen2 extends Fragment {
         View view = inflater.inflate(R.layout.fragment_screen2, container, false);
 
         fitnessOptions = FitnessOptions.builder()
-                .addDataType(DataType.TYPE_ACTIVITY_SEGMENT, FitnessOptions.ACCESS_READ)
+                .addDataType(com.google.android.gms.fitness.data.DataType.TYPE_ACTIVITY_SEGMENT, FitnessOptions.ACCESS_READ)
                 .build();
 
-        activityAutoCompleteTextView = view.findViewById(R.id.activityAutoCompleteTextView);
-        String[] activitySuggestions = getResources().getStringArray(R.array.activity_suggestions);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, activitySuggestions);
-        activityAutoCompleteTextView.setAdapter(adapter);
-
+        activitySpinner = view.findViewById(R.id.activitySpinner);
         submitButton = view.findViewById(R.id.submitButton);
         journalTextView = view.findViewById(R.id.journalTextView);
+
+        // Populate Spinner with activity suggestions
+        String[] activitySuggestions = getResources().getStringArray(R.array.activity_suggestions);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, activitySuggestions);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        activitySpinner.setAdapter(adapter);
 
         GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(requireContext());
 
@@ -66,13 +61,42 @@ public class FragmentScreen2 extends Fragment {
             @Override
             public void onClick(View v) {
                 Log.d("FragmentScreen2", "Submit button clicked");
-                String selectedActivity = activityAutoCompleteTextView.getText().toString();
-                if (!selectedActivity.isEmpty()) {
-                    insertActivitySegment(selectedActivity);
-                    activityAutoCompleteTextView.setText(""); // Clear the input field
+                String selectedActivity = activitySpinner.getSelectedItem().toString();
+
+                // Check if the user is signed in with Google
+                GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(requireContext());
+                if (googleSignInAccount != null) {
+                    // Insert a session into Google Fit for the selected activity
+                    long endTime = System.currentTimeMillis();
+                    long startTime = endTime - TimeUnit.MINUTES.toMillis(30); // Example: 30 minutes ago
+
+                    Session session = new Session.Builder()
+                            .setName("MyActivitySession")
+                            .setIdentifier("activitySegment" + startTime) // Unique identifier for session
+                            .setActivity(selectedActivity)
+                            .setStartTime(startTime, TimeUnit.MILLISECONDS)
+                            .setEndTime(endTime, TimeUnit.MILLISECONDS)
+                            .build();
+
+                    SessionInsertRequest sessionInsertRequest = new SessionInsertRequest.Builder()
+                            .setSession(session)
+                            .build();
+
+                    Fitness.getSessionsClient(requireContext(), googleSignInAccount)
+                            .insertSession(sessionInsertRequest)
+                            .addOnSuccessListener(sessionID -> {
+                                updateJournal(selectedActivity);
+                            })
+                            .addOnFailureListener(e -> {
+                                // Handle failure
+                            });
+                } else {
+                    // Handle the case where the user is not signed in with Google
+                    // You can show a message or take appropriate action
                 }
             }
         });
+
 
         if (googleSignInAccount != null && !GoogleSignIn.hasPermissions(googleSignInAccount, fitnessOptions)) {
             Log.d("FragmentScreen2", "Requesting Google Fit permissions");
@@ -106,34 +130,6 @@ public class FragmentScreen2 extends Fragment {
         }
     }
 
-    private void insertActivitySegment(String selectedActivity) {
-        if (!selectedActivity.isEmpty()) {
-            long endTime = System.currentTimeMillis();
-            long startTime = endTime - TimeUnit.MINUTES.toMillis(30); // Example: 30 minutes ago
-
-            Session session = new Session.Builder()
-                    .setName("MyActivitySession")
-                    .setIdentifier("activitySegment" + startTime) // Unique identifier for session
-                    .setActivity(selectedActivity)
-                    .setStartTime(startTime, TimeUnit.MILLISECONDS)
-                    .setEndTime(endTime, TimeUnit.MILLISECONDS)
-                    .build();
-
-            SessionInsertRequest sessionInsertRequest = new SessionInsertRequest.Builder()
-                    .setSession(session)
-                    .build();
-
-            Fitness.getSessionsClient(requireContext(), Objects.requireNonNull(GoogleSignIn.getLastSignedInAccount(requireContext())))
-                    .insertSession(sessionInsertRequest)
-                    .addOnSuccessListener(sessionID -> {
-                        updateJournal(selectedActivity);
-                    })
-                    .addOnFailureListener(e -> {
-                        // Handle failure
-                    });
-        }
-    }
-
     private void updateJournal(String activity) {
         String existingJournalText = journalTextView.getText().toString();
         String newJournalText = existingJournalText + "\n" + activity;
@@ -142,13 +138,13 @@ public class FragmentScreen2 extends Fragment {
 
     private void readActivityData() {
         Calendar calendar = Calendar.getInstance();
-        long endTime = calendar.getTimeInMillis();
+        long endTimestamp = calendar.getTimeInMillis();
         calendar.add(Calendar.DAY_OF_YEAR, -1);
-        long startTime = calendar.getTimeInMillis();
+        long startTimestamp = calendar.getTimeInMillis();
 
         DataReadRequest readRequest = new DataReadRequest.Builder()
-                .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
-                .read(DataType.TYPE_ACTIVITY_SEGMENT)
+                .setTimeRange(startTimestamp, endTimestamp, TimeUnit.MILLISECONDS)
+                .read(com.google.android.gms.fitness.data.DataType.TYPE_ACTIVITY_SEGMENT)
                 .build();
 
         GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(requireContext());
@@ -157,7 +153,16 @@ public class FragmentScreen2 extends Fragment {
             Fitness.getHistoryClient(requireContext(), googleSignInAccount)
                     .readData(readRequest)
                     .addOnSuccessListener(dataReadResponse -> {
-                        processActivityData(dataReadResponse.getDataSets());
+                        for (DataSet dataSet : dataReadResponse.getDataSets()) {
+                            for (com.google.android.gms.fitness.data.DataPoint dataPoint : dataSet.getDataPoints()) {
+                                long startTime = dataPoint.getStartTime(TimeUnit.MILLISECONDS);
+                                long endTime = dataPoint.getEndTime(TimeUnit.MILLISECONDS);
+                                int activityType = dataPoint.getValue(Field.FIELD_ACTIVITY).asInt();
+
+                                String activityName = getActivityName(activityType);
+                                updateJournal(activityName);
+                            }
+                        }
                     })
                     .addOnFailureListener(e -> {
                         // Handle error
@@ -165,16 +170,7 @@ public class FragmentScreen2 extends Fragment {
         }
     }
 
-    private void processActivityData(List<DataSet> dataSets) {
-        for (DataSet dataSet : dataSets) {
-            for (DataPoint dataPoint : dataSet.getDataPoints()) {
-                long startTime = dataPoint.getStartTime(TimeUnit.MILLISECONDS);
-                long endTime = dataPoint.getEndTime(TimeUnit.MILLISECONDS);
-                int activityType = dataPoint.getValue(Field.FIELD_ACTIVITY).asInt();
-
-                // Here you can update your journal with the activity information
-                // You might want to convert activityType to a human-readable string
-            }
-        }
+    private String getActivityName(int activityType) {
+        return ActivityTypes.getActivityName(activityType);
     }
 }
