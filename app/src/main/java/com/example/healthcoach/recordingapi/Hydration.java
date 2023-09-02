@@ -1,5 +1,6 @@
 package com.example.healthcoach.recordingapi;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
@@ -20,6 +21,8 @@ import java.util.concurrent.TimeUnit;
 
 public class Hydration implements WaterIntakeRepository {
 
+    private static final int REQUEST_OAUTH_REQUEST_CODE = 1001;
+
     private GoogleSignInAccount googleSignInAccount;
     private DataSource dataSource;
     private Context context;
@@ -27,12 +30,30 @@ public class Hydration implements WaterIntakeRepository {
 
     public Hydration(Context context) {
         this.context = context;
+        setupHydration();
+    }
 
+    private void setupHydration() {
         FitnessOptions fitnessOptions = FitnessOptions.builder()
                 .addDataType(DataType.TYPE_HYDRATION, FitnessOptions.ACCESS_WRITE)
                 .build();
 
         googleSignInAccount = GoogleSignIn.getAccountForExtension(context, fitnessOptions);
+
+        if (googleSignInAccount == null) {
+            Log.e("Hydration", "User is not signed in.");
+            return;
+        }
+
+        if (!GoogleSignIn.hasPermissions(googleSignInAccount, fitnessOptions)) {
+            Log.e("Hydration", "Requesting permissions for Google Fit.");
+            GoogleSignIn.requestPermissions(
+                    (Activity) context,
+                    REQUEST_OAUTH_REQUEST_CODE,
+                    googleSignInAccount,
+                    fitnessOptions);
+            return;
+        }
 
         dataSource = new DataSource.Builder()
                 .setAppPackageName(context.getPackageName())
@@ -45,6 +66,11 @@ public class Hydration implements WaterIntakeRepository {
 
     @Override
     public void insertWaterIntake(float waterIntake) {
+        if (dataSource == null) {
+            Log.e("Hydration", "DataSource is not initialized.");
+            return;
+        }
+
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(System.currentTimeMillis());
 
@@ -62,7 +88,7 @@ public class Hydration implements WaterIntakeRepository {
                     Log.d("Hydration", "Hydration data inserted successfully");
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("Hydration", "Failed to insert hydration data", e);
+                    Log.e("Hydration", "Failed to insert hydration data: " + e.getMessage(), e);
                 });
     }
 }
