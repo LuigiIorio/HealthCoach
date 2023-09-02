@@ -13,16 +13,16 @@ import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
-public class TypeWeight {
+public class BasalMetabolicRate {
 
-    private static final String WEIGHT_DATA_TYPE = "com.google.weight";
+    private static final String BMR_DATA_TYPE = "com.google.basal_metabolic_rate";
 
     private GoogleSignInAccount googleSignInAccount;
     private DataSource dataSource;
 
-    public TypeWeight(Context context) {
+    public BasalMetabolicRate(Context context) {
         FitnessOptions fitnessOptions = FitnessOptions.builder()
-                .addDataType(DataType.TYPE_WEIGHT, FitnessOptions.ACCESS_WRITE)
+                .addDataType(DataType.TYPE_BASAL_METABOLIC_RATE, FitnessOptions.ACCESS_WRITE)
                 .build();
 
         googleSignInAccount = GoogleSignIn.getAccountForExtension(context, fitnessOptions);
@@ -30,12 +30,12 @@ public class TypeWeight {
         // Create a Fitness recording client
         RecordingClient recordingClient = Fitness.getRecordingClient(context, googleSignInAccount);
 
-        // Create a DataSource for weight
+        // Create a DataSource for basal metabolic rate
         dataSource = new DataSource.Builder()
                 .setAppPackageName(context.getPackageName())
-                .setDataType(DataType.TYPE_WEIGHT)
+                .setDataType(DataType.TYPE_BASAL_METABOLIC_RATE)
                 .setType(DataSource.TYPE_RAW)
-                .setStreamName("WeightRecorderStream") // Unique stream name
+                .setStreamName("BasalMetabolicRateRecorderStream") // Unique stream name
                 .build();
 
         // Subscribe to the data source
@@ -43,13 +43,13 @@ public class TypeWeight {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Log.d("TypeWeight", "Weight recording started");
+                        Log.d("BasalMetabolicRate", "Basal metabolic rate recording started");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(Exception e) {
-                        Log.e("TypeWeight", "Failed to start weight recording", e);
+                        Log.e("BasalMetabolicRate", "Failed to start basal metabolic rate recording", e);
                     }
                 });
     }
@@ -63,13 +63,13 @@ public class TypeWeight {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Log.d("TypeWeight", "Weight recording stopped");
+                        Log.d("BasalMetabolicRate", "Basal metabolic rate recording stopped");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(Exception e) {
-                        Log.e("TypeWeight", "Failed to stop weight recording", e);
+                        Log.e("BasalMetabolicRate", "Failed to stop basal metabolic rate recording", e);
                     }
                 });
     }

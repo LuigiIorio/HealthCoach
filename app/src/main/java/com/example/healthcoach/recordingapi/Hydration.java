@@ -13,16 +13,16 @@ import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
-public class TypeSleepSegment {
+public class Hydration {
 
-    private static final String SLEEP_SEGMENT_DATA_TYPE = "com.google.sleep.segment";
+    private static final String HYDRATION_DATA_TYPE = "com.google.hydration";
 
     private GoogleSignInAccount googleSignInAccount;
     private DataSource dataSource;
 
-    public TypeSleepSegment(Context context) {
+    public Hydration(Context context) {
         FitnessOptions fitnessOptions = FitnessOptions.builder()
-                .addDataType(DataType.TYPE_SLEEP_SEGMENT, FitnessOptions.ACCESS_WRITE)
+                .addDataType(DataType.TYPE_HYDRATION, FitnessOptions.ACCESS_WRITE)
                 .build();
 
         googleSignInAccount = GoogleSignIn.getAccountForExtension(context, fitnessOptions);
@@ -30,12 +30,12 @@ public class TypeSleepSegment {
         // Create a Fitness recording client
         RecordingClient recordingClient = Fitness.getRecordingClient(context, googleSignInAccount);
 
-        // Create a DataSource for sleep segments
+        // Create a DataSource for hydration
         dataSource = new DataSource.Builder()
                 .setAppPackageName(context.getPackageName())
-                .setDataType(DataType.TYPE_SLEEP_SEGMENT)
+                .setDataType(DataType.TYPE_HYDRATION)
                 .setType(DataSource.TYPE_RAW)
-                .setStreamName("SleepSegmentRecorderStream") // Unique stream name
+                .setStreamName("HydrationRecorderStream") // Unique stream name
                 .build();
 
         // Subscribe to the data source
@@ -43,13 +43,13 @@ public class TypeSleepSegment {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Log.d("TypeSleepSegment", "Sleep segment recording started");
+                        Log.d("Hydration", "Hydration recording started");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(Exception e) {
-                        Log.e("TypeSleepSegment", "Failed to start sleep segment recording", e);
+                        Log.e("Hydration", "Failed to start hydration recording", e);
                     }
                 });
     }
@@ -63,13 +63,13 @@ public class TypeSleepSegment {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Log.d("TypeSleepSegment", "Sleep segment recording stopped");
+                        Log.d("Hydration", "Hydration recording stopped");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(Exception e) {
-                        Log.e("TypeSleepSegment", "Failed to stop sleep segment recording", e);
+                        Log.e("Hydration", "Failed to stop hydration recording", e);
                     }
                 });
     }
