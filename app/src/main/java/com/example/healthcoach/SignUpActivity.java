@@ -12,7 +12,6 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
-import com.google.firebase.auth.FirebaseUser;
 
 public class SignUpActivity extends AppCompatActivity {
 
@@ -72,24 +71,6 @@ public class SignUpActivity extends AppCompatActivity {
                 mAuth.createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener(SignUpActivity.this, task -> {
                             if (task.isSuccessful()) {
-                                FirebaseUser firebaseUser = mAuth.getCurrentUser();
-
-                                // Create a UserEntity object with the additional information
-                                UserEntity userEntity = new UserEntity(email, age, gender, birthdate, weight, height);
-
-                                // Insert user data into the Room database using a background thread
-                                new Thread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        // Initialize the Room database
-                                        AppDatabase appDatabase = AppDatabase.getInstance(getApplicationContext());
-                                        UserDao userDao = appDatabase.userDao();
-
-                                        // Insert user data into the Room database
-                                        userDao.insert(userEntity);
-                                    }
-                                }).start();
-
                                 Toast.makeText(SignUpActivity.this, "Registration successful", Toast.LENGTH_SHORT).show();
 
                                 // Navigate to HomeActivity
