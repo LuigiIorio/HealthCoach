@@ -3,74 +3,67 @@ package com.example.healthcoach.recordingapi;
 import android.content.Context;
 import android.util.Log;
 
+import com.example.healthcoach.interfaces.HeartRateRepository;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessOptions;
+import com.google.android.gms.fitness.HistoryClient;
 import com.google.android.gms.fitness.RecordingClient;
+import com.google.android.gms.fitness.data.DataPoint;
+import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataSource;
 import com.google.android.gms.fitness.data.DataType;
+import com.google.android.gms.fitness.data.Field;
+import com.google.android.gms.fitness.request.DataReadRequest;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
-public class HeartRateBPM {
+import java.util.concurrent.TimeUnit;
 
-    private static final String HEART_RATE_DATA_TYPE = "com.google.heart_rate.bpm";
+public class HeartRateBPM implements HeartRateRepository {
 
     private GoogleSignInAccount googleSignInAccount;
-    private DataSource dataSource;
 
     public HeartRateBPM(Context context) {
         FitnessOptions fitnessOptions = FitnessOptions.builder()
-                .addDataType(DataType.TYPE_HEART_RATE_BPM, FitnessOptions.ACCESS_WRITE)
+                .addDataType(DataType.TYPE_HEART_RATE_BPM, FitnessOptions.ACCESS_READ)
                 .build();
 
         googleSignInAccount = GoogleSignIn.getAccountForExtension(context, fitnessOptions);
+    }
 
-        // Create a Fitness recording client
-        RecordingClient recordingClient = Fitness.getRecordingClient(context, googleSignInAccount);
+    @Override
+    public void getLatestHeartRate(Context context, OnHeartRateFetchListener listener) {
+        HistoryClient historyClient = Fitness.getHistoryClient(context, googleSignInAccount);
+        long endTime = System.currentTimeMillis();
+        long startTime = endTime - (24 * 60 * 60 * 1000); // 24 hours ago
 
-        // Create a DataSource for heart rate
-        dataSource = new DataSource.Builder()
-                .setAppPackageName(context.getPackageName())
-                .setDataType(DataType.TYPE_HEART_RATE_BPM)
-                .setType(DataSource.TYPE_RAW)
-                .setStreamName("HeartRateRecorderStream") // Unique stream name
+        DataReadRequest readRequest = new DataReadRequest.Builder()
+                .read(DataType.TYPE_HEART_RATE_BPM)
+                .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+                .setLimit(1)
                 .build();
 
-        // Subscribe to the data source
-        recordingClient.subscribe(dataSource)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("HeartRateBPM", "Heart rate recording started");
+        historyClient.readData(readRequest)
+                .addOnSuccessListener(response -> {
+                    float heartRate = 0;
+                    for (DataSet dataSet : response.getDataSets()) {
+                        for (DataPoint dp : dataSet.getDataPoints()) {
+                            for (Field field : dp.getDataType().getFields()) {
+                                heartRate = dp.getValue(field).asFloat();
+                            }
+                        }
                     }
+                    listener.onSuccess(heartRate);
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(Exception e) {
-                        Log.e("HeartRateBPM", "Failed to start heart rate recording", e);
-                    }
+                .addOnFailureListener(e -> {
+                    listener.onFailure(e.getMessage());
                 });
     }
 
-    public void stopRecording(Context context) {
-        // Create a Fitness recording client
-        RecordingClient recordingClient = Fitness.getRecordingClient(context, googleSignInAccount);
-
-        // Unsubscribe from the data source
-        recordingClient.unsubscribe(dataSource)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("HeartRateBPM", "Heart rate recording stopped");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(Exception e) {
-                        Log.e("HeartRateBPM", "Failed to stop heart rate recording", e);
-                    }
-                });
+    public interface OnHeartRateFetchListener {
+        void onSuccess(float bpm);
+        void onFailure(String error);
     }
 }
