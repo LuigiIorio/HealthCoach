@@ -1,4 +1,4 @@
-package com.example.healthcoach.viewmodel;
+package com.example.healthcoach.viewmodels;
 
 import com.example.healthcoach.interfaces.WaterIntakeRepository;
 

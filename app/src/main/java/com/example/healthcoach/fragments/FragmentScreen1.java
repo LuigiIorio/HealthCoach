@@ -16,7 +16,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.healthcoach.R;
 import com.example.healthcoach.interfaces.WaterIntakeRepository;
 import com.example.healthcoach.recordingapi.Hydration;
-import com.example.healthcoach.viewmodel.WaterIntakeViewModel;
+import com.example.healthcoach.viewmodels.WaterIntakeViewModel;
 
 
 
