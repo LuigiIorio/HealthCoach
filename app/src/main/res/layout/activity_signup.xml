@@ -30,52 +30,12 @@
         android:layout_below="@id/signupPasswordEditText"
         android:layout_marginTop="16dp"/>
 
-    <EditText
-        android:id="@+id/signupAgeEditText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Age"
-        android:layout_below="@id/signupConfirmPasswordEditText"
-        android:layout_marginTop="16dp"/>
-
-    <EditText
-        android:id="@+id/signupGenderEditText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Gender"
-        android:layout_below="@id/signupAgeEditText"
-        android:layout_marginTop="16dp"/>
-
-    <EditText
-        android:id="@+id/signupBirthdateEditText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Birthdate"
-        android:layout_below="@id/signupGenderEditText"
-        android:layout_marginTop="16dp"/>
-
-    <EditText
-        android:id="@+id/signupWeightEditText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Weight"
-        android:layout_below="@id/signupBirthdateEditText"
-        android:layout_marginTop="16dp"/>
-
-    <EditText
-        android:id="@+id/signupHeightEditText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Height"
-        android:layout_below="@id/signupWeightEditText"
-        android:layout_marginTop="16dp"/>
-
     <Button
         android:id="@+id/signupConfirmButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Confirm"
-        android:layout_below="@id/signupHeightEditText"
+        android:layout_below="@id/signupConfirmPasswordEditText"
         android:layout_marginTop="32dp"/>
 
     <TextView
