@@ -27,23 +27,13 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"/>
 
-    <TextView
-        android:id="@+id/waterIntakeTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/addWaterIntakeButton"
-        android:text="0 ml"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"/>
-
+    <!-- Moved heartRateTextView below the water intake components -->
     <TextView
         android:id="@+id/heartRateTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/waterIntakeTextView"
-        android:text="Heart Rate: -- BPM"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"/>
-
+        android:layout_below="@id/addWaterIntakeButton"
+        android:layout_marginTop="16dp"
+        android:text="Heart Rate: -- BPM" />
 
 </RelativeLayout>

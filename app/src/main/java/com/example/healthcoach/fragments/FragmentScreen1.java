@@ -32,7 +32,6 @@ public class FragmentScreen1 extends Fragment {
     // UI Components related to water intake
     private EditText waterIntakeEditText;
     private Button addWaterIntakeButton;
-    private TextView waterIntakeTextView;
 
     // UI Component to display the heart rate
     private TextView heartRateTextView;
@@ -90,11 +89,11 @@ public class FragmentScreen1 extends Fragment {
         return view;
     }
 
+
     private void initUI(View view) {
         // Initialize water intake UI components
         waterIntakeEditText = view.findViewById(R.id.waterIntakeEditText);
         addWaterIntakeButton = view.findViewById(R.id.addWaterIntakeButton);
-        waterIntakeTextView = view.findViewById(R.id.waterIntakeTextView);
 
         // Initialize heart rate UI component
         heartRateTextView = view.findViewById(R.id.heartRateTextView);
@@ -107,20 +106,19 @@ public class FragmentScreen1 extends Fragment {
             try {
                 waterIntake = Float.parseFloat(waterIntakeString);
             } catch (NumberFormatException e) {
-                waterIntakeTextView.setText("Please enter a valid number");
+                Toast.makeText(requireContext(), "Please enter a valid number", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             waterIntakeViewModel.addWater(waterIntake);
+            Toast.makeText(requireContext(), "Water added successfully!", Toast.LENGTH_SHORT).show();
         });
     }
 
+
+
     private void observeData() {
-        if (waterIntakeViewModel != null) {
-            waterIntakeViewModel.getTotalWaterIntake().observe(getViewLifecycleOwner(), intake -> {
-                waterIntakeTextView.setText(String.valueOf(intake) + " ml");
-            });
-        }
+
 
         if (heartRateViewModel != null) {
             heartRateViewModel.getHeartRate().observe(getViewLifecycleOwner(), bpm -> {

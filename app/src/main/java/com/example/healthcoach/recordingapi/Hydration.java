@@ -19,6 +19,7 @@ import com.google.android.gms.fitness.data.Field;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
+
 public class Hydration implements WaterIntakeRepository {
 
     private static final int REQUEST_OAUTH_REQUEST_CODE = 1001;
