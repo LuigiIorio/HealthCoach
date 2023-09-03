@@ -9,6 +9,9 @@ import androidx.lifecycle.ViewModel;
 import com.example.healthcoach.interfaces.HeartRateRepository;
 import com.example.healthcoach.recordingapi.HeartRateBPM;
 
+import java.util.Random;
+
+
 public class HeartRateViewModel extends ViewModel {
     private MutableLiveData<Float> heartRateLiveData = new MutableLiveData<>();
     private HeartRateRepository heartRateRepository;
@@ -26,18 +29,11 @@ public class HeartRateViewModel extends ViewModel {
     }
 
     public void fetchLatestHeartRate() {
-        heartRateRepository.getLatestHeartRate(context, new HeartRateBPM.OnHeartRateFetchListener() {
-            @Override
-            public void onSuccess(float bpm) {
-                heartRateLiveData.setValue(bpm);
-            }
-
-            @Override
-            public void onFailure(String error) {
-                // Handle the error here, perhaps with a separate LiveData to display error messages.
-            }
-        });
+        Random random = new Random();
+        float randomBpm = random.nextInt(31) + 50; // Generates a random value between 50 and 80
+        heartRateLiveData.setValue(randomBpm);
     }
+
 
     public LiveData<Float> getHeartRate() {
         return heartRateLiveData;

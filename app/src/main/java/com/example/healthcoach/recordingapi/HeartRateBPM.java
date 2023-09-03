@@ -21,6 +21,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.concurrent.TimeUnit;
 
+
 public class HeartRateBPM implements HeartRateRepository {
 
     private GoogleSignInAccount googleSignInAccount;

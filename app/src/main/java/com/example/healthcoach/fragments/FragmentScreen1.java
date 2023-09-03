@@ -116,16 +116,14 @@ public class FragmentScreen1 extends Fragment {
     }
 
 
-
     private void observeData() {
-
-
         if (heartRateViewModel != null) {
-            heartRateViewModel.getHeartRate().observe(getViewLifecycleOwner(), bpm -> {
+            heartRateViewModel.getHeartRateLiveData().observe(getViewLifecycleOwner(), bpm -> {
                 heartRateTextView.setText(String.format("Heart Rate: %.2f BPM", bpm));
             });
         }
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
