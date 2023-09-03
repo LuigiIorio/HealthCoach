@@ -21,7 +21,7 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".MainActivity"
+            android:name=".activities.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,23 +30,18 @@
         </activity>
 
         <activity
-            android:name=".SignUpActivity"
+            android:name=".activities.SignUpActivity"
             android:label="Sign Up">
         </activity>
 
         <activity
-            android:name=".HomeActivity"
+            android:name=".activities.HomeActivity"
             android:label="Home">
         </activity>
 
         <activity
-            android:name=".ForgotPasswordActivity"
+            android:name=".activities.ForgotPasswordActivity"
             android:label="Forgot Password">
-        </activity>
-
-        <activity
-            android:name=".FitnessSubscriptionActivity"
-            android:label="Fitness Subscription">
         </activity>
 
     </application>

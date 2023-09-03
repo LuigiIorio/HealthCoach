@@ -1,4 +1,4 @@
-package com.example.healthcoach;
+package com.example.healthcoach.other;
 
 import com.google.android.gms.common.api.Scope;
 

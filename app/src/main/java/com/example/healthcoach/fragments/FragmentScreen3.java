@@ -1,4 +1,4 @@
-package com.example.healthcoach;
+package com.example.healthcoach.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -9,6 +9,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
+import com.example.healthcoach.R;
 
 public class FragmentScreen3 extends Fragment {
     @Override

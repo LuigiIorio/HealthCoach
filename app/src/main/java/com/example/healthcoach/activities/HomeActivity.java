@@ -1,4 +1,4 @@
-package com.example.healthcoach;
+package com.example.healthcoach.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -8,6 +8,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import com.example.healthcoach.R;
+import com.example.healthcoach.fragments.FragmentScreen1;
+import com.example.healthcoach.fragments.FragmentScreen2;
+import com.example.healthcoach.fragments.FragmentScreen3;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 

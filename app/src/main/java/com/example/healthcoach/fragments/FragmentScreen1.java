@@ -1,4 +1,4 @@
-package com.example.healthcoach;
+package com.example.healthcoach.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.healthcoach.R;
 import com.example.healthcoach.interfaces.WaterIntakeRepository;
 import com.example.healthcoach.recordingapi.Hydration;
 import com.example.healthcoach.viewmodel.WaterIntakeViewModel;

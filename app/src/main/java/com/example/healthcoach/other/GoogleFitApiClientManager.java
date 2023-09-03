@@ -1,4 +1,4 @@
-package com.example.healthcoach;
+package com.example.healthcoach.other;
 
 import android.content.Context;
 import android.content.res.AssetManager;
