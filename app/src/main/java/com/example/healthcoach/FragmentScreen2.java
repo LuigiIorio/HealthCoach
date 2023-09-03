@@ -10,6 +10,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -20,12 +22,14 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessOptions;
 import com.google.android.gms.fitness.data.DataSet;
+import com.google.android.gms.fitness.data.DataSource;
 import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.data.Session;
 import com.google.android.gms.fitness.request.DataReadRequest;
 import com.google.android.gms.fitness.request.SessionInsertRequest;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
+
 
 public class FragmentScreen2 extends Fragment {
 
@@ -34,11 +38,12 @@ public class FragmentScreen2 extends Fragment {
     private Spinner activitySpinner;
     private Button submitButton;
     private TextView journalTextView;
+    private Button retrieveHydrationDataButton;
+    private TextView hydrationTextView;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.d("FragmentScreen2", "onCreateView: Inflating layout");
         View view = inflater.inflate(R.layout.fragment_screen2, container, false);
 
         fitnessOptions = FitnessOptions.builder()
@@ -48,61 +53,42 @@ public class FragmentScreen2 extends Fragment {
         activitySpinner = view.findViewById(R.id.activitySpinner);
         submitButton = view.findViewById(R.id.submitButton);
         journalTextView = view.findViewById(R.id.journalTextView);
+        retrieveHydrationDataButton = view.findViewById(R.id.retrieveHydrationDataButton);
+        hydrationTextView = view.findViewById(R.id.hydrationTextView);
 
-        // Populate Spinner with activity suggestions
-        String[] activitySuggestions = getResources().getStringArray(R.array.activity_suggestions);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, activitySuggestions);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        activitySpinner.setAdapter(adapter);
+        retrieveHydrationDataButton.setOnClickListener(v -> retrieveHydrationData());
 
-        GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(requireContext());
-
-        submitButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("FragmentScreen2", "Submit button clicked");
-                String selectedActivity = activitySpinner.getSelectedItem().toString();
-
-                // Check if the user is signed in with Google
-                GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(requireContext());
-                if (googleSignInAccount != null) {
-                    // Insert a session into Google Fit for the selected activity
-                    long endTime = System.currentTimeMillis();
-                    long startTime = endTime - TimeUnit.MINUTES.toMillis(30); // Example: 30 minutes ago
-
-                    Session session = new Session.Builder()
-                            .setName("MyActivitySession")
-                            .setIdentifier("activitySegment" + startTime) // Unique identifier for session
-                            .setActivity(selectedActivity)
-                            .setStartTime(startTime, TimeUnit.MILLISECONDS)
-                            .setEndTime(endTime, TimeUnit.MILLISECONDS)
-                            .build();
-
-                    SessionInsertRequest sessionInsertRequest = new SessionInsertRequest.Builder()
-                            .setSession(session)
-                            .build();
-
-                    Fitness.getSessionsClient(requireContext(), googleSignInAccount)
-                            .insertSession(sessionInsertRequest)
-                            .addOnSuccessListener(sessionID -> {
-                                updateJournal(selectedActivity);
-                            })
-                            .addOnFailureListener(e -> {
-                                // Handle failure
-                            });
-                } else {
-                    // Handle the case where the user is not signed in with Google
-                    // You can show a message or take appropriate action
-                }
+        submitButton.setOnClickListener(v -> {
+            String selectedActivity = activitySpinner.getSelectedItem().toString();
+            GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(requireContext());
+            if (googleSignInAccount != null) {
+                long endTime = System.currentTimeMillis();
+                long startTime = endTime - TimeUnit.MINUTES.toMillis(30);
+                Session session = new Session.Builder()
+                        .setName("MyActivitySession")
+                        .setIdentifier("activitySegment" + startTime)
+                        .setActivity(selectedActivity)
+                        .setStartTime(startTime, TimeUnit.MILLISECONDS)
+                        .setEndTime(endTime, TimeUnit.MILLISECONDS)
+                        .build();
+                SessionInsertRequest sessionInsertRequest = new SessionInsertRequest.Builder()
+                        .setSession(session)
+                        .build();
+                Fitness.getSessionsClient(requireContext(), googleSignInAccount)
+                        .insertSession(sessionInsertRequest)
+                        .addOnSuccessListener(sessionID -> {
+                            updateJournal(selectedActivity);
+                        })
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(requireContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        });
             }
         });
 
-
+        GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(requireContext());
         if (googleSignInAccount != null && !GoogleSignIn.hasPermissions(googleSignInAccount, fitnessOptions)) {
-            Log.d("FragmentScreen2", "Requesting Google Fit permissions");
             requestGoogleFitPermissions();
         } else {
-            Log.d("FragmentScreen2", "Reading activity data");
             readActivityData();
         }
 
@@ -141,14 +127,11 @@ public class FragmentScreen2 extends Fragment {
         long endTimestamp = calendar.getTimeInMillis();
         calendar.add(Calendar.DAY_OF_YEAR, -1);
         long startTimestamp = calendar.getTimeInMillis();
-
         DataReadRequest readRequest = new DataReadRequest.Builder()
                 .setTimeRange(startTimestamp, endTimestamp, TimeUnit.MILLISECONDS)
                 .read(com.google.android.gms.fitness.data.DataType.TYPE_ACTIVITY_SEGMENT)
                 .build();
-
         GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(requireContext());
-
         if (googleSignInAccount != null) {
             Fitness.getHistoryClient(requireContext(), googleSignInAccount)
                     .readData(readRequest)
@@ -158,19 +141,56 @@ public class FragmentScreen2 extends Fragment {
                                 long startTime = dataPoint.getStartTime(TimeUnit.MILLISECONDS);
                                 long endTime = dataPoint.getEndTime(TimeUnit.MILLISECONDS);
                                 int activityType = dataPoint.getValue(Field.FIELD_ACTIVITY).asInt();
-
-                                String activityName = getActivityName(activityType);
+                                String activityName = ActivityTypes.getActivityName(activityType);
                                 updateJournal(activityName);
                             }
                         }
                     })
                     .addOnFailureListener(e -> {
-                        // Handle error
+                        Toast.makeText(requireContext(), "Error Reading Activity: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     });
         }
     }
 
-    private String getActivityName(int activityType) {
-        return ActivityTypes.getActivityName(activityType);
+    private void retrieveHydrationData() {
+        GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(requireContext());
+        if (googleSignInAccount != null) {
+            // Updated the data source for hydration data
+            DataSource hydrationDataSource = new DataSource.Builder()
+                    .setAppPackageName(requireContext().getPackageName())
+                    .setDataType(com.google.android.gms.fitness.data.DataType.TYPE_HYDRATION)
+                    .setType(DataSource.TYPE_RAW)
+                    .build();
+
+            // Updated the time range for hydration data retrieval
+            long endTime = System.currentTimeMillis();
+            long startTime = endTime - TimeUnit.DAYS.toMillis(1);
+
+            DataReadRequest readRequest = new DataReadRequest.Builder()
+                    .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+                    .read(hydrationDataSource)
+                    .build();
+
+            Fitness.getHistoryClient(requireContext(), googleSignInAccount)
+                    .readData(readRequest)
+                    .addOnSuccessListener(dataReadResponse -> {
+                        float totalHydrationVolume = 0f;
+                        for (DataSet dataSet : dataReadResponse.getDataSets()) {
+                            for (com.google.android.gms.fitness.data.DataPoint dataPoint : dataSet.getDataPoints()) {
+                                float hydrationVolume = dataPoint.getValue(Field.FIELD_VOLUME).asFloat();
+                                totalHydrationVolume += hydrationVolume;
+                            }
+                        }
+                        updateHydrationTextView(totalHydrationVolume);
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(requireContext(), "Error Reading Hydration: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+        }
+    }
+
+    private void updateHydrationTextView(float hydrationVolume) {
+        String hydrationText = "Total Hydration Volume: " + hydrationVolume + " ml";
+        hydrationTextView.setText(hydrationText);
     }
 }

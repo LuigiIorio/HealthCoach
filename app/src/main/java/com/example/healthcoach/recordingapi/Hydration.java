@@ -68,7 +68,11 @@ public class Hydration implements WaterIntakeRepository {
     public void insertWaterIntake(float waterIntake) {
         if (dataSource == null) {
             Log.e("Hydration", "DataSource is not initialized.");
-            return;
+            setupHydration(); // Try initializing again if not initialized
+            if (dataSource == null) {
+                Log.e("Hydration", "Still unable to initialize DataSource.");
+                return;
+            }
         }
 
         Calendar cal = Calendar.getInstance();

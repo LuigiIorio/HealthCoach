@@ -17,6 +17,9 @@ import com.example.healthcoach.interfaces.WaterIntakeRepository;
 import com.example.healthcoach.recordingapi.Hydration;
 import com.example.healthcoach.viewmodel.WaterIntakeViewModel;
 
+
+
+
 public class FragmentScreen1 extends Fragment {
 
     // UI Components

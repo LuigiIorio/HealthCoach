@@ -21,6 +21,22 @@
         android:hint="@string/select_activity"/>
 
     <Button
+        android:id="@+id/retrieveHydrationDataButton"
+        android:layout_below="@id/journalTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Retrieve Hydration Data"/>
+
+    <TextView
+        android:id="@+id/hydrationTextView"
+        android:layout_below="@id/retrieveHydrationDataButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:textSize="16sp"/>
+
+    <Button
         android:id="@+id/submitButton"
         android:layout_below="@id/activitySpinner"
         android:layout_width="wrap_content"
