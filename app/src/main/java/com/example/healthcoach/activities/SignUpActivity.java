@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.healthcoach.R;
@@ -41,12 +40,23 @@ public class SignUpActivity extends AppCompatActivity {
                 // Observing changes in userId to handle the UI reactions.
                 signUpViewModel.getUserId().observe(SignUpActivity.this, userId -> {
                     if (userId != null) {
-                        // Registration successful. Navigate or show success.
+                        if (userId.equals("email_in_use")) {
+                            Toast.makeText(SignUpActivity.this, "Email already in use", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(SignUpActivity.this, "Registration successful", Toast.LENGTH_SHORT).show();
+                            navigateToNextScreen(); // Navigate to the appropriate screen
+                        }
                     } else {
                         Toast.makeText(SignUpActivity.this, "Registration failed", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
         });
+    }
+
+    private void navigateToNextScreen() {
+        Intent intent = new Intent(SignUpActivity.this, HomeActivity.class); // Navigate to HomeActivity or desired activity
+        startActivity(intent);
+        finish(); // Close the current activity
     }
 }
