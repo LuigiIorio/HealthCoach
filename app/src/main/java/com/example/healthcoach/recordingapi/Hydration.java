@@ -20,6 +20,8 @@ import com.google.android.gms.fitness.data.Field;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
+
+
 public class Hydration implements WaterIntakeRepository {
 
     public static final int REQUEST_OAUTH_REQUEST_CODE = 1001;
@@ -105,16 +107,15 @@ public class Hydration implements WaterIntakeRepository {
     }
 
     private void promptSignIn() {
-        if (!GoogleSignIn.hasPermissions(googleSignInAccount, fitnessOptions)) {
-            Log.e("Hydration", "Requesting permissions for Google Fit.");
-            GoogleSignIn.requestPermissions(
-                    (Activity) context,
-                    REQUEST_OAUTH_REQUEST_CODE,
-                    googleSignInAccount,
-                    fitnessOptions
-            );
-        }
+        Log.e("Hydration", "Requesting permissions for Google Fit.");
+        GoogleSignIn.requestPermissions(
+                (Activity) context,
+                REQUEST_OAUTH_REQUEST_CODE,
+                googleSignInAccount,
+                fitnessOptions
+        );
     }
+
 
     private void requestPermissions() {
         GoogleSignIn.requestPermissions(

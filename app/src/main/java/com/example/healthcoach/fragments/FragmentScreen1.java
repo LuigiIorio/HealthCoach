@@ -28,25 +28,17 @@ import com.example.healthcoach.recordingapi.Hydration;
 import com.example.healthcoach.viewmodels.HeartRateViewModel;
 import com.example.healthcoach.viewmodels.WaterIntakeViewModel;
 
-public class FragmentScreen1 extends Fragment {
 
-    // UI Components related to water intake
+public class FragmentScreen1 extends Fragment {
+    // UI Components
     private EditText waterIntakeEditText;
     private Button addWaterIntakeButton;
-
-    // UI Component to display the heart rate
     private TextView heartRateTextView;
 
-    // ViewModel for storing totalWaterIntake
     private WaterIntakeViewModel waterIntakeViewModel;
-
-    // ViewModel for heart rate
     private HeartRateViewModel heartRateViewModel;
-
-    // Hydration instance for Google Fit
     private Hydration hydration;
 
-    // Define a request code for our permissions request.
     private static final int BODY_SENSOR_PERMISSION_REQUEST_CODE = 1001;
 
     @Override
@@ -57,7 +49,6 @@ public class FragmentScreen1 extends Fragment {
 
     private void checkBodySensorPermissionAndInitialize() {
         if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.BODY_SENSORS) == PackageManager.PERMISSION_GRANTED) {
-            // Initialize ViewModels here, but LiveData observation will be set in onCreateView.
             initializeViewModels();
         } else {
             requestPermissions(new String[]{android.Manifest.permission.BODY_SENSORS}, BODY_SENSOR_PERMISSION_REQUEST_CODE);
@@ -70,7 +61,6 @@ public class FragmentScreen1 extends Fragment {
         if (requestCode == Hydration.REQUEST_OAUTH_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
                 Toast.makeText(requireContext(), "Signed in to Google Fit successfully!", Toast.LENGTH_SHORT).show();
-                // Ensure that we refresh the GoogleSignInAccount information after re-signing in
                 hydration.refreshGoogleSignInAccount();
             } else {
                 Toast.makeText(requireContext(), "Failed to sign in to Google Fit.", Toast.LENGTH_SHORT).show();
@@ -107,11 +97,8 @@ public class FragmentScreen1 extends Fragment {
     }
 
     private void initUI(View view) {
-        // Initialize water intake UI components
         waterIntakeEditText = view.findViewById(R.id.waterIntakeEditText);
         addWaterIntakeButton = view.findViewById(R.id.addWaterIntakeButton);
-
-        // Initialize heart rate UI component
         heartRateTextView = view.findViewById(R.id.heartRateTextView);
 
         addWaterIntakeButton.setOnClickListener(v -> {
@@ -144,7 +131,7 @@ public class FragmentScreen1 extends Fragment {
         if (requestCode == BODY_SENSOR_PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 initializeViewModels();
-                observeData(); // Added to ensure data is observed upon permission grant.
+                observeData();
             } else {
                 Toast.makeText(requireContext(), "Body sensor permission is required to read heart rate data.", Toast.LENGTH_LONG).show();
             }
