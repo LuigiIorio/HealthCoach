@@ -3,5 +3,6 @@
     <string name="app_name">HealthCoach</string>
     <string name="logout">Logout</string>
     <string name="select_activity">Select activity</string>
+    <string name="diary">Diary</string>
 
 </resources>

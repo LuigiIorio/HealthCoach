@@ -1,14 +1,27 @@
 package com.example.healthcoach.viewmodels;
 
+
+
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 public class HomeViewModel extends ViewModel {
-    // You can add data fields and methods related to the business logic here
-    // For example, handling data retrieval, processing, and manipulation
+    private final MutableLiveData<String> welcomeMessage = new MutableLiveData<>();
 
-    // Sample method to perform some business logic
-    public String getWelcomeMessage() {
-        return "Welcome to HealthCoach!";
+    public HomeViewModel() {
+        welcomeMessage.setValue("Welcome to HealthCoach!");  // initializing with default value
+    }
+
+    // This method can be expanded upon later, for instance if you want to fetch the welcome message from a repository
+    public LiveData<String> getWelcomeMessage() {
+        return welcomeMessage;
+    }
+
+    // If you want to change the welcome message dynamically
+    public void setWelcomeMessage(String message) {
+        welcomeMessage.setValue(message);
     }
 
     // Add more methods as needed for your business logic

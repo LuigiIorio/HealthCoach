@@ -2,6 +2,7 @@ package com.example.healthcoach.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
@@ -13,6 +14,7 @@ import com.example.healthcoach.R;
 import com.example.healthcoach.fragments.FragmentScreen1;
 import com.example.healthcoach.fragments.FragmentScreen2;
 import com.example.healthcoach.fragments.FragmentScreen3;
+import com.example.healthcoach.fragments.FragmentScreen4;
 import com.example.healthcoach.viewmodels.HomeViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -22,9 +24,9 @@ import org.jetbrains.annotations.Nullable;
 public class HomeActivity extends AppCompatActivity {
 
     private TextView welcomeTextView;
-    private Fragment fragment1, fragment2, fragment3;
+    private Fragment fragment1, fragment2, fragment3, fragment4;
     private Fragment activeFragment;
-    private HomeViewModel homeViewModel; // Add ViewModel
+    private HomeViewModel homeViewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -33,12 +35,22 @@ public class HomeActivity extends AppCompatActivity {
 
         welcomeTextView = findViewById(R.id.welcomeTextView);
 
-        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class); // Initialize ViewModel
+        // Initialize ViewModel
+        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+
+        // Observe ViewModel for changes to the welcome message
+        homeViewModel.getWelcomeMessage().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                welcomeTextView.setText(s);
+            }
+        });
 
         // Initialize fragments
         fragment1 = new FragmentScreen1();
         fragment2 = new FragmentScreen2();
-        fragment3 = new FragmentScreen3();
+        fragment3 = new FragmentScreen3();  // Diary Fragment
+        fragment4 = new FragmentScreen4();  // Profile Fragment
 
         // Set initial active fragment
         activeFragment = fragment1;
@@ -52,6 +64,7 @@ public class HomeActivity extends AppCompatActivity {
         fragment1.setRetainInstance(true);
         fragment2.setRetainInstance(true);
         fragment3.setRetainInstance(true);
+        fragment4.setRetainInstance(true);
     }
 
     private final BottomNavigationView.OnNavigationItemSelectedListener navListener =
@@ -64,8 +77,11 @@ public class HomeActivity extends AppCompatActivity {
                     case R.id.navigation_journal:
                         selectedFragment = fragment2;
                         break;
-                    case R.id.navigation_profile:
+                    case R.id.navigation_diary:
                         selectedFragment = fragment3;
+                        break;
+                    case R.id.navigation_profile:
+                        selectedFragment = fragment4;
                         break;
                     default:
                         return false;
