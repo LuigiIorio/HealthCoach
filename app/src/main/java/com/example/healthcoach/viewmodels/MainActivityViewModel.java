@@ -57,20 +57,21 @@ public class MainActivityViewModel extends ViewModel {
     }
 
     private void initializeGoogleSignInClient(Context context) {
-        // Specify fitness options for hydration data
         FitnessOptions fitnessOptions = FitnessOptions.builder()
                 .addDataType(DataType.TYPE_NUTRITION, FitnessOptions.ACCESS_WRITE)
+                .addDataType(DataType.TYPE_WEIGHT, FitnessOptions.ACCESS_WRITE) // This alone is sufficient
                 .build();
 
-        // Configure Google Sign-In to request hydration data
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken("99729341904-qlls8u6lhkf63fc4n68s2dvt9mnncpg2.apps.googleusercontent.com")
                 .requestEmail()
                 .requestScopes(Fitness.SCOPE_NUTRITION_READ_WRITE)
+                .requestScopes(Fitness.SCOPE_BODY_READ_WRITE)
                 .build();
 
         mGoogleSignInClient = GoogleSignIn.getClient(context, gso);
     }
+
 
     public void handleGoogleSignInResult(Intent data) {
         Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
