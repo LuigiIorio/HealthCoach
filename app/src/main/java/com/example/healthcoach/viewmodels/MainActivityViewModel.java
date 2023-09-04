@@ -116,4 +116,7 @@ public class MainActivityViewModel extends ViewModel {
     public enum LoginResult {
         SUCCESS, FAILURE
     }
+
+
+
 }

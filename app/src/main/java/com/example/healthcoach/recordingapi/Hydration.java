@@ -52,10 +52,14 @@ public class Hydration implements WaterIntakeRepository {
     private void setupHydrationDataSource() {
         hydrationDataSource = new DataSource.Builder()
                 .setDataType(DataType.TYPE_HYDRATION)
+                .setStreamName("hydrationSource")
                 .setType(DataSource.TYPE_RAW)
-                .setAppPackageName(context)
+                .setAppPackageName(context.getPackageName())
                 .build();
     }
+
+
+
 
     public void insertWaterIntake(float waterIntake) {
         if (!isUserSignedIn()) {
