@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.example.healthcoach.R;
 import com.example.healthcoach.viewmodels.MainActivityViewModel;
 
+
 public class MainActivity extends AppCompatActivity {
 
     private EditText emailEditText;

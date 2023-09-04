@@ -13,9 +13,16 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.Scope;
+import com.google.android.gms.fitness.Fitness;
+import com.google.android.gms.fitness.FitnessOptions;
+import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+
+
 
 public class MainActivityViewModel extends ViewModel {
 
@@ -34,20 +41,36 @@ public class MainActivityViewModel extends ViewModel {
     }
 
 
+
     public void signInWithGoogle(Context context) {
+        // If mGoogleSignInClient is not already initialized, do so
         if (mGoogleSignInClient == null) {
-// Configure Google Sign-In
-            GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                    .requestIdToken("99729341904-on4htetl569e2ehr9n5rkprfsjcqouqr.apps.googleusercontent.com")
-                    .requestEmail()
-                    .build();
-            mGoogleSignInClient = GoogleSignIn.getClient(context, gso);
+            initializeGoogleSignInClient(context);
         }
 
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        ((Activity) context).startActivityForResult(signInIntent, RC_SIGN_IN);
+        // Ensure we're not already signed in, to force re-authentication and permission request
+        mGoogleSignInClient.revokeAccess()
+                .addOnCompleteListener((Activity) context, task -> {
+                    Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+                    ((Activity) context).startActivityForResult(signInIntent, RC_SIGN_IN);
+                });
     }
 
+    private void initializeGoogleSignInClient(Context context) {
+        // Specify fitness options for hydration data
+        FitnessOptions fitnessOptions = FitnessOptions.builder()
+                .addDataType(DataType.TYPE_NUTRITION, FitnessOptions.ACCESS_WRITE)
+                .build();
+
+        // Configure Google Sign-In to request hydration data
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken("99729341904-qlls8u6lhkf63fc4n68s2dvt9mnncpg2.apps.googleusercontent.com")
+                .requestEmail()
+                .requestScopes(Fitness.SCOPE_NUTRITION_READ_WRITE)
+                .build();
+
+        mGoogleSignInClient = GoogleSignIn.getClient(context, gso);
+    }
 
     public void handleGoogleSignInResult(Intent data) {
         Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
@@ -55,24 +78,27 @@ public class MainActivityViewModel extends ViewModel {
             GoogleSignInAccount account = task.getResult(ApiException.class);
 
             if (account != null) {
-                // You can use account data to further authenticate with your backend or Firebase.
-                // If using Firebase, you'd firebaseAuthWithGoogle(account.getIdToken());
-                loginResult.setValue(LoginResult.SUCCESS);
+                FitnessOptions fitnessOptions = FitnessOptions.builder()
+                        .addDataType(DataType.TYPE_NUTRITION, FitnessOptions.ACCESS_WRITE)
+                        .build();
+
+                if (GoogleSignIn.hasPermissions(account, fitnessOptions)) {
+                    // The user granted Google Fit permissions
+                    loginResult.setValue(LoginResult.SUCCESS);
+                } else {
+                    // The user didn't grant Google Fit permissions
+                    loginResult.setValue(LoginResult.FAILURE);
+                }
             } else {
-                // This indicates a configuration issue or refusal from the user.
+                // Account was null
                 loginResult.setValue(LoginResult.FAILURE);
             }
         } catch (ApiException e) {
-            // The GoogleSignInAccount object returned null, meaning the user did not sign in successfully.
             e.printStackTrace();
-
-            // Logging the exact error can provide clarity
             Log.e("GoogleSignIn", "Google sign in failed", e);
-
             loginResult.setValue(LoginResult.FAILURE);
         }
     }
-
 
 
     public void loginWithEmailAndPassword(String email, String password) {
