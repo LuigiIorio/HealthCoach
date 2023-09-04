@@ -49,8 +49,8 @@ public class HomeActivity extends AppCompatActivity {
         // Initialize fragments
         fragment1 = new FragmentScreen1();
         fragment2 = new FragmentScreen2();
-        fragment3 = new FragmentScreen3();  // Diary Fragment
-        fragment4 = new FragmentScreen4();  // Profile Fragment
+        fragment3 = new FragmentScreen3();
+        fragment4 = new FragmentScreen4();
 
         // Set initial active fragment
         activeFragment = fragment1;
