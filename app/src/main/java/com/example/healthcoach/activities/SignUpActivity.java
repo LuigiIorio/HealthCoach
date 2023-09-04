@@ -14,6 +14,7 @@ import com.example.healthcoach.R;
 import com.example.healthcoach.viewmodels.SignUpViewModel;
 import com.google.firebase.auth.FirebaseAuth;
 
+
 public class SignUpActivity extends AppCompatActivity {
 
     private SignUpViewModel signUpViewModel;

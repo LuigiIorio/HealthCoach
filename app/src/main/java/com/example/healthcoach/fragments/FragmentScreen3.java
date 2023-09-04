@@ -10,19 +10,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import com.example.healthcoach.R;
-
-
+import androidx.lifecycle.ViewModelProvider;
+import com.example.healthcoach.viewmodels.Screen3ViewModel;
 
 public class FragmentScreen3 extends Fragment {
 
-    public FragmentScreen3() {
-        // Required empty public constructor
+    private Screen3ViewModel viewModel;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        viewModel = new ViewModelProvider(this).get(Screen3ViewModel.class);
     }
 
+    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_screen3, container, false);
     }
 
@@ -30,6 +34,10 @@ public class FragmentScreen3 extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         TextView textView = view.findViewById(R.id.text_screen3);
-        textView.setText("Welcome to Screen 3");
+        observeData(textView);
+    }
+
+    private void observeData(TextView textView) {
+        viewModel.getScreenText().observe(getViewLifecycleOwner(), textView::setText);
     }
 }

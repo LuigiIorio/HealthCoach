@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 
 
+
 public class WeightViewModel extends ViewModel {
     private MutableLiveData<String> weightError = new MutableLiveData<>();
     private MutableLiveData<Boolean> weightSuccess = new MutableLiveData<>();

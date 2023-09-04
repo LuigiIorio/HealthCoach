@@ -1,5 +1,6 @@
 package com.example.healthcoach.fragments;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -21,6 +22,7 @@ import com.example.healthcoach.viewmodels.HomeViewModel;
 import com.example.healthcoach.viewmodels.WeightViewModel;
 
 
+
 public class FragmentScreen4 extends Fragment {
 
     private HomeViewModel userProfileViewModel;
@@ -28,68 +30,24 @@ public class FragmentScreen4 extends Fragment {
     private EditText weightEditText;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_screen4, container, false);
 
         // Initialize ViewModels
         userProfileViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         weightViewModel = new ViewModelProvider(this).get(WeightViewModel.class);
 
-        // Set up Gender Spinner
-        Spinner genderSpinner = view.findViewById(R.id.genderSpinner);
-        String[] genderArray = {"Male", "Female"};
-        ArrayAdapter<String> genderAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, genderArray);
-        genderAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        genderSpinner.setAdapter(genderAdapter);
+        // Setup Gender Spinner
+        setupGenderSpinner(view);
 
-        // Observe and set Gender
-        userProfileViewModel.getGender().observe(getViewLifecycleOwner(), gender -> {
-            int position = genderAdapter.getPosition(gender);
-            if (position != -1) {
-                genderSpinner.setSelection(position);
-            }
-        });
-
-        // Gender Spinner Selection Listener
-        genderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                userProfileViewModel.setGender(genderArray[position]);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // Do Nothing
-            }
-        });
-
-        // Set up Age NumberPicker
-        NumberPicker ageNumberPicker = view.findViewById(R.id.ageNumberPicker);
-        ageNumberPicker.setMinValue(18);
-        ageNumberPicker.setMaxValue(100);
-
-        // Observe and set Age
-        userProfileViewModel.getAge().observe(getViewLifecycleOwner(), ageNumberPicker::setValue);
-        ageNumberPicker.setOnValueChangedListener((picker, oldVal, newVal) -> userProfileViewModel.setAge(newVal));
+        // Setup Age NumberPicker
+        setupAgeNumberPicker(view);
 
         // Weight Input field initialization
         weightEditText = view.findViewById(R.id.weightEditText);
 
         // Button for inserting weight data to Google Fit
-        Button insertToGoogleFitButton = view.findViewById(R.id.insertToGoogleFitButton);
-        insertToGoogleFitButton.setOnClickListener(v -> {
-            String weightString = weightEditText.getText().toString().trim();
-            if (!weightString.isEmpty()) {
-                try {
-                    float weight = Float.parseFloat(weightString);
-                    weightViewModel.insertWeightDataOrSignInIfNeeded(getActivity(), weight);
-                } catch (NumberFormatException e) {
-                    Toast.makeText(getContext(), "Please enter a valid weight.", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                Toast.makeText(getContext(), "Weight field cannot be empty.", Toast.LENGTH_SHORT).show();
-            }
-        });
+        setupWeightInsertButton(view);
 
         // Observe any weight errors
         weightViewModel.getWeightError().observe(getViewLifecycleOwner(), error -> {
@@ -106,18 +64,62 @@ public class FragmentScreen4 extends Fragment {
         return view;
     }
 
+    private void setupGenderSpinner(View view) {
+        Spinner genderSpinner = view.findViewById(R.id.genderSpinner);
+        ArrayAdapter<String> genderAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, new String[]{"Male", "Female"});
+        genderAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        genderSpinner.setAdapter(genderAdapter);
+
+        userProfileViewModel.getGender().observe(getViewLifecycleOwner(), gender -> {
+            int position = genderAdapter.getPosition(gender);
+            if (position != -1) {
+                genderSpinner.setSelection(position);
+            }
+        });
+
+        genderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                userProfileViewModel.setGender(parent.getItemAtPosition(position).toString());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Do Nothing
+            }
+        });
+    }
+
+    private void setupAgeNumberPicker(View view) {
+        NumberPicker ageNumberPicker = view.findViewById(R.id.ageNumberPicker);
+        ageNumberPicker.setMinValue(18);
+        ageNumberPicker.setMaxValue(100);
+
+        userProfileViewModel.getAge().observe(getViewLifecycleOwner(), ageNumberPicker::setValue);
+
+        ageNumberPicker.setOnValueChangedListener((picker, oldVal, newVal) -> userProfileViewModel.setAge(newVal));
+    }
+
+    private void setupWeightInsertButton(View view) {
+        Button insertToGoogleFitButton = view.findViewById(R.id.insertToGoogleFitButton);
+        insertToGoogleFitButton.setOnClickListener(v -> {
+            String weightString = weightEditText.getText().toString().trim();
+            weightViewModel.validateAndSubmitWeight(getContext(), weightString);
+        });
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == WeightViewModel.REQUEST_OAUTH_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
-                // Now that the user has given permission, try to insert weight again.
                 String weightString = weightEditText.getText().toString().trim();
                 if (!weightString.isEmpty()) {
                     try {
                         float weight = Float.parseFloat(weightString);
                         weightViewModel.insertWeightData(getContext(), weight);
-                    } catch (NumberFormatException ignored) {}
+                    } catch (NumberFormatException ignored) {
+                    }
                 }
             } else {
                 Toast.makeText(getContext(), "Permission denied!", Toast.LENGTH_SHORT).show();
