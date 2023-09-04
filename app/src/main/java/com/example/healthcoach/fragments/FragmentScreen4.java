@@ -2,6 +2,9 @@ package com.example.healthcoach.fragments;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +19,7 @@ import android.widget.Toast;
 import com.example.healthcoach.R;
 import com.example.healthcoach.viewmodels.HomeViewModel;
 import com.example.healthcoach.viewmodels.WeightViewModel;
+
 
 public class FragmentScreen4 extends Fragment {
 
@@ -75,10 +79,10 @@ public class FragmentScreen4 extends Fragment {
         Button insertToGoogleFitButton = view.findViewById(R.id.insertToGoogleFitButton);
         insertToGoogleFitButton.setOnClickListener(v -> {
             String weightString = weightEditText.getText().toString().trim();
-            if(!weightString.isEmpty()) {
+            if (!weightString.isEmpty()) {
                 try {
                     float weight = Float.parseFloat(weightString);
-                    weightViewModel.insertWeightData(getContext(), weight); // Assuming this method is part of WeightViewModel to insert weight to Google Fit
+                    weightViewModel.insertWeightDataOrSignInIfNeeded(getActivity(), weight);
                 } catch (NumberFormatException e) {
                     Toast.makeText(getContext(), "Please enter a valid weight.", Toast.LENGTH_SHORT).show();
                 }
@@ -100,5 +104,24 @@ public class FragmentScreen4 extends Fragment {
         });
 
         return view;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == WeightViewModel.REQUEST_OAUTH_REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                // Now that the user has given permission, try to insert weight again.
+                String weightString = weightEditText.getText().toString().trim();
+                if (!weightString.isEmpty()) {
+                    try {
+                        float weight = Float.parseFloat(weightString);
+                        weightViewModel.insertWeightData(getContext(), weight);
+                    } catch (NumberFormatException ignored) {}
+                }
+            } else {
+                Toast.makeText(getContext(), "Permission denied!", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }

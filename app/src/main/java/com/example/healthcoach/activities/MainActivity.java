@@ -1,5 +1,7 @@
 package com.example.healthcoach.activities;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -14,7 +16,6 @@ import android.widget.Toast;
 import com.example.healthcoach.R;
 import com.example.healthcoach.viewmodels.MainActivityViewModel;
 
-
 public class MainActivity extends AppCompatActivity {
 
     private EditText emailEditText;
@@ -25,12 +26,15 @@ public class MainActivity extends AppCompatActivity {
 
     private MainActivityViewModel viewModel;
 
+    // Moved ActivityResultLauncher initialization inside onCreate method
+    private ActivityResultLauncher<Intent> googleSignInResultLauncher;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        viewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
+        viewModel = new ViewModelProvider(this, new ViewModelProvider.AndroidViewModelFactory(getApplication())).get(MainActivityViewModel.class);
 
         emailEditText = findViewById(R.id.emailEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
@@ -56,7 +60,16 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        googleLoginButton.setOnClickListener(v -> viewModel.signInWithGoogle(MainActivity.this));
+        // Register the ActivityResultLauncher for Google Sign In
+        googleSignInResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> viewModel.handleGoogleSignInResult(result.getData())
+        );
+
+        googleLoginButton.setOnClickListener(v -> {
+            Intent signInIntent = viewModel.getGoogleSignInIntent(); // Assuming your ViewModel can provide the Google SignIn Intent
+            googleSignInResultLauncher.launch(signInIntent);
+        });
 
         // New code for "Forgot Password?" button
         Button forgotPasswordButton = findViewById(R.id.forgotPasswordButton);
@@ -79,12 +92,5 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == MainActivityViewModel.RC_SIGN_IN) {
-            viewModel.handleGoogleSignInResult(data);
-        }
-    }
+    // Removed the onActivityResult method as it's no longer needed with the new approach
 }

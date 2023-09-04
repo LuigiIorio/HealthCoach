@@ -1,10 +1,13 @@
 package com.example.healthcoach.viewmodels;
 
 import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -23,32 +26,30 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 
 
-
-public class MainActivityViewModel extends ViewModel {
+public class MainActivityViewModel extends AndroidViewModel {
 
     public static final int RC_SIGN_IN = 9001;
+    private final Application application;
 
     private MutableLiveData<LoginResult> loginResult = new MutableLiveData<>();
     private GoogleSignInClient mGoogleSignInClient;
     private FirebaseAuth mAuth;
 
-    public MainActivityViewModel() {
-        mAuth = FirebaseAuth.getInstance();
+    public MainActivityViewModel(@NonNull Application application) {
+        super(application);
+        this.application = application;
+        mAuth = FirebaseAuth.getInstance();  // Initialize Firebase Auth
     }
 
     public LiveData<LoginResult> getLoginResult() {
         return loginResult;
     }
 
-
-
     public void signInWithGoogle(Context context) {
-        // If mGoogleSignInClient is not already initialized, do so
         if (mGoogleSignInClient == null) {
             initializeGoogleSignInClient(context);
         }
 
-        // Ensure we're not already signed in, to force re-authentication and permission request
         mGoogleSignInClient.revokeAccess()
                 .addOnCompleteListener((Activity) context, task -> {
                     Intent signInIntent = mGoogleSignInClient.getSignInIntent();
@@ -59,19 +60,26 @@ public class MainActivityViewModel extends ViewModel {
     private void initializeGoogleSignInClient(Context context) {
         FitnessOptions fitnessOptions = FitnessOptions.builder()
                 .addDataType(DataType.TYPE_NUTRITION, FitnessOptions.ACCESS_WRITE)
-                .addDataType(DataType.TYPE_WEIGHT, FitnessOptions.ACCESS_WRITE) // This alone is sufficient
+                .addDataType(DataType.TYPE_WEIGHT, FitnessOptions.ACCESS_WRITE)
                 .build();
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken("99729341904-qlls8u6lhkf63fc4n68s2dvt9mnncpg2.apps.googleusercontent.com")
                 .requestEmail()
-                .requestScopes(Fitness.SCOPE_NUTRITION_READ_WRITE)
-                .requestScopes(Fitness.SCOPE_BODY_READ_WRITE)
+                .requestScopes(Fitness.SCOPE_NUTRITION_READ_WRITE, Fitness.SCOPE_BODY_READ_WRITE)
                 .build();
 
         mGoogleSignInClient = GoogleSignIn.getClient(context, gso);
     }
 
+    public Intent getGoogleSignInIntent() {
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken("99729341904-qlls8u6lhkf63fc4n68s2dvt9mnncpg2.apps.googleusercontent.com")
+                .requestEmail()
+                .build();
+        GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(application, gso);
+        return googleSignInClient.getSignInIntent();
+    }
 
     public void handleGoogleSignInResult(Intent data) {
         Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
@@ -81,17 +89,15 @@ public class MainActivityViewModel extends ViewModel {
             if (account != null) {
                 FitnessOptions fitnessOptions = FitnessOptions.builder()
                         .addDataType(DataType.TYPE_NUTRITION, FitnessOptions.ACCESS_WRITE)
+                        .addDataType(DataType.TYPE_WEIGHT, FitnessOptions.ACCESS_WRITE)
                         .build();
 
                 if (GoogleSignIn.hasPermissions(account, fitnessOptions)) {
-                    // The user granted Google Fit permissions
                     loginResult.setValue(LoginResult.SUCCESS);
                 } else {
-                    // The user didn't grant Google Fit permissions
                     loginResult.setValue(LoginResult.FAILURE);
                 }
             } else {
-                // Account was null
                 loginResult.setValue(LoginResult.FAILURE);
             }
         } catch (ApiException e) {
@@ -101,14 +107,12 @@ public class MainActivityViewModel extends ViewModel {
         }
     }
 
-
     public void loginWithEmailAndPassword(String email, String password) {
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         loginResult.setValue(LoginResult.SUCCESS);
                     } else {
-                        // You can retrieve the exception and show a more specific error message to the user
                         loginResult.setValue(LoginResult.FAILURE);
                     }
                 });
@@ -117,7 +121,4 @@ public class MainActivityViewModel extends ViewModel {
     public enum LoginResult {
         SUCCESS, FAILURE
     }
-
-
-
 }

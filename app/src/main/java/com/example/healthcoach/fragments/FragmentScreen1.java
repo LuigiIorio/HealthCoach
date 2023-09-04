@@ -12,6 +12,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -55,18 +57,19 @@ public class FragmentScreen1 extends Fragment {
         }
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == Hydration.REQUEST_OAUTH_REQUEST_CODE) {
-            if (resultCode == Activity.RESULT_OK) {
-                Toast.makeText(requireContext(), "Signed in to Google Fit successfully!", Toast.LENGTH_SHORT).show();
-                hydration.refreshGoogleSignInAccount();
-            } else {
-                Toast.makeText(requireContext(), "Failed to sign in to Google Fit.", Toast.LENGTH_SHORT).show();
+
+    private final ActivityResultLauncher<Intent> googleSignInResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    Toast.makeText(requireContext(), "Signed in to Google Fit successfully!", Toast.LENGTH_SHORT).show();
+                    hydration.refreshGoogleSignInAccount();
+                } else {
+                    Toast.makeText(requireContext(), "Failed to sign in to Google Fit.", Toast.LENGTH_SHORT).show();
+                }
             }
-        }
-    }
+    );
+
 
     private void initializeViewModels() {
         hydration = new Hydration(getActivity());

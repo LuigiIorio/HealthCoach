@@ -1,5 +1,6 @@
 package com.example.healthcoach.viewmodels;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
@@ -10,6 +11,7 @@ import androidx.lifecycle.ViewModel;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.fitness.Fitness;
+import com.google.android.gms.fitness.FitnessOptions;
 import com.google.android.gms.fitness.HistoryClient;
 import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
@@ -44,6 +46,11 @@ public class WeightViewModel extends ViewModel {
                 if (weight < 30 || weight > 130) {
                     weightError.setValue("Please enter a weight between 30 and 130.");
                 } else {
+                    if (!isUserSignedIn(context)) {
+                        promptSignIn(context);
+                        return;
+                    }
+
                     insertWeightData(context, (float) weight);
                     weightSuccess.setValue(true);
                 }
@@ -53,6 +60,58 @@ public class WeightViewModel extends ViewModel {
         } else {
             weightError.setValue("Weight field cannot be empty.");
         }
+    }
+
+
+
+    private boolean isUserSignedIn(Context context) {
+        GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(context);
+        return googleSignInAccount != null;
+    }
+
+    private void promptSignIn(Context context) {
+        FitnessOptions fitnessOptions = FitnessOptions.builder()
+                .addDataType(DataType.TYPE_WEIGHT, FitnessOptions.ACCESS_WRITE)
+                .build();
+
+        GoogleSignIn.requestPermissions(
+                (Activity) context,
+                REQUEST_OAUTH_REQUEST_CODE,
+                GoogleSignIn.getLastSignedInAccount(context),
+                fitnessOptions
+        );
+    }
+
+    public void insertWeightDataOrSignInIfNeeded(Context context, float weightValue) {
+        if (!isUserSignedIn(context)) {
+            promptSignIn(context);
+        } else if (!hasFitnessPermission(context)) {
+            requestFitnessPermission(context);
+        } else {
+            insertWeightData(context, weightValue);
+        }
+    }
+
+    private boolean hasFitnessPermission(Context context) {
+        GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(context);
+        FitnessOptions fitnessOptions = FitnessOptions.builder()
+                .addDataType(DataType.TYPE_WEIGHT, FitnessOptions.ACCESS_WRITE)
+                .build();
+
+        return GoogleSignIn.hasPermissions(googleSignInAccount, fitnessOptions);
+    }
+
+    private void requestFitnessPermission(Context context) {
+        FitnessOptions fitnessOptions = FitnessOptions.builder()
+                .addDataType(DataType.TYPE_WEIGHT, FitnessOptions.ACCESS_WRITE)
+                .build();
+
+        GoogleSignIn.requestPermissions(
+                (Activity) context,
+                REQUEST_OAUTH_REQUEST_CODE,
+                GoogleSignIn.getLastSignedInAccount(context),
+                fitnessOptions
+        );
     }
 
 
@@ -98,5 +157,5 @@ public class WeightViewModel extends ViewModel {
     }
 
 
-
+    public static final int REQUEST_OAUTH_REQUEST_CODE = 1002;
 }

@@ -43,6 +43,9 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.android.gms:play-services-auth:20.7.0'
     implementation "androidx.lifecycle:lifecycle-viewmodel:2.6.1"
+    implementation 'androidx.activity:activity:1.7.2'
+    implementation 'androidx.fragment:fragment:1.6.1'
+
 
     // Explicitly include kotlin-stdlib-jdk8 to ensure compatibility
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.10'

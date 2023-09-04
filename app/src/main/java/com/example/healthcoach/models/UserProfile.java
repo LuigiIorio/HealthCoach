@@ -9,8 +9,6 @@ public class UserProfile {
         return gender;
     }
 
-
-
     public int getAge() {
         return age;
     }
