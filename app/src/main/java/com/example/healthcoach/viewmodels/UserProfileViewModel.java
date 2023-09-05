@@ -1,10 +1,9 @@
 package com.example.healthcoach.viewmodels;
 
 
+
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-
-import com.example.healthcoach.models.UserProfile;
 
 public class UserProfileViewModel extends ViewModel {
     private final MutableLiveData<String> gender = new MutableLiveData<>();

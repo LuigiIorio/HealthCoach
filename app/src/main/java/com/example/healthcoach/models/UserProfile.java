@@ -1,5 +1,6 @@
 package com.example.healthcoach.models;
 
+
 public class UserProfile {
 
     private String gender;

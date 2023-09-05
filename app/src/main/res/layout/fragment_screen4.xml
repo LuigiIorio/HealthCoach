@@ -19,6 +19,15 @@
             android:layout_marginBottom="16dp" />
 
         <!-- For Gender -->
+        <TextView
+            android:id="@+id/genderLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Select Your Gender"
+            android:textSize="18sp"
+            android:layout_gravity="center"
+            android:paddingBottom="8dp" />
+
         <Spinner
             android:id="@+id/genderSpinner"
             android:layout_width="match_parent"
@@ -34,7 +43,7 @@
             android:layout_gravity="center"
             android:paddingBottom="8dp" />
 
-        <!-- For Weight -->
+        <!-- For Age -->
         <NumberPicker
             android:id="@+id/ageNumberPicker"
             android:layout_width="wrap_content"
@@ -51,6 +60,7 @@
             android:paddingTop="16dp"
             android:paddingBottom="8dp" />
 
+        <!-- For Weight -->
         <EditText
             android:id="@+id/weightEditText"
             android:layout_width="200dp"
@@ -74,6 +84,7 @@
             android:paddingTop="16dp"
             android:paddingBottom="8dp" />
 
+        <!-- For Height -->
         <EditText
             android:id="@+id/heightEditText"
             android:layout_width="200dp"

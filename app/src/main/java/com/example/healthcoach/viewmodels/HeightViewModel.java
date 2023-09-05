@@ -22,6 +22,7 @@ import com.google.android.gms.fitness.data.Field;
 
 import java.util.concurrent.TimeUnit;
 
+
 public class HeightViewModel extends ViewModel {
     private MutableLiveData<String> heightError = new MutableLiveData<>();
     private MutableLiveData<Boolean> heightSuccess = new MutableLiveData<>();

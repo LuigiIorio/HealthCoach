@@ -1,14 +1,12 @@
 package com.example.healthcoach.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.healthcoach.R;
 import com.example.healthcoach.fragments.FragmentScreen1;
@@ -23,7 +21,6 @@ import org.jetbrains.annotations.Nullable;
 
 public class HomeActivity extends AppCompatActivity {
 
-    private TextView welcomeTextView;
     private Fragment fragment1, fragment2, fragment3, fragment4;
     private Fragment activeFragment;
     private HomeViewModel homeViewModel;
@@ -33,18 +30,10 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home_activity);
 
-        welcomeTextView = findViewById(R.id.welcomeTextView);
-
         // Initialize ViewModel
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
 
-        // Observe ViewModel for changes to the welcome message
-        homeViewModel.getWelcomeMessage().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(String s) {
-                welcomeTextView.setText(s);
-            }
-        });
+        // NOTE: Removed the welcomeTextView as it's no longer in your layout.
 
         // Initialize fragments
         fragment1 = new FragmentScreen1();
