@@ -22,41 +22,39 @@ import com.google.android.gms.fitness.data.Field;
 
 import java.util.concurrent.TimeUnit;
 
+public class HeightViewModel extends ViewModel {
+    private MutableLiveData<String> heightError = new MutableLiveData<>();
+    private MutableLiveData<Boolean> heightSuccess = new MutableLiveData<>();
 
+    public static final int REQUEST_OAUTH_REQUEST_CODE = 1003;
 
-public class WeightViewModel extends ViewModel {
-    private MutableLiveData<String> weightError = new MutableLiveData<>();
-    private MutableLiveData<Boolean> weightSuccess = new MutableLiveData<>();
-
-    public static final int REQUEST_OAUTH_REQUEST_CODE = 1004;
-
-    public LiveData<String> getWeightError() {
-        return weightError;
+    public LiveData<String> getHeightError() {
+        return heightError;
     }
 
-    public LiveData<Boolean> getWeightSuccess() {
-        return weightSuccess;
+    public LiveData<Boolean> getHeightSuccess() {
+        return heightSuccess;
     }
 
-    public void validateAndSubmitWeight(Context context, String weightInput) {
-        if (!weightInput.isEmpty()) {
+    public void validateAndSubmitHeight(Context context, String heightInput) {
+        if (!heightInput.isEmpty()) {
             try {
-                float weight = Float.parseFloat(weightInput);
-                if (weight < 30 || weight > 300) {
-                    weightError.setValue("Please enter a weight between 30 and 300 kg.");
+                float height = Float.parseFloat(heightInput);
+                if (height < 50 || height > 250) {
+                    heightError.setValue("Please enter a height between 50 and 250 cm.");
                 } else {
                     if (!isUserSignedIn(context)) {
                         promptSignIn(context);
                         return;
                     }
-                    insertWeightDataOrSignInIfNeeded(context, weight);
-                    weightSuccess.setValue(true);
+                    insertHeightDataOrSignInIfNeeded(context, height);
+                    heightSuccess.setValue(true);
                 }
             } catch (NumberFormatException e) {
-                weightError.setValue("Please enter a valid weight.");
+                heightError.setValue("Please enter a valid height.");
             }
         } else {
-            weightError.setValue("Weight field cannot be empty.");
+            heightError.setValue("Height field cannot be empty.");
         }
     }
 
@@ -67,7 +65,7 @@ public class WeightViewModel extends ViewModel {
 
     private void promptSignIn(Context context) {
         FitnessOptions fitnessOptions = FitnessOptions.builder()
-                .addDataType(DataType.TYPE_WEIGHT, FitnessOptions.ACCESS_WRITE)
+                .addDataType(DataType.TYPE_HEIGHT, FitnessOptions.ACCESS_WRITE)
                 .build();
 
         GoogleSignIn.requestPermissions(
@@ -78,20 +76,20 @@ public class WeightViewModel extends ViewModel {
         );
     }
 
-    public void insertWeightDataOrSignInIfNeeded(Context context, float weightValue) {
+    public void insertHeightDataOrSignInIfNeeded(Context context, float heightValue) {
         if (!isUserSignedIn(context)) {
             promptSignIn(context);
         } else if (!hasFitnessPermission(context)) {
             requestFitnessPermission(context);
         } else {
-            insertWeightData(context, weightValue);
+            insertHeightData(context, heightValue);
         }
     }
 
     private boolean hasFitnessPermission(Context context) {
         GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(context);
         FitnessOptions fitnessOptions = FitnessOptions.builder()
-                .addDataType(DataType.TYPE_WEIGHT, FitnessOptions.ACCESS_WRITE)
+                .addDataType(DataType.TYPE_HEIGHT, FitnessOptions.ACCESS_WRITE)
                 .build();
 
         return GoogleSignIn.hasPermissions(googleSignInAccount, fitnessOptions);
@@ -99,7 +97,7 @@ public class WeightViewModel extends ViewModel {
 
     private void requestFitnessPermission(Context context) {
         FitnessOptions fitnessOptions = FitnessOptions.builder()
-                .addDataType(DataType.TYPE_WEIGHT, FitnessOptions.ACCESS_WRITE)
+                .addDataType(DataType.TYPE_HEIGHT, FitnessOptions.ACCESS_WRITE)
                 .build();
 
         GoogleSignIn.requestPermissions(
@@ -110,36 +108,38 @@ public class WeightViewModel extends ViewModel {
         );
     }
 
-    public void insertWeightData(Context context, float weightInKg) {
+    public void insertHeightData(Context context, float heightInCm) {
         GoogleSignInAccount lastSignedInAccount = GoogleSignIn.getLastSignedInAccount(context);
 
         FitnessOptions fitnessOptions = FitnessOptions.builder()
-                .addDataType(DataType.TYPE_WEIGHT, FitnessOptions.ACCESS_WRITE)
+                .addDataType(DataType.TYPE_HEIGHT, FitnessOptions.ACCESS_WRITE)
                 .build();
 
         if (GoogleSignIn.hasPermissions(lastSignedInAccount, fitnessOptions)) {
-            DataSource weightSource = new DataSource.Builder()
-                    .setDataType(DataType.TYPE_WEIGHT)
+            float heightInMeters = heightInCm / 100;
+
+            DataSource heightSource = new DataSource.Builder()
+                    .setDataType(DataType.TYPE_HEIGHT)
                     .setAppPackageName(context.getPackageName())
-                    .setStreamName("user weight")
+                    .setStreamName("user height")
                     .setType(DataSource.TYPE_RAW)
                     .build();
 
-            DataPoint weightPoint = DataPoint.builder(weightSource)
-                    .setField(Field.FIELD_WEIGHT, weightInKg)
+            DataPoint heightPoint = DataPoint.builder(heightSource)
+                    .setField(Field.FIELD_HEIGHT, heightInMeters)
                     .setTimestamp(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
                     .build();
 
-            DataSet dataSet = DataSet.builder(weightSource)
-                    .add(weightPoint)
+            DataSet dataSet = DataSet.builder(heightSource)
+                    .add(heightPoint)
                     .build();
 
             Fitness.getHistoryClient(context, lastSignedInAccount)
                     .insertData(dataSet)
-                    .addOnSuccessListener(unused -> Log.d(TAG, "Weight data inserted!"))
-                    .addOnFailureListener(e -> Log.e(TAG, "There was a problem inserting the weight data.", e));
+                    .addOnSuccessListener(unused -> Log.d(TAG, "Height data inserted!"))
+                    .addOnFailureListener(e -> Log.e(TAG, "There was a problem inserting the height data.", e));
         } else {
-            Log.e(TAG, "Permission for weight is not granted.");
+            Log.e(TAG, "Permission for height is not granted.");
         }
     }
 }

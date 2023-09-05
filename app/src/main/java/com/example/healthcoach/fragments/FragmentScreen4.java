@@ -1,53 +1,46 @@
 package com.example.healthcoach.fragments;
 
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.NumberPicker;
-import android.widget.Spinner;
 import android.widget.Toast;
-import com.example.healthcoach.R;
-import com.example.healthcoach.viewmodels.HomeViewModel;
-import com.example.healthcoach.viewmodels.WeightViewModel;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+
+import com.example.healthcoach.R;
+import com.example.healthcoach.viewmodels.HeightViewModel;
+import com.example.healthcoach.viewmodels.WeightViewModel;
 
 
 public class FragmentScreen4 extends Fragment {
 
-    private HomeViewModel userProfileViewModel;
+    // Global variables for Weight
     private WeightViewModel weightViewModel;
     private EditText weightEditText;
+
+    // Global variables for Height
+    private HeightViewModel heightViewModel;
+    private EditText heightEditText;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_screen4, container, false);
 
-        // Initialize ViewModels
-        userProfileViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+        // Initialize WeightViewModel
         weightViewModel = new ViewModelProvider(this).get(WeightViewModel.class);
-
-        // Setup Gender Spinner
-        setupGenderSpinner(view);
-
-        // Setup Age NumberPicker
-        setupAgeNumberPicker(view);
 
         // Weight Input field initialization
         weightEditText = view.findViewById(R.id.weightEditText);
 
-        // Button for inserting weight data to Google Fit
-        setupWeightInsertButton(view);
+        // Button for submitting weight data
+        setupWeightSubmitButton(view);
 
         // Observe any weight errors
         weightViewModel.getWeightError().observe(getViewLifecycleOwner(), error -> {
@@ -61,56 +54,51 @@ public class FragmentScreen4 extends Fragment {
             }
         });
 
+        // Initialize HeightViewModel
+        heightViewModel = new ViewModelProvider(this).get(HeightViewModel.class);
+
+        // Height Input field initialization
+        heightEditText = view.findViewById(R.id.heightEditText);
+
+        // Button for submitting height data
+        setupHeightSubmitButton(view);
+
+        // Observe any height errors
+        heightViewModel.getHeightError().observe(getViewLifecycleOwner(), error -> {
+            Toast.makeText(getContext(), error, Toast.LENGTH_SHORT).show();
+        });
+
+        // Observe height submission success
+        heightViewModel.getHeightSuccess().observe(getViewLifecycleOwner(), success -> {
+            if (success) {
+                Toast.makeText(getContext(), "Height submitted successfully!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         return view;
     }
 
-    private void setupGenderSpinner(View view) {
-        Spinner genderSpinner = view.findViewById(R.id.genderSpinner);
-        ArrayAdapter<String> genderAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, new String[]{"Male", "Female"});
-        genderAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        genderSpinner.setAdapter(genderAdapter);
-
-        userProfileViewModel.getGender().observe(getViewLifecycleOwner(), gender -> {
-            int position = genderAdapter.getPosition(gender);
-            if (position != -1) {
-                genderSpinner.setSelection(position);
-            }
-        });
-
-        genderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                userProfileViewModel.setGender(parent.getItemAtPosition(position).toString());
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // Do Nothing
-            }
-        });
-    }
-
-    private void setupAgeNumberPicker(View view) {
-        NumberPicker ageNumberPicker = view.findViewById(R.id.ageNumberPicker);
-        ageNumberPicker.setMinValue(18);
-        ageNumberPicker.setMaxValue(100);
-
-        userProfileViewModel.getAge().observe(getViewLifecycleOwner(), ageNumberPicker::setValue);
-
-        ageNumberPicker.setOnValueChangedListener((picker, oldVal, newVal) -> userProfileViewModel.setAge(newVal));
-    }
-
-    private void setupWeightInsertButton(View view) {
-        Button insertToGoogleFitButton = view.findViewById(R.id.insertToGoogleFitButton);
-        insertToGoogleFitButton.setOnClickListener(v -> {
+    private void setupWeightSubmitButton(View view) {
+        Button submitWeightButton = view.findViewById(R.id.submitWeightButton);
+        submitWeightButton.setOnClickListener(v -> {
             String weightString = weightEditText.getText().toString().trim();
             weightViewModel.validateAndSubmitWeight(getContext(), weightString);
+        });
+    }
+
+    private void setupHeightSubmitButton(View view) {
+        Button submitHeightButton = view.findViewById(R.id.submitHeightButton);
+        submitHeightButton.setOnClickListener(v -> {
+            String heightString = heightEditText.getText().toString().trim();
+            heightViewModel.validateAndSubmitHeight(getActivity(), heightString);
         });
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+        // Handling for weight data
         if (requestCode == WeightViewModel.REQUEST_OAUTH_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
                 String weightString = weightEditText.getText().toString().trim();
@@ -118,6 +106,22 @@ public class FragmentScreen4 extends Fragment {
                     try {
                         float weight = Float.parseFloat(weightString);
                         weightViewModel.insertWeightData(getContext(), weight);
+                    } catch (NumberFormatException ignored) {
+                    }
+                }
+            } else {
+                Toast.makeText(getContext(), "Permission denied!", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        // Handling for height data
+        if (requestCode == HeightViewModel.REQUEST_OAUTH_REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                String heightString = heightEditText.getText().toString().trim();
+                if (!heightString.isEmpty()) {
+                    try {
+                        float height = Float.parseFloat(heightString);
+                        heightViewModel.insertHeightData(getContext(), height);
                     } catch (NumberFormatException ignored) {
                     }
                 }

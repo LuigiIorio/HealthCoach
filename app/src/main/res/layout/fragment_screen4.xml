@@ -42,13 +42,6 @@
             android:layout_gravity="center"
             android:descendantFocusability="blocksDescendants" />
 
-        <Button
-            android:id="@+id/insertToGoogleFitButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Insert to Google Fit" />
-
         <TextView
             android:id="@+id/weightLabel"
             android:layout_width="wrap_content"
@@ -65,6 +58,35 @@
             android:inputType="number"
             android:hint="Enter weight between 30 and 130"
             android:layout_gravity="center" />
+
+        <Button
+            android:id="@+id/submitWeightButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Submit Weight"/>
+
+        <TextView
+            android:id="@+id/heightLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Enter Your Height (cm)"
+            android:textSize="16sp"
+            android:paddingTop="16dp"
+            android:paddingBottom="8dp" />
+
+        <EditText
+            android:id="@+id/heightEditText"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:hint="Enter height between 100 and 220"
+            android:inputType="numberDecimal"
+            android:layout_gravity="center" />
+
+        <Button
+            android:id="@+id/submitHeightButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Submit Height"/>
 
     </LinearLayout>
 </ScrollView>

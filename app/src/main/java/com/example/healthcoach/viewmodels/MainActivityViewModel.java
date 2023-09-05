@@ -10,15 +10,12 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessOptions;
 import com.google.android.gms.fitness.data.DataType;
@@ -57,10 +54,12 @@ public class MainActivityViewModel extends AndroidViewModel {
                 });
     }
 
+
     private void initializeGoogleSignInClient(Context context) {
         FitnessOptions fitnessOptions = FitnessOptions.builder()
                 .addDataType(DataType.TYPE_NUTRITION, FitnessOptions.ACCESS_WRITE)
                 .addDataType(DataType.TYPE_WEIGHT, FitnessOptions.ACCESS_WRITE)
+                .addDataType(DataType.TYPE_HEIGHT, FitnessOptions.ACCESS_WRITE)
                 .build();
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -72,6 +71,8 @@ public class MainActivityViewModel extends AndroidViewModel {
         mGoogleSignInClient = GoogleSignIn.getClient(context, gso);
     }
 
+
+
     public Intent getGoogleSignInIntent() {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken("99729341904-qlls8u6lhkf63fc4n68s2dvt9mnncpg2.apps.googleusercontent.com")
@@ -80,6 +81,7 @@ public class MainActivityViewModel extends AndroidViewModel {
         GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(application, gso);
         return googleSignInClient.getSignInIntent();
     }
+
 
     public void handleGoogleSignInResult(Intent data) {
         Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
@@ -90,6 +92,7 @@ public class MainActivityViewModel extends AndroidViewModel {
                 FitnessOptions fitnessOptions = FitnessOptions.builder()
                         .addDataType(DataType.TYPE_NUTRITION, FitnessOptions.ACCESS_WRITE)
                         .addDataType(DataType.TYPE_WEIGHT, FitnessOptions.ACCESS_WRITE)
+                        .addDataType(DataType.TYPE_HEIGHT, FitnessOptions.ACCESS_WRITE)  // Add height permissions
                         .build();
 
                 if (GoogleSignIn.hasPermissions(account, fitnessOptions)) {
@@ -106,6 +109,9 @@ public class MainActivityViewModel extends AndroidViewModel {
             loginResult.setValue(LoginResult.FAILURE);
         }
     }
+
+
+
 
     public void loginWithEmailAndPassword(String email, String password) {
         mAuth.signInWithEmailAndPassword(email, password)

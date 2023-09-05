@@ -18,22 +18,21 @@ import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+public class Height {
 
-public class Weight {
-
-    private static final String WEIGHT_DATA_TYPE = "com.google.weight";
+    private static final String HEIGHT_DATA_TYPE = "com.google.height";
     private static final int PERMISSION_REQUEST_CODE = 1001;
 
     private GoogleSignInAccount googleSignInAccount;
     private DataSource dataSource;
 
-    public Weight(Context context) {
+    public Height(Context context) {
         if (!checkAndRequestPermissions(context)) {
             return;
         }
 
         FitnessOptions fitnessOptions = FitnessOptions.builder()
-                .addDataType(DataType.TYPE_WEIGHT, FitnessOptions.ACCESS_WRITE)
+                .addDataType(DataType.TYPE_HEIGHT, FitnessOptions.ACCESS_WRITE)
                 .build();
 
         googleSignInAccount = GoogleSignIn.getAccountForExtension(context, fitnessOptions);
@@ -41,12 +40,12 @@ public class Weight {
         // Create a Fitness recording client
         RecordingClient recordingClient = Fitness.getRecordingClient(context, googleSignInAccount);
 
-        // Create a DataSource for weight
+        // Create a DataSource for height
         dataSource = new DataSource.Builder()
                 .setAppPackageName(context.getPackageName())
-                .setDataType(DataType.TYPE_WEIGHT)
+                .setDataType(DataType.TYPE_HEIGHT)
                 .setType(DataSource.TYPE_RAW)
-                .setStreamName("WeightRecorderStream")
+                .setStreamName("HeightRecorderStream")
                 .build();
 
         // Subscribe to the data source
@@ -54,13 +53,13 @@ public class Weight {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Log.d("Weight", "Weight recording started");
+                        Log.d("Height", "Height recording started");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(Exception e) {
-                        Log.e("Weight", "Failed to start weight recording", e);
+                        Log.e("Height", "Failed to start height recording", e);
                     }
                 });
     }
@@ -88,13 +87,13 @@ public class Weight {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Log.d("Weight", "Weight recording stopped");
+                        Log.d("Height", "Height recording stopped");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(Exception e) {
-                        Log.e("Weight", "Failed to stop weight recording", e);
+                        Log.e("Height", "Failed to stop height recording", e);
                     }
                 });
     }
