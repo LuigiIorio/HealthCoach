@@ -23,6 +23,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 
 
+
 public class MainActivityViewModel extends AndroidViewModel {
 
     public static final int RC_SIGN_IN = 9001;
@@ -46,12 +47,8 @@ public class MainActivityViewModel extends AndroidViewModel {
         if (mGoogleSignInClient == null) {
             initializeGoogleSignInClient(context);
         }
-
-        mGoogleSignInClient.revokeAccess()
-                .addOnCompleteListener((Activity) context, task -> {
-                    Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-                    ((Activity) context).startActivityForResult(signInIntent, RC_SIGN_IN);
-                });
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        ((Activity) context).startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
 
@@ -83,7 +80,7 @@ public class MainActivityViewModel extends AndroidViewModel {
     }
 
 
-    public void handleGoogleSignInResult(Intent data) {
+    public void handleGoogleSignInResult(Activity activity, Intent data) {
         Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
         try {
             GoogleSignInAccount account = task.getResult(ApiException.class);
@@ -92,13 +89,17 @@ public class MainActivityViewModel extends AndroidViewModel {
                 FitnessOptions fitnessOptions = FitnessOptions.builder()
                         .addDataType(DataType.TYPE_NUTRITION, FitnessOptions.ACCESS_WRITE)
                         .addDataType(DataType.TYPE_WEIGHT, FitnessOptions.ACCESS_WRITE)
-                        .addDataType(DataType.TYPE_HEIGHT, FitnessOptions.ACCESS_WRITE)  // Add height permissions
+                        .addDataType(DataType.TYPE_HEIGHT, FitnessOptions.ACCESS_WRITE)
                         .build();
 
                 if (GoogleSignIn.hasPermissions(account, fitnessOptions)) {
                     loginResult.setValue(LoginResult.SUCCESS);
                 } else {
-                    loginResult.setValue(LoginResult.FAILURE);
+                    GoogleSignIn.requestPermissions(
+                            activity, // Now using the passed activity context
+                            RC_SIGN_IN,
+                            account,
+                            fitnessOptions);
                 }
             } else {
                 loginResult.setValue(LoginResult.FAILURE);
@@ -109,6 +110,7 @@ public class MainActivityViewModel extends AndroidViewModel {
             loginResult.setValue(LoginResult.FAILURE);
         }
     }
+
 
 
 

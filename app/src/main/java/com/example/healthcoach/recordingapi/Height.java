@@ -1,100 +1,77 @@
 package com.example.healthcoach.recordingapi;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.util.Log;
 
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessOptions;
-import com.google.android.gms.fitness.RecordingClient;
+import com.google.android.gms.fitness.data.DataPoint;
+import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataSource;
 import com.google.android.gms.fitness.data.DataType;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.fitness.data.Field;
+
+import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 public class Height {
 
-    private static final String HEIGHT_DATA_TYPE = "com.google.height";
-    private static final int PERMISSION_REQUEST_CODE = 1001;
-
-    private GoogleSignInAccount googleSignInAccount;
-    private DataSource dataSource;
+    private Context context;
+    private FitnessOptions fitnessOptions;
+    private DataSource heightDataSource;
 
     public Height(Context context) {
-        if (!checkAndRequestPermissions(context)) {
-            return;
-        }
+        this.context = context;
+        setupHeight();
+    }
 
-        FitnessOptions fitnessOptions = FitnessOptions.builder()
+    private void setupHeight() {
+        // Create fitness options with the specific DataType and access type.
+        fitnessOptions = FitnessOptions.builder()
                 .addDataType(DataType.TYPE_HEIGHT, FitnessOptions.ACCESS_WRITE)
                 .build();
 
-        googleSignInAccount = GoogleSignIn.getAccountForExtension(context, fitnessOptions);
+        // Ensure the user has granted the necessary permissions.
+        if (!GoogleSignIn.hasPermissions(GoogleSignIn.getLastSignedInAccount(context), fitnessOptions)) {
+            Log.e("Height", "Necessary permissions not granted for height data.");
+            // Handle permission request here or inform the user to grant permissions
+            // For now, I'll just return from the method to avoid proceeding further.
+            return;
+        }
 
-        // Create a Fitness recording client
-        RecordingClient recordingClient = Fitness.getRecordingClient(context, googleSignInAccount);
-
-        // Create a DataSource for height
-        dataSource = new DataSource.Builder()
-                .setAppPackageName(context.getPackageName())
+        // Set up the height data source.
+        heightDataSource = new DataSource.Builder()
+                .setAppPackageName(context)
                 .setDataType(DataType.TYPE_HEIGHT)
                 .setType(DataSource.TYPE_RAW)
-                .setStreamName("HeightRecorderStream")
+                .build();
+    }
+
+
+    public void insertHeightData(float heightValue) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(System.currentTimeMillis());
+
+        // Create a data point for height.
+        DataPoint dataPoint = DataPoint.builder(heightDataSource)
+                .setField(Field.FIELD_HEIGHT, heightValue)
+                .setTimeInterval(cal.getTimeInMillis(), cal.getTimeInMillis(), TimeUnit.MILLISECONDS)
                 .build();
 
-        // Subscribe to the data source
-        recordingClient.subscribe(dataSource)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("Height", "Height recording started");
-                    }
+        // Create a data set using the data point.
+        DataSet dataSet = DataSet.builder(heightDataSource)
+                .add(dataPoint)
+                .build();
+
+        // Insert the height data.
+        Fitness.getHistoryClient(context, GoogleSignIn.getLastSignedInAccount(context))
+                .insertData(dataSet)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("Height", "Height data inserted successfully");
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(Exception e) {
-                        Log.e("Height", "Failed to start height recording", e);
-                    }
-                });
-    }
-
-    private boolean checkAndRequestPermissions(Context context) {
-        if (ContextCompat.checkSelfPermission(context, "android.permission.BODY_SENSORS")
-                != PackageManager.PERMISSION_GRANTED) {
-
-            ActivityCompat.requestPermissions(
-                    (Activity) context,
-                    new String[]{"android.permission.BODY_SENSORS"},
-                    PERMISSION_REQUEST_CODE
-            );
-            return false;
-        }
-        return true;
-    }
-
-    public void stopRecording(Context context) {
-        // Create a Fitness recording client
-        RecordingClient recordingClient = Fitness.getRecordingClient(context, googleSignInAccount);
-
-        // Unsubscribe from the data source
-        recordingClient.unsubscribe(dataSource)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("Height", "Height recording stopped");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(Exception e) {
-                        Log.e("Height", "Failed to stop height recording", e);
-                    }
+                .addOnFailureListener(e -> {
+                    Log.e("Height", "Failed to insert height data.", e);
                 });
     }
 }

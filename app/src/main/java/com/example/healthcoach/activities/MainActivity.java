@@ -1,21 +1,19 @@
 package com.example.healthcoach.activities;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.example.healthcoach.R;
 import com.example.healthcoach.viewmodels.MainActivityViewModel;
-
 
 public class MainActivity extends AppCompatActivity {
 
@@ -27,7 +25,6 @@ public class MainActivity extends AppCompatActivity {
 
     private MainActivityViewModel viewModel;
 
-    // Moved ActivityResultLauncher initialization inside onCreate method
     private ActivityResultLauncher<Intent> googleSignInResultLauncher;
 
     @Override
@@ -61,14 +58,13 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // Register the ActivityResultLauncher for Google Sign In
         googleSignInResultLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
-                result -> viewModel.handleGoogleSignInResult(result.getData())
+                result -> viewModel.handleGoogleSignInResult(MainActivity.this, result.getData())
         );
 
         googleLoginButton.setOnClickListener(v -> {
-            Intent signInIntent = viewModel.getGoogleSignInIntent(); // Assuming your ViewModel can provide the Google SignIn Intent
+            Intent signInIntent = viewModel.getGoogleSignInIntent();
             googleSignInResultLauncher.launch(signInIntent);
         });
 
@@ -92,6 +88,4 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-    // Removed the onActivityResult method as it's no longer needed with the new approach
 }
