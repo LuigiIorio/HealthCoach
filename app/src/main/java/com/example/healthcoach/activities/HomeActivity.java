@@ -19,6 +19,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import org.jetbrains.annotations.Nullable;
 
+
 public class HomeActivity extends AppCompatActivity {
 
     private Fragment fragment1, fragment2, fragment3, fragment4;
@@ -32,8 +33,6 @@ public class HomeActivity extends AppCompatActivity {
 
         // Initialize ViewModel
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
-
-        // NOTE: Removed the welcomeTextView as it's no longer in your layout.
 
         // Initialize fragments
         fragment1 = new FragmentScreen1();
@@ -55,6 +54,8 @@ public class HomeActivity extends AppCompatActivity {
         fragment3.setRetainInstance(true);
         fragment4.setRetainInstance(true);
     }
+
+    // Removed the bindViews method as it's not used anymore
 
     private final BottomNavigationView.OnNavigationItemSelectedListener navListener =
             item -> {
