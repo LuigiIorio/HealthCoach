@@ -1,7 +1,5 @@
 package com.example.healthcoach.fragments;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,21 +9,16 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.healthcoach.R;
-import com.example.healthcoach.interfaces.WaterIntakeRepository;
 import com.example.healthcoach.recordingapi.Hydration;
 import com.example.healthcoach.viewmodels.Screen2ViewModel;
 import com.example.healthcoach.viewmodels.WaterIntakeViewModel;
-
+import com.example.healthcoach.viewmodels.WeightViewModel;
 
 public class FragmentScreen2 extends Fragment {
 
@@ -33,37 +26,21 @@ public class FragmentScreen2 extends Fragment {
     private Screen2ViewModel viewModel;
     private EditText waterIntakeEditText;
     private Button addWaterIntakeButton;
-    private WaterIntakeViewModel waterIntakeViewModel;
-    private Hydration hydration;
+    private WeightViewModel weightViewModel;
+    private EditText weightEditText;
+    private WaterIntakeViewModel waterIntakeViewModel;  // Declare this line for waterIntakeViewModel
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         viewModel = new ViewModelProvider(this).get(Screen2ViewModel.class);
-        initializeViewModels();
+        weightViewModel = new ViewModelProvider(this).get(WeightViewModel.class);
+        waterIntakeViewModel = new ViewModelProvider(this).get(WaterIntakeViewModel.class);
+        waterIntakeViewModel.setRepository(new Hydration(getContext()));  // Use your existing Hydration class
     }
 
-    private final ActivityResultLauncher<Intent> googleSignInResultLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if (result.getResultCode() == Activity.RESULT_OK) {
-                    Toast.makeText(requireContext(), "Signed in to Google Fit successfully!", Toast.LENGTH_SHORT).show();
-                    hydration.refreshGoogleSignInAccount();
-                } else {
-                    Toast.makeText(requireContext(), "Failed to sign in to Google Fit.", Toast.LENGTH_SHORT).show();
-                }
-            }
-    );
 
-    private void initializeViewModels() {
-        hydration = new Hydration(getActivity());
-        waterIntakeViewModel = new ViewModelProvider(this, new ViewModelProvider.Factory() {
-            @Override
-            public <T extends ViewModel> T create(Class<T> modelClass) {
-                return (T) new WaterIntakeViewModel((WaterIntakeRepository) hydration);
-            }
-        }).get(WaterIntakeViewModel.class);
-    }
 
     @Nullable
     @Override
@@ -72,16 +49,21 @@ public class FragmentScreen2 extends Fragment {
         journalTextView = view.findViewById(R.id.journalTextView);
         waterIntakeEditText = view.findViewById(R.id.waterIntakeEditText);
         addWaterIntakeButton = view.findViewById(R.id.addWaterIntakeButton);
+        weightEditText = view.findViewById(R.id.weightEditText2);
+
         observeData();
         initWaterIntakeUI();
+        setupWeightSubmitButton(view);
+
         return view;
     }
 
     private void observeData() {
-        viewModel.getJournalText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(String s) {
-                journalTextView.setText(s);
+        viewModel.getJournalText().observe(getViewLifecycleOwner(), journalTextView::setText);
+        weightViewModel.getWeightError().observe(getViewLifecycleOwner(), error -> Toast.makeText(getContext(), error, Toast.LENGTH_SHORT).show());
+        weightViewModel.getWeightSuccess().observe(getViewLifecycleOwner(), success -> {
+            if (success) {
+                Toast.makeText(getContext(), "Weight submitted successfully!", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -98,9 +80,16 @@ public class FragmentScreen2 extends Fragment {
                 Toast.makeText(requireContext(), "Please enter a valid number", Toast.LENGTH_SHORT).show();
                 return;
             }
-
             waterIntakeViewModel.addWater(waterIntake);
             Toast.makeText(requireContext(), "Water added successfully!", Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    private void setupWeightSubmitButton(View view) {
+        Button submitWeightButton = view.findViewById(R.id.submitWeightButton2);
+        submitWeightButton.setOnClickListener(v -> {
+            String weightString = weightEditText.getText().toString().trim();
+            weightViewModel.validateAndSubmitWeight(getContext(), weightString);
         });
     }
 }

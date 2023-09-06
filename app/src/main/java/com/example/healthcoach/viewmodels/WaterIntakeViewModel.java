@@ -6,13 +6,17 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.healthcoach.interfaces.WaterIntakeRepository;
 
-
-
 public class WaterIntakeViewModel extends ViewModel {
     private final MutableLiveData<Float> totalWaterIntake = new MutableLiveData<>(0f);
     private WaterIntakeRepository repository;
 
+    public WaterIntakeViewModel() {}  // Empty constructor
+
     public WaterIntakeViewModel(WaterIntakeRepository repository) {
+        this.repository = repository;
+    }
+
+    public void setRepository(WaterIntakeRepository repository) {
         this.repository = repository;
     }
 
@@ -22,6 +26,8 @@ public class WaterIntakeViewModel extends ViewModel {
 
     public void addWater(float intake) {
         totalWaterIntake.setValue(totalWaterIntake.getValue() + intake);
-        repository.insertWaterIntake(intake); // Insert into data source directly from ViewModel
+        if (repository != null) {
+            repository.insertWaterIntake(intake); // Insert into data source directly from ViewModel
+        }
     }
 }

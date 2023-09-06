@@ -26,4 +26,34 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"/>
 
+    <TextView
+        android:id="@+id/weightLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Enter Your Weight (kg)"
+        android:textSize="16sp"
+        android:paddingTop="16dp"
+        android:paddingBottom="8dp"
+        android:layout_below="@id/addWaterIntakeButton"
+        android:layout_marginTop="16dp"/>
+
+    <EditText
+        android:id="@+id/weightEditText2"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:hint="Enter weight between 30 and 130"
+        android:layout_below="@id/weightLabel"
+        android:layout_centerHorizontal="true"/>
+
+    <Button
+        android:id="@+id/submitWeightButton2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Submit Weight"
+        android:layout_below="@id/weightEditText2"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"/>
+
+
 </RelativeLayout>
