@@ -5,12 +5,11 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 public class Screen3ViewModel extends ViewModel {
-
     private final MutableLiveData<String> screenText = new MutableLiveData<>();
+    private final MutableLiveData<Long> selectedDate = new MutableLiveData<>();
+    private final MutableLiveData<String> selectedDataType = new MutableLiveData<>();
 
     public Screen3ViewModel() {
-        // For the sake of demonstration, we are setting an initial value here.
-        // In real-world scenarios, this might come from a database, API, or other data sources.
         screenText.setValue("Welcome to Screen 3");
     }
 
@@ -18,9 +17,19 @@ public class Screen3ViewModel extends ViewModel {
         return screenText;
     }
 
-    // If you ever need to update the text from somewhere (for example, in response to user input or a database change),
-    // you can expose a method to do so:
-    // public void setScreenText(String newText) {
-    //     screenText.setValue(newText);
-    // }
+    public LiveData<Long> getSelectedDate() {
+        return selectedDate;
+    }
+
+    public void setSelectedDate(Long date) {
+        selectedDate.setValue(date);
+    }
+
+    public LiveData<String> getSelectedDataType() {
+        return selectedDataType;
+    }
+
+    public void setSelectedDataType(String type) {
+        selectedDataType.setValue(type);
+    }
 }

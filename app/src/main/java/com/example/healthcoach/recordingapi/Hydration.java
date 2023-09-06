@@ -16,10 +16,12 @@ import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataSource;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
+import com.google.android.gms.fitness.request.DataReadRequest;
+import com.google.android.gms.fitness.result.DataReadResponse;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
-
 
 
 public class Hydration implements WaterIntakeRepository {
@@ -57,10 +59,6 @@ public class Hydration implements WaterIntakeRepository {
                 .setAppPackageName(context.getPackageName())
                 .build();
     }
-
-
-
-
     public void insertWaterIntake(float waterIntake) {
         if (!isUserSignedIn()) {
             Log.e("Hydration", "User is not signed in. Can't insert data.");
@@ -119,6 +117,35 @@ public class Hydration implements WaterIntakeRepository {
                 fitnessOptions
         );
     }
+
+    public void readHydrationData(long startTime, long endTime, OnSuccessListener<DataReadResponse> onRead) {
+        if (!isUserSignedIn()) {
+            Log.e("Hydration", "User is not signed in. Can't read data.");
+            promptSignIn();
+            return;
+        }
+
+        if (!hasNecessaryPermissions()) {
+            Log.e("Hydration", "No permissions to read data. Requesting permissions.");
+            requestPermissions();
+            return;
+        }
+
+        DataReadRequest readRequest = new DataReadRequest.Builder()
+                .read(DataType.TYPE_HYDRATION)
+                .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+                .build();
+
+        Fitness.getHistoryClient(context, googleSignInAccount)
+                .readData(readRequest)
+                .addOnSuccessListener(onRead)
+                .addOnFailureListener(e -> {
+                    Log.e("Hydration", "Failed to read hydration data: " + e.getMessage(), e);
+                });
+    }
+
+
+
 
 
     private void requestPermissions() {

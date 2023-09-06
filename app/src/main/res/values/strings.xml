@@ -5,11 +5,19 @@
     <string name="select_activity">Select activity</string>
     <string name="diary">Diary</string>
     <string name="user_profile">User Profile</string>
+
+
     <!-- Gender values -->
     <string-array name="gender_values">
         <item>Male</item>
         <item>Female</item>
         <item>Other</item>
     </string-array>
+
+    <string-array name="data_types_array">
+        <item>Hydration</item>
+        <item>Weight</item>
+    </string-array>
+
 
 </resources>

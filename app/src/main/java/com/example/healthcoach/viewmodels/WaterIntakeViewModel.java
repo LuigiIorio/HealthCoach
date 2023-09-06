@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.healthcoach.interfaces.WaterIntakeRepository;
 
+
 public class WaterIntakeViewModel extends ViewModel {
     private final MutableLiveData<Float> totalWaterIntake = new MutableLiveData<>(0f);
     private WaterIntakeRepository repository;

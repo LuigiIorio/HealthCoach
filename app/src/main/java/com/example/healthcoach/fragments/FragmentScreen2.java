@@ -40,8 +40,6 @@ public class FragmentScreen2 extends Fragment {
         waterIntakeViewModel.setRepository(new Hydration(getContext()));  // Use your existing Hydration class
     }
 
-
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
