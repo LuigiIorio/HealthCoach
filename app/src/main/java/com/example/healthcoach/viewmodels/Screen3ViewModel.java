@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+
+
 public class Screen3ViewModel extends ViewModel {
     private final MutableLiveData<String> screenText = new MutableLiveData<>();
     private final MutableLiveData<Long> selectedDate = new MutableLiveData<>();

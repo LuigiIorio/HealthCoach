@@ -1,11 +1,9 @@
 <resources>
-
     <string name="app_name">HealthCoach</string>
     <string name="logout">Logout</string>
     <string name="select_activity">Select activity</string>
     <string name="diary">Diary</string>
     <string name="user_profile">User Profile</string>
-
 
     <!-- Gender values -->
     <string-array name="gender_values">
@@ -14,10 +12,8 @@
         <item>Other</item>
     </string-array>
 
-    <string-array name="data_types_array">
+    <string-array name="data_types">
         <item>Hydration</item>
         <item>Weight</item>
     </string-array>
-
-
 </resources>

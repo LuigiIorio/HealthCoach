@@ -27,5 +27,14 @@
         android:layout_height="wrap_content"
         android:text="History Data Here" />
 
+    <!-- ... existing layout ... -->
+    <Button
+        android:id="@+id/fetchDataButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Fetch Data" />
+    <!-- ... existing layout ... -->
+
+
 
 </LinearLayout>
