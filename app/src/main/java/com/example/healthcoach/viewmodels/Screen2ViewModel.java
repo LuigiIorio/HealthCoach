@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+
+
 public class Screen2ViewModel extends ViewModel {
 
     private final MutableLiveData<String> journalText = new MutableLiveData<>();

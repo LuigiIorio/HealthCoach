@@ -1,11 +1,11 @@
 package com.example.healthcoach.viewmodels;
 
-import com.example.healthcoach.interfaces.WaterIntakeRepository;
-
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+
+import com.example.healthcoach.interfaces.WaterIntakeRepository;
+
 
 
 public class WaterIntakeViewModel extends ViewModel {

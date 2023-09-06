@@ -13,6 +13,7 @@ import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+
 public class Nutrition {
 
     private static final String NUTRITION_DATA_TYPE = "com.google.nutrition";
