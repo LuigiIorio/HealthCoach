@@ -3,12 +3,13 @@ package com.example.healthcoach.viewmodels;
 import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
 import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -19,16 +20,26 @@ import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataSource;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
+import com.google.android.gms.fitness.request.DataReadRequest;
+import com.google.android.gms.fitness.result.DataReadResponse;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.concurrent.TimeUnit;
 
 
 
-public class WeightViewModel extends ViewModel {
+public class WeightViewModel extends AndroidViewModel {
+
+    private Context context;
     private MutableLiveData<String> weightError = new MutableLiveData<>();
     private MutableLiveData<Boolean> weightSuccess = new MutableLiveData<>();
 
     public static final int REQUEST_OAUTH_REQUEST_CODE = 1004;
+
+    public WeightViewModel(Application application) {
+        super(application);
+        this.context = application.getApplicationContext();
+    }
 
     public LiveData<String> getWeightError() {
         return weightError;
@@ -142,4 +153,22 @@ public class WeightViewModel extends ViewModel {
             Log.e(TAG, "Permission for weight is not granted.");
         }
     }
+
+    public void fetchLatestWeight(long startTime, long endTime, OnSuccessListener<DataReadResponse> onSuccessListener) {
+        DataReadRequest readRequest = new DataReadRequest.Builder()
+                .read(DataType.TYPE_WEIGHT)
+                .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+                .setLimit(1)
+                .enableServerQueries()
+                .build();
+
+        Fitness.getHistoryClient(context, GoogleSignIn.getLastSignedInAccount(context))
+                .readData(readRequest)
+                .addOnSuccessListener(onSuccessListener)
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Failed to read weight data.", e);
+                });
+    }
+
+
 }

@@ -15,60 +15,52 @@ import com.google.android.gms.fitness.FitnessOptions;
 import com.google.android.gms.fitness.RecordingClient;
 import com.google.android.gms.fitness.data.DataSource;
 import com.google.android.gms.fitness.data.DataType;
-import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.fitness.request.DataReadRequest;
+import com.google.android.gms.fitness.result.DataReadResponse;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import java.util.concurrent.TimeUnit;
 
 public class Weight {
-
-    private static final String WEIGHT_DATA_TYPE = "com.google.weight";
     private static final int PERMISSION_REQUEST_CODE = 1001;
-
     private GoogleSignInAccount googleSignInAccount;
     private DataSource dataSource;
+    private Context context; // Store context for further use
+    private FitnessOptions fitnessOptions;
 
     public Weight(Context context) {
-        if (!checkAndRequestPermissions(context)) {
-            return;
-        }
-
-        FitnessOptions fitnessOptions = FitnessOptions.builder()
+        this.context = context;
+        this.fitnessOptions = FitnessOptions.builder()
                 .addDataType(DataType.TYPE_WEIGHT, FitnessOptions.ACCESS_WRITE)
                 .build();
-
-        googleSignInAccount = GoogleSignIn.getAccountForExtension(context, fitnessOptions);
-
-        // Create a Fitness recording client
+        if (!checkAndRequestPermissions()) {
+            return;
+        }
+        refreshGoogleSignInAccount();
         RecordingClient recordingClient = Fitness.getRecordingClient(context, googleSignInAccount);
-
-        // Create a DataSource for weight
         dataSource = new DataSource.Builder()
                 .setAppPackageName(context.getPackageName())
                 .setDataType(DataType.TYPE_WEIGHT)
                 .setType(DataSource.TYPE_RAW)
                 .setStreamName("WeightRecorderStream")
                 .build();
-
-        // Subscribe to the data source
         recordingClient.subscribe(dataSource)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("Weight", "Weight recording started");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(Exception e) {
-                        Log.e("Weight", "Failed to start weight recording", e);
-                    }
-                });
+                .addOnSuccessListener(aVoid -> Log.d("Weight", "Weight recording started"))
+                .addOnFailureListener(e -> Log.e("Weight", "Failed to start weight recording", e));
     }
 
-    private boolean checkAndRequestPermissions(Context context) {
+    public void refreshGoogleSignInAccount() {
+        googleSignInAccount = GoogleSignIn.getAccountForExtension(context, fitnessOptions);
+    }
+
+    private boolean isUserSignedIn() {
+        refreshGoogleSignInAccount();
+        return googleSignInAccount != null && GoogleSignIn.hasPermissions(googleSignInAccount, fitnessOptions);
+    }
+
+    private boolean checkAndRequestPermissions() {
         if (ContextCompat.checkSelfPermission(context, "android.permission.BODY_SENSORS")
                 != PackageManager.PERMISSION_GRANTED) {
-
             ActivityCompat.requestPermissions(
                     (Activity) context,
                     new String[]{"android.permission.BODY_SENSORS"},
@@ -79,23 +71,57 @@ public class Weight {
         return true;
     }
 
-    public void stopRecording(Context context) {
-        // Create a Fitness recording client
-        RecordingClient recordingClient = Fitness.getRecordingClient(context, googleSignInAccount);
+    private boolean hasNecessaryPermissions() {
+        return ContextCompat.checkSelfPermission(context, "android.permission.BODY_SENSORS")
+                == PackageManager.PERMISSION_GRANTED;
+    }
 
-        // Unsubscribe from the data source
+    public void stopRecording() {
+        RecordingClient recordingClient = Fitness.getRecordingClient(context, googleSignInAccount);
         recordingClient.unsubscribe(dataSource)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("Weight", "Weight recording stopped");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(Exception e) {
-                        Log.e("Weight", "Failed to stop weight recording", e);
-                    }
-                });
+                .addOnSuccessListener(aVoid -> Log.d("Weight", "Weight recording stopped"))
+                .addOnFailureListener(e -> Log.e("Weight", "Failed to stop weight recording", e));
+    }
+
+    public void readWeightData(long startTime, long endTime, OnSuccessListener<DataReadResponse> onRead) {
+        if (!isUserSignedIn()) {
+            Log.e("Weight", "User is not signed in. Can't read data.");
+            promptSignIn();
+            return;
+        }
+
+        if (!hasNecessaryPermissions()) {
+            Log.e("Weight", "No permissions to read data. Requesting permissions.");
+            requestPermissions();
+            return;
+        }
+
+        DataReadRequest readRequest = new DataReadRequest.Builder()
+                .read(DataType.TYPE_WEIGHT)
+                .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+                .build();
+
+        Fitness.getHistoryClient(context, googleSignInAccount)
+                .readData(readRequest)
+                .addOnSuccessListener(onRead)
+                .addOnFailureListener(e -> Log.e("Weight", "Failed to read weight data: " + e.getMessage(), e));
+    }
+
+    private void promptSignIn() {
+        GoogleSignIn.requestPermissions(
+                (Activity) context,
+                PERMISSION_REQUEST_CODE,
+                googleSignInAccount,
+                fitnessOptions
+        );
+    }
+
+
+    private void requestPermissions() {
+        ActivityCompat.requestPermissions(
+                (Activity) context,
+                new String[]{"android.permission.BODY_SENSORS"},
+                PERMISSION_REQUEST_CODE
+        );
     }
 }

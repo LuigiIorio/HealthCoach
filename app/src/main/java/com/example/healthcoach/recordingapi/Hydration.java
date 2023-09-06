@@ -101,9 +101,10 @@ public class Hydration implements WaterIntakeRepository {
     }
 
     private boolean isUserSignedIn() {
-        refreshGoogleSignInAccount();
-        return googleSignInAccount != null;
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(context);
+        return (account != null) && GoogleSignIn.hasPermissions(account, fitnessOptions);
     }
+
 
     private boolean hasNecessaryPermissions() {
         return GoogleSignIn.hasPermissions(googleSignInAccount, fitnessOptions);
@@ -121,14 +122,7 @@ public class Hydration implements WaterIntakeRepository {
 
     public void readHydrationData(long startTime, long endTime, OnSuccessListener<DataReadResponse> onRead) {
         if (!isUserSignedIn()) {
-            Log.e("Hydration", "User is not signed in. Can't read data.");
-            promptSignIn();
-            return;
-        }
-
-        if (!hasNecessaryPermissions()) {
-            Log.e("Hydration", "No permissions to read data. Requesting permissions.");
-            requestPermissions();
+            Log.e("Hydration", "User is not signed in. Can't read hydration data.");
             return;
         }
 
@@ -140,10 +134,9 @@ public class Hydration implements WaterIntakeRepository {
         Fitness.getHistoryClient(context, googleSignInAccount)
                 .readData(readRequest)
                 .addOnSuccessListener(onRead)
-                .addOnFailureListener(e -> {
-                    Log.e("Hydration", "Failed to read hydration data: " + e.getMessage(), e);
-                });
+                .addOnFailureListener(e -> Log.e("Hydration", "Failed to read hydration data.", e));
     }
+
 
 
 
