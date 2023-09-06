@@ -59,10 +59,11 @@ public class MainActivityViewModel extends AndroidViewModel {
                 .addDataType(DataType.TYPE_HEIGHT, FitnessOptions.ACCESS_WRITE)
                 .build();
 
+
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken("99729341904-qlls8u6lhkf63fc4n68s2dvt9mnncpg2.apps.googleusercontent.com")
                 .requestEmail()
-                .requestScopes(Fitness.SCOPE_NUTRITION_READ_WRITE, Fitness.SCOPE_BODY_READ_WRITE)
+                .requestScopes(Fitness.SCOPE_NUTRITION_READ_WRITE, Fitness.SCOPE_BODY_READ_WRITE, Fitness.SCOPE_ACTIVITY_READ_WRITE)
                 .build();
 
         mGoogleSignInClient = GoogleSignIn.getClient(context, gso);
