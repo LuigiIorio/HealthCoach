@@ -97,19 +97,16 @@ public class FragmentScreen3 extends Fragment {
             hydration.readHydrationData(startTime, endTime, new OnSuccessListener<DataReadResponse>() {
                 @Override
                 public void onSuccess(DataReadResponse dataReadResponse) {
-                    StringBuilder builder = new StringBuilder();
-
+                    float totalHydration = 0;
                     for (DataPoint dp : dataReadResponse.getDataSet(DataType.TYPE_HYDRATION).getDataPoints()) {
                         for (Field field : dp.getDataType().getFields()) {
-                            builder.append("Field: ").append(field.getName());
-                            builder.append(" Value: ").append(dp.getValue(field));
+                            totalHydration += dp.getValue(field).asFloat();
                         }
                     }
-
-                    if (builder.length() == 0) {
+                    if (totalHydration == 0) {
                         historyTextView.setText("No hydration data");
                     } else {
-                        historyTextView.setText(builder.toString());
+                        historyTextView.setText("Total Hydration: " + totalHydration + " ml");
                     }
                 }
             });
@@ -117,4 +114,6 @@ public class FragmentScreen3 extends Fragment {
             historyTextView.setText("No weight data");
         }
     }
+
+
 }
