@@ -10,18 +10,22 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.healthcoach.R;
+import com.example.healthcoach.viewmodels.DistanceDeltaViewModel;
 import com.example.healthcoach.viewmodels.StepViewModel;
+
+
 
 public class FragmentScreen1 extends Fragment {
 
     // UI Component
     private TextView messageTextView;
     private TextView stepTextView;
+    private TextView distanceTextView; // New TextView for distance
     private StepViewModel stepViewModel;
+    private DistanceDeltaViewModel distanceDeltaViewModel; // New ViewModel for distance
     private Handler handler;
 
     @Nullable
@@ -29,19 +33,19 @@ public class FragmentScreen1 extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_screen1, container, false);
 
-        // Initialize TextView
+        // Initialize TextViews
         stepTextView = view.findViewById(R.id.stepTextView);
+        distanceTextView = view.findViewById(R.id.distanceTextView);  // Initialize distance TextView
 
-        // Initialize ViewModel
+        // Initialize ViewModel for steps and distance
         stepViewModel = new ViewModelProvider(this).get(StepViewModel.class);
+        distanceDeltaViewModel = new ViewModelProvider(this).get(DistanceDeltaViewModel.class);  // Initialize distance ViewModel
 
-        // Observe LiveData from ViewModel
-        stepViewModel.getSteps().observe(getViewLifecycleOwner(), new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer steps) {
-                stepTextView.setText("Steps: " + steps);
-            }
-        });
+        // Observe LiveData from ViewModel for steps
+        stepViewModel.getSteps().observe(getViewLifecycleOwner(), steps -> stepTextView.setText("Steps: " + steps));
+
+        // Observe LiveData from ViewModel for distance
+        distanceDeltaViewModel.getTotalDistance().observe(getViewLifecycleOwner(), distance -> distanceTextView.setText("Distance: " + distance + " meters"));
 
         initUI(view);
         return view;
@@ -54,11 +58,15 @@ public class FragmentScreen1 extends Fragment {
         // Initialize Handler
         handler = new Handler();
 
-        final int delay = 10000; // 10 seconds in milliseconds
+        final int delay = 30000; // 30 seconds in milliseconds
 
         handler.postDelayed(new Runnable() {
             public void run() {
-                // Insert code to update steps from Google Fit here
+                // Update steps from Google Fit (existing logic)
+
+                // Query distance from Google Fit (new logic)
+                distanceDeltaViewModel.queryTodayDistance(getContext());
+
                 handler.postDelayed(this, delay);
             }
         }, delay);

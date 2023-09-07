@@ -20,5 +20,15 @@
         android:layout_below="@+id/messageTextView"
         android:layout_marginTop="16dp"/>
 
+    <TextView
+        android:id="@+id/distanceTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Distance: "
+        android:textSize="18sp"
+        android:layout_below="@+id/stepTextView"
+        android:layout_marginTop="16dp"/>
+
+
 
 </RelativeLayout>

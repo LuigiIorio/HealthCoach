@@ -13,6 +13,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.healthcoach.R;
+import com.example.healthcoach.recordingapi.DistanceDelta;
+import com.example.healthcoach.recordingapi.StepCountDelta;
 import com.example.healthcoach.viewmodels.MainActivityViewModel;
 
 
@@ -32,6 +34,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+        // Initialize DistanceDelta to start recording distance data
+        new DistanceDelta(this);
+        // Initialize StepCountDelta to start recording step data
+        new StepCountDelta(this).startRecording(this);
+
 
         viewModel = new ViewModelProvider(this, new ViewModelProvider.AndroidViewModelFactory(getApplication())).get(MainActivityViewModel.class);
 
@@ -89,4 +98,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+
+
+
 }

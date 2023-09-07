@@ -57,6 +57,7 @@ public class MainActivityViewModel extends AndroidViewModel {
                 .addDataType(DataType.TYPE_NUTRITION, FitnessOptions.ACCESS_WRITE)
                 .addDataType(DataType.TYPE_WEIGHT, FitnessOptions.ACCESS_WRITE)
                 .addDataType(DataType.TYPE_HEIGHT, FitnessOptions.ACCESS_WRITE)
+                .addDataType(DataType.TYPE_DISTANCE_DELTA, FitnessOptions.ACCESS_WRITE)
                 .build();
 
 
@@ -91,6 +92,7 @@ public class MainActivityViewModel extends AndroidViewModel {
                         .addDataType(DataType.TYPE_NUTRITION, FitnessOptions.ACCESS_WRITE)
                         .addDataType(DataType.TYPE_WEIGHT, FitnessOptions.ACCESS_WRITE)
                         .addDataType(DataType.TYPE_HEIGHT, FitnessOptions.ACCESS_WRITE)
+                        .addDataType(DataType.TYPE_DISTANCE_DELTA, FitnessOptions.ACCESS_WRITE)
                         .build();
 
                 if (GoogleSignIn.hasPermissions(account, fitnessOptions)) {
@@ -111,9 +113,6 @@ public class MainActivityViewModel extends AndroidViewModel {
             loginResult.setValue(LoginResult.FAILURE);
         }
     }
-
-
-
 
 
     public void loginWithEmailAndPassword(String email, String password) {

@@ -137,11 +137,6 @@ public class Hydration implements WaterIntakeRepository {
                 .addOnFailureListener(e -> Log.e("Hydration", "Failed to read hydration data.", e));
     }
 
-
-
-
-
-
     private void requestPermissions() {
         GoogleSignIn.requestPermissions(
                 (Activity) context,

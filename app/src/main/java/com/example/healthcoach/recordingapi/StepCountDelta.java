@@ -25,6 +25,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.concurrent.TimeUnit;
 
+
 public class StepCountDelta {
     private GoogleSignInAccount googleSignInAccount;
     private DataSource dataSource;
