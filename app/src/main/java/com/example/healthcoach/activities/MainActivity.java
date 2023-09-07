@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.healthcoach.R;
+import com.example.healthcoach.recordingapi.CaloriesExpended;
 import com.example.healthcoach.recordingapi.DistanceDelta;
 import com.example.healthcoach.recordingapi.StepCountDelta;
 import com.example.healthcoach.viewmodels.MainActivityViewModel;
@@ -40,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
         new DistanceDelta(this);
         // Initialize StepCountDelta to start recording step data
         new StepCountDelta(this).startRecording(this);
+        // Initialize CaloriesExpended to start recording calories data
+        new CaloriesExpended(this);
 
 
         viewModel = new ViewModelProvider(this, new ViewModelProvider.AndroidViewModelFactory(getApplication())).get(MainActivityViewModel.class);

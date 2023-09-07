@@ -13,9 +13,10 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.healthcoach.R;
+import com.example.healthcoach.recordingapi.StepCountDelta;
+import com.example.healthcoach.viewmodels.CaloriesExpendedViewModel;
 import com.example.healthcoach.viewmodels.DistanceDeltaViewModel;
 import com.example.healthcoach.viewmodels.StepViewModel;
-
 
 
 public class FragmentScreen1 extends Fragment {
@@ -23,9 +24,12 @@ public class FragmentScreen1 extends Fragment {
     // UI Component
     private TextView messageTextView;
     private TextView stepTextView;
-    private TextView distanceTextView; // New TextView for distance
+    private TextView distanceTextView;
+    private TextView caloriesTextView; // New TextView for calories
     private StepViewModel stepViewModel;
-    private DistanceDeltaViewModel distanceDeltaViewModel; // New ViewModel for distance
+    private StepCountDelta stepCountDelta;
+    private DistanceDeltaViewModel distanceDeltaViewModel;
+    private CaloriesExpendedViewModel caloriesExpendedViewModel; // New ViewModel for calories
     private Handler handler;
 
     @Nullable
@@ -35,17 +39,18 @@ public class FragmentScreen1 extends Fragment {
 
         // Initialize TextViews
         stepTextView = view.findViewById(R.id.stepTextView);
-        distanceTextView = view.findViewById(R.id.distanceTextView);  // Initialize distance TextView
+        distanceTextView = view.findViewById(R.id.distanceTextView);
+        caloriesTextView = view.findViewById(R.id.caloriesTextView); // Initialize calories TextView
 
-        // Initialize ViewModel for steps and distance
+        // Initialize ViewModel for steps, distance, and calories
         stepViewModel = new ViewModelProvider(this).get(StepViewModel.class);
-        distanceDeltaViewModel = new ViewModelProvider(this).get(DistanceDeltaViewModel.class);  // Initialize distance ViewModel
+        distanceDeltaViewModel = new ViewModelProvider(this).get(DistanceDeltaViewModel.class);
+        caloriesExpendedViewModel = new ViewModelProvider(this).get(CaloriesExpendedViewModel.class); // Initialize calories ViewModel
 
-        // Observe LiveData from ViewModel for steps
+        // Observe LiveData from ViewModel
         stepViewModel.getSteps().observe(getViewLifecycleOwner(), steps -> stepTextView.setText("Steps: " + steps));
-
-        // Observe LiveData from ViewModel for distance
         distanceDeltaViewModel.getTotalDistance().observe(getViewLifecycleOwner(), distance -> distanceTextView.setText("Distance: " + distance + " meters"));
+        caloriesExpendedViewModel.getTotalCalories().observe(getViewLifecycleOwner(), calories -> caloriesTextView.setText("Calories: " + calories + " kcal")); // Observe calories
 
         initUI(view);
         return view;
@@ -54,34 +59,35 @@ public class FragmentScreen1 extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-
-        // Initialize Handler
+        stepCountDelta = new StepCountDelta(getContext());  // Instantiate once here
         handler = new Handler();
-
-        final int delay = 30000; // 30 seconds in milliseconds
+        final int delay = 10000;  // 10 seconds in milliseconds
 
         handler.postDelayed(new Runnable() {
             public void run() {
-                // Update steps from Google Fit (existing logic)
-
-                // Query distance from Google Fit (new logic)
+                // Query today's distance from Google Fit
                 distanceDeltaViewModel.queryTodayDistance(getContext());
+
+                // Query today's calories from Google Fit
+                caloriesExpendedViewModel.queryTodayCalories(getContext());
+
+                // Query today's steps from Google Fit
+                stepCountDelta.readTodaySteps(getContext(), getActivity());  // Use the instantiated object
 
                 handler.postDelayed(this, delay);
             }
         }, delay);
     }
 
+
+
     @Override
     public void onPause() {
         super.onPause();
-
-        // Remove callbacks to stop updates
         handler.removeCallbacksAndMessages(null);
     }
 
     private void initUI(View view) {
         messageTextView = view.findViewById(R.id.messageTextView);
-        // If you have additional logic or UI components to initialize, you can do it here.
     }
 }

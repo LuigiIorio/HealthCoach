@@ -20,19 +20,17 @@ import com.google.android.gms.fitness.request.DataReadRequest;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
+public class CaloriesExpendedViewModel extends ViewModel {
 
+    private final MutableLiveData<Float> totalCalories = new MutableLiveData<>(0f);
 
-public class DistanceDeltaViewModel extends ViewModel {
-
-    private final MutableLiveData<Float> totalDistance = new MutableLiveData<>(0f);
-
-    public LiveData<Float> getTotalDistance() {
-        return totalDistance;
+    public LiveData<Float> getTotalCalories() {
+        return totalCalories;
     }
 
-    public void queryTodayDistance(Context context) {
+    public void queryTodayCalories(Context context) {
         FitnessOptions fitnessOptions = FitnessOptions.builder()
-                .addDataType(DataType.TYPE_DISTANCE_DELTA, FitnessOptions.ACCESS_READ)
+                .addDataType(DataType.TYPE_CALORIES_EXPENDED, FitnessOptions.ACCESS_READ)
                 .build();
 
         GoogleSignInAccount googleSignInAccount = GoogleSignIn.getAccountForExtension(context, fitnessOptions);
@@ -46,7 +44,7 @@ public class DistanceDeltaViewModel extends ViewModel {
         long endTime = System.currentTimeMillis();
 
         DataReadRequest readRequest = new DataReadRequest.Builder()
-                .aggregate(DataType.TYPE_DISTANCE_DELTA, DataType.AGGREGATE_DISTANCE_DELTA)
+                .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
                 .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
                 .build();
 
@@ -61,11 +59,8 @@ public class DistanceDeltaViewModel extends ViewModel {
                             }
                         }
                     }
-                    totalDistance.setValue(sum);
+                    totalCalories.setValue(sum);
                 })
-                .addOnFailureListener(e -> Log.e("DistanceDeltaViewModel", "Failed to read data", e));
+                .addOnFailureListener(e -> Log.e("CaloriesExpendedViewModel", "Failed to read data", e));
     }
-
-
 }
-

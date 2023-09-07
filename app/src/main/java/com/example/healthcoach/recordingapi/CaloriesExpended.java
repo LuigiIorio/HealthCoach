@@ -13,6 +13,7 @@ import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+
 public class CaloriesExpended {
 
     private static final String CALORIES_EXPENDED_DATA_TYPE = "com.google.calories.expended";
