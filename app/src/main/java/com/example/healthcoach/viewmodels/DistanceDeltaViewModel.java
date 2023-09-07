@@ -1,6 +1,7 @@
 package com.example.healthcoach.viewmodels;
 
 import android.content.Context;
+import android.icu.util.Calendar;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
@@ -17,9 +18,7 @@ import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.request.DataReadRequest;
 
-import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
-
 
 
 public class DistanceDeltaViewModel extends ViewModel {
@@ -29,6 +28,7 @@ public class DistanceDeltaViewModel extends ViewModel {
     public LiveData<Float> getTotalDistance() {
         return totalDistance;
     }
+
 
     public void queryTodayDistance(Context context) {
         FitnessOptions fitnessOptions = FitnessOptions.builder()
@@ -48,6 +48,7 @@ public class DistanceDeltaViewModel extends ViewModel {
         DataReadRequest readRequest = new DataReadRequest.Builder()
                 .aggregate(DataType.TYPE_DISTANCE_DELTA, DataType.AGGREGATE_DISTANCE_DELTA)
                 .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+                .bucketByTime(1, TimeUnit.DAYS)  // Added this line
                 .build();
 
         Fitness.getHistoryClient(context, googleSignInAccount)
@@ -65,6 +66,7 @@ public class DistanceDeltaViewModel extends ViewModel {
                 })
                 .addOnFailureListener(e -> Log.e("DistanceDeltaViewModel", "Failed to read data", e));
     }
+
 
 
 }

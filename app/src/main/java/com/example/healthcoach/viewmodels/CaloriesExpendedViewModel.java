@@ -46,6 +46,7 @@ public class CaloriesExpendedViewModel extends ViewModel {
         DataReadRequest readRequest = new DataReadRequest.Builder()
                 .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
                 .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+                .bucketByTime(1, TimeUnit.DAYS)  // Added this line for bucketing
                 .build();
 
         Fitness.getHistoryClient(context, googleSignInAccount)
