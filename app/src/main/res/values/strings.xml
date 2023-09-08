@@ -4,6 +4,9 @@
     <string name="select_activity">Select activity</string>
     <string name="diary">Diary</string>
     <string name="user_profile">User Profile</string>
+    <string name="forget_password">Forget Password?</string>
+    <string name="remember_password">Remember the password? Log in.</string>
+    <string name="reset_password">Reset Password</string>
 
     <!-- Gender values -->
     <string-array name="gender_values">
