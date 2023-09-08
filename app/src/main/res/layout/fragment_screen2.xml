@@ -55,5 +55,33 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"/>
 
+    <TextView
+        android:id="@+id/bodyFatLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Enter Your Body Fat (%)"
+        android:textSize="16sp"
+        android:layout_below="@id/submitWeightButton2"
+        android:layout_marginTop="16dp"/>
+
+    <EditText
+        android:id="@+id/bodyFatEditText"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal"
+        android:hint="Enter BF percentage between 3% and 40%"
+        android:layout_below="@id/bodyFatLabel"
+        android:layout_centerHorizontal="true"/>
+
+    <Button
+        android:id="@+id/submitBodyFatButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Submit Body Fat"
+        android:layout_below="@id/bodyFatEditText"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"/>
+
+
 
 </RelativeLayout>

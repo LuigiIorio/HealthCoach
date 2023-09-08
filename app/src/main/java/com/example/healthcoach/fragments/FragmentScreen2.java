@@ -16,9 +16,11 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.healthcoach.R;
 import com.example.healthcoach.recordingapi.Hydration;
+import com.example.healthcoach.viewmodels.BodyFatViewModel;
 import com.example.healthcoach.viewmodels.Screen2ViewModel;
 import com.example.healthcoach.viewmodels.WaterIntakeViewModel;
 import com.example.healthcoach.viewmodels.WeightViewModel;
+
 
 public class FragmentScreen2 extends Fragment {
 
@@ -28,7 +30,13 @@ public class FragmentScreen2 extends Fragment {
     private Button addWaterIntakeButton;
     private WeightViewModel weightViewModel;
     private EditText weightEditText;
-    private WaterIntakeViewModel waterIntakeViewModel;  // Declare this line for waterIntakeViewModel
+    private WaterIntakeViewModel waterIntakeViewModel;
+
+    private EditText bodyFatEditText;
+
+    private Button submitBodyFatButton;
+
+    private BodyFatViewModel bodyFatViewModel;
 
 
     @Override
@@ -37,8 +45,10 @@ public class FragmentScreen2 extends Fragment {
         viewModel = new ViewModelProvider(this).get(Screen2ViewModel.class);
         weightViewModel = new ViewModelProvider(this).get(WeightViewModel.class);
         waterIntakeViewModel = new ViewModelProvider(this).get(WaterIntakeViewModel.class);
-        waterIntakeViewModel.setRepository(new Hydration(getContext()));  // Use your existing Hydration class
+        bodyFatViewModel = new ViewModelProvider(this).get(BodyFatViewModel.class);  // New line
+        waterIntakeViewModel.setRepository(new Hydration(getContext()));
     }
+
 
     @Nullable
     @Override
@@ -48,13 +58,34 @@ public class FragmentScreen2 extends Fragment {
         waterIntakeEditText = view.findViewById(R.id.waterIntakeEditText);
         addWaterIntakeButton = view.findViewById(R.id.addWaterIntakeButton);
         weightEditText = view.findViewById(R.id.weightEditText2);
+        bodyFatEditText = view.findViewById(R.id.bodyFatEditText);
+        submitBodyFatButton = view.findViewById(R.id.submitBodyFatButton);
 
         observeData();
         initWaterIntakeUI();
         setupWeightSubmitButton(view);
+        setupBodyFatButton();
+
 
         return view;
     }
+
+    private void setupBodyFatButton() {
+        submitBodyFatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String bodyFatText = bodyFatEditText.getText().toString();
+                if (!bodyFatText.isEmpty()) {
+                    float bodyFat = Float.parseFloat(bodyFatText);
+                    bodyFatViewModel.insertBodyFat(getContext(), bodyFat);
+                    Toast.makeText(getContext(), "Body fat data added successfully!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(), "Please enter body fat percentage", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
 
     private void observeData() {
         viewModel.getJournalText().observe(getViewLifecycleOwner(), journalTextView::setText);
