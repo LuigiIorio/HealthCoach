@@ -15,8 +15,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.healthcoach.R;
+import com.example.healthcoach.recordingapi.BodyFat;
 import com.example.healthcoach.recordingapi.Hydration;
 import com.example.healthcoach.recordingapi.Weight;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.Field;
@@ -27,10 +30,13 @@ import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
 
+
+
 public class FragmentScreen3 extends Fragment {
 
     private Hydration hydration;
     private Weight weight;
+    private BodyFat bodyFat; // added this
     private TextView historyTextView;
     private Spinner dataTypeSpinner;
     private Button fetchDataButton;
@@ -56,6 +62,7 @@ public class FragmentScreen3 extends Fragment {
     private void initializeVariables(View view) {
         hydration = new Hydration(getActivity());
         weight = new Weight(getActivity());
+        bodyFat = new BodyFat(getActivity());
         historyTextView = view.findViewById(R.id.historyTextView);
         dataTypeSpinner = view.findViewById(R.id.dataTypeSpinner);
         fetchDataButton = view.findViewById(R.id.fetchDataButton);
@@ -97,11 +104,6 @@ public class FragmentScreen3 extends Fragment {
         });
     }
 
-
-
-
-
-
     private long getDateInMillis(int year, int month, int day) {
         Calendar calendar = Calendar.getInstance();
         calendar.set(year, month, day);
@@ -109,7 +111,11 @@ public class FragmentScreen3 extends Fragment {
     }
 
     private void updateDataBasedOnType(String type, long startTime, long endTime) {
-        TextView historyTextView = getView().findViewById(R.id.historyTextView);
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
+        if (account == null) {
+            historyTextView.setText("Not signed in");
+            return;
+        }
 
         if ("Hydration".equals(type)) {
             hydration.readHydrationData(startTime, endTime, new OnSuccessListener<DataReadResponse>() {
@@ -124,7 +130,6 @@ public class FragmentScreen3 extends Fragment {
                             }
                         }
                     }
-                    // Update UI with totalHydration
                     historyTextView.setText(String.format("Total water intake: %.2f L", totalHydration));
                 }
             });
@@ -146,12 +151,30 @@ public class FragmentScreen3 extends Fragment {
                             }
                         }
                     }
-                    // Update UI with latestWeight
                     historyTextView.setText(String.format("Latest weight: %.2f kg", latestWeight));
+                }
+            });
+        } else if ("BodyFat".equals(type)) {
+            bodyFat.readBodyFatData(getActivity(), account, startTime, endTime, new OnSuccessListener<DataReadResponse>() {
+                @Override
+                public void onSuccess(DataReadResponse dataReadResponse) {
+                    float latestBodyFat = 0;
+                    long latestTime = 0;
+                    for (DataSet dataSet : dataReadResponse.getDataSets()) {
+                        for (DataPoint point : dataSet.getDataPoints()) {
+                            for (Field field : point.getDataType().getFields()) {
+                                float bodyFatValue = point.getValue(field).asFloat();
+                                long endTime = point.getEndTime(TimeUnit.MILLISECONDS);
+                                if (endTime > latestTime) {
+                                    latestTime = endTime;
+                                    latestBodyFat = bodyFatValue;
+                                }
+                            }
+                        }
+                    }
+                    historyTextView.setText(String.format("Latest body fat: %.2f%%", latestBodyFat));
                 }
             });
         }
     }
-
-
 }

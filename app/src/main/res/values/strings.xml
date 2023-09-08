@@ -18,5 +18,6 @@
     <string-array name="data_types">
         <item>Hydration</item>
         <item>Weight</item>
+        <item>BodyFat</item>
     </string-array>
 </resources>
