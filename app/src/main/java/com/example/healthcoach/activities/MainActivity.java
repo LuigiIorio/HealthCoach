@@ -17,6 +17,9 @@ import com.example.healthcoach.recordingapi.CaloriesExpended;
 import com.example.healthcoach.recordingapi.DistanceDelta;
 import com.example.healthcoach.recordingapi.StepCountDelta;
 import com.example.healthcoach.viewmodels.MainActivityViewModel;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+
 
 
 public class MainActivity extends AppCompatActivity {
@@ -36,16 +39,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Declare GoogleSignInAccount account only once here
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
 
-        // Initialize DistanceDelta to start recording distance data
-        new DistanceDelta(this);
-        // Initialize StepCountDelta to start recording step data
-        new StepCountDelta(this).startRecording(this);
-        // Initialize CaloriesExpended to start recording calories data
-        new CaloriesExpended(this);
-
+        // Initialize DistanceDelta, StepCountDelta, and CaloriesExpended using the 'account' variable
+        new DistanceDelta(this, account);
+        new StepCountDelta(this, account).startRecording(this);
+        new CaloriesExpended(this, account);
 
         viewModel = new ViewModelProvider(this, new ViewModelProvider.AndroidViewModelFactory(getApplication())).get(MainActivityViewModel.class);
+
+        // Use the existing 'account' variable
+        viewModel.setGoogleSignInAccount(account);
 
         emailEditText = findViewById(R.id.emailEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
@@ -59,14 +64,13 @@ public class MainActivity extends AppCompatActivity {
 
             if (email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(MainActivity.this, "Email and password are required", Toast.LENGTH_SHORT).show();
-                return; // Don't proceed with login
+                return;
             }
 
             viewModel.loginWithEmailAndPassword(email, password);
         });
 
         signUpTextView.setOnClickListener(v -> {
-            // Navigate to the sign-up activity.
             Intent intent = new Intent(MainActivity.this, SignUpActivity.class);
             startActivity(intent);
         });
@@ -81,19 +85,15 @@ public class MainActivity extends AppCompatActivity {
             googleSignInResultLauncher.launch(signInIntent);
         });
 
-        // New code for "Forgot Password?" button
         Button forgotPasswordButton = findViewById(R.id.forgotPasswordButton);
         forgotPasswordButton.setOnClickListener(v -> {
-            // Start the ForgotPasswordActivity
             Intent intent = new Intent(MainActivity.this, ForgotPasswordActivity.class);
             startActivity(intent);
         });
 
-        // Observe login result from ViewModel
         viewModel.getLoginResult().observe(this, loginResult -> {
             if (loginResult == MainActivityViewModel.LoginResult.SUCCESS) {
                 Toast.makeText(MainActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
-                // Navigate to the HomeActivity
                 Intent intent = new Intent(MainActivity.this, HomeActivity.class);
                 startActivity(intent);
             } else if (loginResult == MainActivityViewModel.LoginResult.FAILURE) {
@@ -101,7 +101,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
 
 
 

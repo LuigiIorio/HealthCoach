@@ -16,12 +16,11 @@ public class DistanceDelta {
     private GoogleSignInAccount googleSignInAccount;
     private DataSource distanceDeltaDataSource;
 
-    public DistanceDelta(Context context) {
+    public DistanceDelta(Context context, GoogleSignInAccount account) {
+        this.googleSignInAccount = account;
         FitnessOptions fitnessOptions = FitnessOptions.builder()
                 .addDataType(DataType.TYPE_DISTANCE_DELTA, FitnessOptions.ACCESS_WRITE)
                 .build();
-
-        googleSignInAccount = GoogleSignIn.getAccountForExtension(context, fitnessOptions);
 
         distanceDeltaDataSource = new DataSource.Builder()
                 .setDataType(DataType.TYPE_DISTANCE_DELTA)

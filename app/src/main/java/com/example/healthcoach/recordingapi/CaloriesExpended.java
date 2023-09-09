@@ -21,12 +21,11 @@ public class CaloriesExpended {
     private GoogleSignInAccount googleSignInAccount;
     private DataSource dataSource;
 
-    public CaloriesExpended(Context context) {
+    public CaloriesExpended(Context context, GoogleSignInAccount account) {
+        this.googleSignInAccount = account;
         FitnessOptions fitnessOptions = FitnessOptions.builder()
                 .addDataType(DataType.TYPE_CALORIES_EXPENDED, FitnessOptions.ACCESS_WRITE)
                 .build();
-
-        googleSignInAccount = GoogleSignIn.getAccountForExtension(context, fitnessOptions);
 
         // Create a Fitness recording client
         RecordingClient recordingClient = Fitness.getRecordingClient(context, googleSignInAccount);

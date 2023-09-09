@@ -30,12 +30,18 @@ public class StepCountDelta {
     private GoogleSignInAccount googleSignInAccount;
     private DataSource dataSource;
 
-    public StepCountDelta(Context context) {
+
+
+    public StepCountDelta(Context context, GoogleSignInAccount account) {
+        this.googleSignInAccount = account;
+
+        if (googleSignInAccount == null) {
+            throw new IllegalArgumentException("GoogleSignInAccount cannot be null");
+        }
+
         FitnessOptions fitnessOptions = FitnessOptions.builder()
                 .addDataType(DataType.TYPE_STEP_COUNT_DELTA, FitnessOptions.ACCESS_WRITE)
                 .build();
-
-        googleSignInAccount = GoogleSignIn.getAccountForExtension(context, fitnessOptions);
 
         // Create a Fitness recording client
         RecordingClient recordingClient = Fitness.getRecordingClient(context, googleSignInAccount);

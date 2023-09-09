@@ -16,7 +16,10 @@ import com.example.healthcoach.R;
 import com.example.healthcoach.recordingapi.StepCountDelta;
 import com.example.healthcoach.viewmodels.CaloriesExpendedViewModel;
 import com.example.healthcoach.viewmodels.DistanceDeltaViewModel;
+import com.example.healthcoach.viewmodels.MainActivityViewModel;
 import com.example.healthcoach.viewmodels.StepViewModel;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+
 
 
 public class FragmentScreen1 extends Fragment {
@@ -32,34 +35,55 @@ public class FragmentScreen1 extends Fragment {
     private CaloriesExpendedViewModel caloriesExpendedViewModel; // New ViewModel for calories
     private Handler handler;
 
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_screen1, container, false);
 
-        // Initialize TextViews
-        stepTextView = view.findViewById(R.id.stepTextView);
-        distanceTextView = view.findViewById(R.id.distanceTextView);
-        caloriesTextView = view.findViewById(R.id.caloriesTextView); // Initialize calories TextView
+        // Initialize ViewModel and get GoogleSignInAccount
+        MainActivityViewModel viewModel = new ViewModelProvider(requireActivity()).get(MainActivityViewModel.class);
+        GoogleSignInAccount account = viewModel.getGoogleSignInAccount();
 
-        // Initialize ViewModel for steps, distance, and calories
-        stepViewModel = new ViewModelProvider(this).get(StepViewModel.class);
-        distanceDeltaViewModel = new ViewModelProvider(this).get(DistanceDeltaViewModel.class);
-        caloriesExpendedViewModel = new ViewModelProvider(this).get(CaloriesExpendedViewModel.class); // Initialize calories ViewModel
+        if (account == null) {
+            // Redirect to Google Sign-In or show a message
+            // Handle this case based on your application logic
+        } else {
+            // Initialize TextViews
+            stepTextView = view.findViewById(R.id.stepTextView);
+            distanceTextView = view.findViewById(R.id.distanceTextView);
+            caloriesTextView = view.findViewById(R.id.caloriesTextView); // Initialize calories TextView
 
-        // Observe LiveData from ViewModel
-        stepViewModel.getSteps().observe(getViewLifecycleOwner(), steps -> stepTextView.setText("Steps: " + steps));
-        distanceDeltaViewModel.getTotalDistance().observe(getViewLifecycleOwner(), distance -> distanceTextView.setText("Distance: " + distance + " meters"));
-        caloriesExpendedViewModel.getTotalCalories().observe(getViewLifecycleOwner(), calories -> caloriesTextView.setText("Calories: " + calories + " kcal")); // Observe calories
+            // Initialize ViewModel for steps, distance, and calories
+            stepViewModel = new ViewModelProvider(this).get(StepViewModel.class);
+            distanceDeltaViewModel = new ViewModelProvider(this).get(DistanceDeltaViewModel.class);
+            caloriesExpendedViewModel = new ViewModelProvider(this).get(CaloriesExpendedViewModel.class); // Initialize calories ViewModel
 
-        initUI(view);
+            // Observe LiveData from ViewModel
+            stepViewModel.getSteps().observe(getViewLifecycleOwner(), steps -> stepTextView.setText("Steps: " + steps));
+            distanceDeltaViewModel.getTotalDistance().observe(getViewLifecycleOwner(), distance -> distanceTextView.setText("Distance: " + distance + " meters"));
+            caloriesExpendedViewModel.getTotalCalories().observe(getViewLifecycleOwner(), calories -> caloriesTextView.setText("Calories: " + calories + " kcal")); // Observe calories
+
+            initUI(view);
+        }
         return view;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        stepCountDelta = new StepCountDelta(getContext());  // Instantiate once here
+
+        MainActivityViewModel viewModel = new ViewModelProvider(requireActivity()).get(MainActivityViewModel.class);
+        GoogleSignInAccount account = viewModel.getGoogleSignInAccount();
+
+        if (account == null) {
+            // Redirect to Google Sign-In or show a message
+            // For example, you might start a Google Sign-In activity here
+            return;
+        }
+
+        stepCountDelta = new StepCountDelta(getContext(), account);
+
         handler = new Handler();
         final int delay = 10000;  // 10 seconds in milliseconds
 
@@ -84,8 +108,11 @@ public class FragmentScreen1 extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        handler.removeCallbacksAndMessages(null);
+        if (handler != null) {
+            handler.removeCallbacksAndMessages(null);
+        }
     }
+
 
     private void initUI(View view) {
         messageTextView = view.findViewById(R.id.messageTextView);

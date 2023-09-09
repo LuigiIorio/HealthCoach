@@ -29,6 +29,15 @@ public class MainActivityViewModel extends AndroidViewModel {
     public static final int RC_SIGN_IN = 9001;
     private final Application application;
 
+    private GoogleSignInAccount mAccount;
+
+    public void setGoogleSignInAccount(GoogleSignInAccount account) {
+        this.mAccount = account;
+    }
+
+    public GoogleSignInAccount getGoogleSignInAccount() {
+        return mAccount;
+    }
     private MutableLiveData<LoginResult> loginResult = new MutableLiveData<>();
     private GoogleSignInClient mGoogleSignInClient;
     private FirebaseAuth mAuth;
