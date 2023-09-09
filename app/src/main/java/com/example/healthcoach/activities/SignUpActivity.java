@@ -26,32 +26,29 @@ public class SignUpActivity extends AppCompatActivity {
 
         signUpViewModel = new ViewModelProvider(this).get(SignUpViewModel.class);
 
-        EditText signupEmailEditText = findViewById(R.id.signupEmailEditText);
-        EditText signupPasswordEditText = findViewById(R.id.signupPasswordEditText);
+        EditText signupEmailEditText = findViewById(R.id.emailText);
+        EditText signupPasswordEditText = findViewById(R.id.passwordText);
         Button signupConfirmButton = findViewById(R.id.signupConfirmButton);
 
-        signupConfirmButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String email = signupEmailEditText.getText().toString();
-                String password = signupPasswordEditText.getText().toString();
+        signupConfirmButton.setOnClickListener(view -> {
+            String email = signupEmailEditText.getText().toString();
+            String password = signupPasswordEditText.getText().toString();
 
-                signUpViewModel.createUser(email, password);
+            signUpViewModel.createUser(email, password);
 
-                // Observing changes in userId to handle the UI reactions.
-                signUpViewModel.getUserId().observe(SignUpActivity.this, userId -> {
-                    if (userId != null) {
-                        if (userId.equals("email_in_use")) {
-                            Toast.makeText(SignUpActivity.this, "Email already in use", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(SignUpActivity.this, "Registration successful", Toast.LENGTH_SHORT).show();
-                            navigateToNextScreen(); // Navigate to the appropriate screen
-                        }
+            // Observing changes in userId to handle the UI reactions.
+            signUpViewModel.getUserId().observe(SignUpActivity.this, userId -> {
+                if (userId != null) {
+                    if (userId.equals("email_in_use")) {
+                        Toast.makeText(SignUpActivity.this, "Email already in use", Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(SignUpActivity.this, "Registration failed", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SignUpActivity.this, "Registration successful", Toast.LENGTH_SHORT).show();
+                        navigateToNextScreen(); // Navigate to the appropriate screen
                     }
-                });
-            }
+                } else {
+                    Toast.makeText(SignUpActivity.this, "Registration failed", Toast.LENGTH_SHORT).show();
+                }
+            });
         });
     }
 

@@ -17,7 +17,8 @@
     <color name="green_light">#FFC8E6C9</color>
     <color name="green">#FF4CAF50</color>
     <color name="green_dark">#FF2E7D32</color>
-    <color name="text">#FF323232</color>
-    <color name="background_white">#FFEEEEEE</color>
+    <color name="green_night">#FF1B5E20</color>
+    <color name="dark">#FF323232</color>
+    <color name="light">#FFDDDDDD</color>
     <color name="background_green">#FFC8E6C9</color>
 </resources>

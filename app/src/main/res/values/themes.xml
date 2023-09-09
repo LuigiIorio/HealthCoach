@@ -1,17 +1,16 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.HealthCoach" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.HealthCoach" parent="Theme.AppCompat.DayNight.NoActionBar">-
         <!-- Primary brand color. -->
         <item name="colorOnPrimary">@color/green_light</item>
         <item name="colorPrimary">@color/green</item>
         <item name="colorPrimaryDark">@color/green_dark</item>
-        <!-- Secondary brand color. -->
+        <!-- Secondary brand color. UNUSED -->
         <item name="colorOnSecondary">@color/material_black</item>
         <item name="colorSecondary">@color/material_teal_200</item>
         <item name="colorSecondaryVariant">@color/material_teal_700</item>
         <!-- Text & BackgroundColor -->
-        <item name="colorTertiary">@color/text</item>
-        <item name="colorOnTertiary">@color/background_white</item>
-        <!-- Customize your theme here. -->
+        <item name="textFillColor">@color/dark</item>
+        <item name="backgroundColor">@color/light</item>
     </style>
 </resources>

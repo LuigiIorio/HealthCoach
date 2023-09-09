@@ -13,9 +13,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.healthcoach.R;
-import com.example.healthcoach.recordingapi.CaloriesExpended;
-import com.example.healthcoach.recordingapi.DistanceDelta;
-import com.example.healthcoach.recordingapi.StepCountDelta;
 import com.example.healthcoach.viewmodels.MainActivityViewModel;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -38,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_login);
 
         // Initialize ViewModel
         viewModel = new ViewModelProvider(this, new ViewModelProvider.AndroidViewModelFactory(getApplication())).get(MainActivityViewModel.class);
@@ -56,8 +53,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Initialize UI components
-        emailEditText = findViewById(R.id.emailEditText);
-        passwordEditText = findViewById(R.id.passwordEditText);
+        emailEditText = findViewById(R.id.emailText);
+        passwordEditText = findViewById(R.id.passwordText);
         loginButton = findViewById(R.id.loginButton);
         signUpTextView = findViewById(R.id.signUpTextView);
         googleLoginButton = findViewById(R.id.googleLoginButton);
@@ -89,7 +86,8 @@ public class MainActivity extends AppCompatActivity {
             googleSignInResultLauncher.launch(signInIntent);
         });
 
-        Button forgotPasswordButton = findViewById(R.id.forgotPasswordButton);
+
+        TextView forgotPasswordButton = findViewById(R.id.forgetPassword);
         forgotPasswordButton.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, ForgotPasswordActivity.class);
             startActivity(intent);

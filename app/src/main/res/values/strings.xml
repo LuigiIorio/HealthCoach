@@ -4,9 +4,20 @@
     <string name="select_activity">Select activity</string>
     <string name="diary">Diary</string>
     <string name="user_profile">User Profile</string>
+
+    <string name="confirm">Confirm</string>
+    <string name="login">Login</string>
+    <string name="register">Register</string>
+    <string name="registration">Registration</string>
+    <string name="mail">Email</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
     <string name="forget_password">Forget Password?</string>
+    <string name="forget_password_info">Enter the mail address associated with your account.</string>
     <string name="remember_password">Remember the password? Log in.</string>
     <string name="reset_password">Reset Password</string>
+    <string name="already_have_account">Already have an account? Sign In!</string>
+    <string name="not_have_account">Don\'t have an account? Sign Up!</string>
 
     <!-- Gender values -->
     <string-array name="gender_values">
