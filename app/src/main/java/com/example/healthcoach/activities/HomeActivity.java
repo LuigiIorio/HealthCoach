@@ -14,10 +14,13 @@ import com.example.healthcoach.fragments.FragmentScreen2;
 import com.example.healthcoach.fragments.FragmentScreen3;
 import com.example.healthcoach.fragments.FragmentScreen4;
 import com.example.healthcoach.viewmodels.HomeViewModel;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 
 import org.jetbrains.annotations.Nullable;
+
 
 
 public class HomeActivity extends AppCompatActivity {
@@ -87,8 +90,14 @@ public class HomeActivity extends AppCompatActivity {
             };
 
     public void logout(View view) {
-        FirebaseAuth.getInstance().signOut();
-        startActivity(new Intent(HomeActivity.this, MainActivity.class));
-        finish();
+        homeViewModel.signOut(this, task -> {
+            startActivity(new Intent(HomeActivity.this, MainActivity.class));
+            finish();
+        });
     }
+
+
+
+
+
 }
