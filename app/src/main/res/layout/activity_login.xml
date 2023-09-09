@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/backgroundColor"
+    android:background="?attr/colorOnPrimary"
     android:padding="16dp"
     tools:context=".activities.SignUpActivity">
 
@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:autofillHints="emailAddress"
             android:background="@drawable/rounded_button"
-            android:backgroundTint="?attr/colorOnPrimary"
+            android:backgroundTint="?attr/backgroundColor"
             android:hint="@string/mail"
             android:inputType="textEmailAddress"
             android:textColor="?attr/textFillColor"
@@ -62,7 +62,7 @@
             android:layout_height="wrap_content"
             android:autofillHints="emailAddress"
             android:background="@drawable/rounded_button"
-            android:backgroundTint="?attr/colorOnPrimary"
+            android:backgroundTint="?attr/backgroundColor"
             android:hint="@string/password"
             android:inputType="textEmailAddress"
             android:textColor="?attr/textFillColor"
