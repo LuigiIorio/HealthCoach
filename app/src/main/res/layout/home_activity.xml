@@ -29,8 +29,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
+        android:background="?attr/colorPrimary"
+        app:itemIconTint="@color/bottom_navigation_menu_icon"
+        app:itemTextColor="@color/bottom_navigation_menu_text"
         app:menu="@menu/bottom_nav_menu" />
-
-
 
 </LinearLayout>
