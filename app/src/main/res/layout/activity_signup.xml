@@ -64,7 +64,7 @@
             android:background="@drawable/rounded_button"
             android:backgroundTint="?attr/backgroundColor"
             android:hint="@string/password"
-            android:inputType="textEmailAddress"
+            android:inputType="textPassword"
             android:textColor="?attr/textFillColor"
             app:hintTextColor="?android:attr/textColor"
             tools:ignore="SpeakableTextPresentCheck" />
@@ -91,7 +91,7 @@
             android:background="@drawable/rounded_button"
             android:backgroundTint="?attr/backgroundColor"
             android:hint="@string/confirm_password"
-            android:inputType="textEmailAddress"
+            android:inputType="textPassword"
             android:textColor="?attr/textFillColor"
             app:hintTextColor="?android:attr/textColor"
             tools:ignore="SpeakableTextPresentCheck" />

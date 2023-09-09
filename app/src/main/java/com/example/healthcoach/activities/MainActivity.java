@@ -86,7 +86,6 @@ public class MainActivity extends AppCompatActivity {
             googleSignInResultLauncher.launch(signInIntent);
         });
 
-
         TextView forgotPasswordButton = findViewById(R.id.forgetPassword);
         forgotPasswordButton.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, ForgotPasswordActivity.class);
