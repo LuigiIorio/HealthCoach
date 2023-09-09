@@ -34,24 +34,32 @@ public class MainActivity extends AppCompatActivity {
 
     private ActivityResultLauncher<Intent> googleSignInResultLauncher;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Declare GoogleSignInAccount account only once here
+        // Initialize ViewModel
+        viewModel = new ViewModelProvider(this, new ViewModelProvider.AndroidViewModelFactory(getApplication())).get(MainActivityViewModel.class);
+
+        // Get GoogleSignInAccount
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
 
-        // Initialize DistanceDelta, StepCountDelta, and CaloriesExpended using the 'account' variable
+        if (account == null) {
+            viewModel.signInWithGoogle(this);  // Redirect to Google Sign-In
+            return;
+        }
+
+        // Initialize DistanceDelta, StepCountDelta, and CaloriesExpended
         new DistanceDelta(this, account);
         new StepCountDelta(this, account).startRecording(this);
         new CaloriesExpended(this, account);
 
-        viewModel = new ViewModelProvider(this, new ViewModelProvider.AndroidViewModelFactory(getApplication())).get(MainActivityViewModel.class);
-
-        // Use the existing 'account' variable
+        // Set GoogleSignInAccount in ViewModel
         viewModel.setGoogleSignInAccount(account);
 
+        // Initialize UI components
         emailEditText = findViewById(R.id.emailEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
         loginButton = findViewById(R.id.loginButton);
@@ -101,6 +109,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+
 
 
 
