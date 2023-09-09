@@ -24,7 +24,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forgot_password);
 
-        emailEditText = findViewById(R.id.emailEditText);
+        emailEditText = findViewById(R.id.emailText);
         resetButton = findViewById(R.id.resetButton);
 
         viewModel = new ViewModelProvider(this).get(ForgotPasswordViewModel.class);
@@ -39,16 +39,13 @@ public class ForgotPasswordActivity extends AppCompatActivity {
             }
         });
 
-        resetButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String email = emailEditText.getText().toString().trim();
+        resetButton.setOnClickListener(v -> {
+            String email = emailEditText.getText().toString().trim();
 
-                if (email.isEmpty()) {
-                    Toast.makeText(ForgotPasswordActivity.this, "Enter your registered email", Toast.LENGTH_SHORT).show();
-                } else {
-                    viewModel.resetPassword(email);
-                }
+            if (email.isEmpty()) {
+                Toast.makeText(ForgotPasswordActivity.this, "Enter your registered email", Toast.LENGTH_SHORT).show();
+            } else {
+                viewModel.resetPassword(email);
             }
         });
     }
