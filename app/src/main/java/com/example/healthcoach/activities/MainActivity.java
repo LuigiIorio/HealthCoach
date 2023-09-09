@@ -22,6 +22,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 
 
+
 public class MainActivity extends AppCompatActivity {
 
     private EditText emailEditText;
@@ -34,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
 
     private ActivityResultLauncher<Intent> googleSignInResultLauncher;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,18 +46,14 @@ public class MainActivity extends AppCompatActivity {
         // Get GoogleSignInAccount
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
 
-        if (account == null) {
-            viewModel.signInWithGoogle(this);  // Redirect to Google Sign-In
-            return;
+        if (account != null) {
+            // Navigate to HomeActivity if already signed in
+            Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+            startActivity(intent);
+            finish();
+        } else {
+            viewModel.signInWithGoogle(this);
         }
-
-        // Initialize DistanceDelta, StepCountDelta, and CaloriesExpended
-        new DistanceDelta(this, account);
-        new StepCountDelta(this, account).startRecording(this);
-        new CaloriesExpended(this, account);
-
-        // Set GoogleSignInAccount in ViewModel
-        viewModel.setGoogleSignInAccount(account);
 
         // Initialize UI components
         emailEditText = findViewById(R.id.emailEditText);
@@ -109,9 +105,4 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-
-
-
-
 }
