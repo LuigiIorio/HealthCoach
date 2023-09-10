@@ -1,5 +1,7 @@
 package com.example.healthcoach.viewmodels;
 
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
@@ -23,11 +25,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 
 
+
 public class MainActivityViewModel extends AndroidViewModel {
 
     public static final int RC_SIGN_IN = 9001;
     private final Application application;
-
     private GoogleSignInAccount mAccount;
     private MutableLiveData<LoginResult> loginResult = new MutableLiveData<>();
     private GoogleSignInClient mGoogleSignInClient;
@@ -81,6 +83,7 @@ public class MainActivityViewModel extends AndroidViewModel {
             GoogleSignInAccount account = task.getResult(ApiException.class);
             if (account != null) {
                 loginResult.setValue(LoginResult.SUCCESS);
+                subscribeToSteps(activity);
             } else {
                 loginResult.setValue(LoginResult.FAILURE);
             }
@@ -89,6 +92,7 @@ public class MainActivityViewModel extends AndroidViewModel {
             loginResult.setValue(LoginResult.FAILURE);
         }
     }
+
 
     public void loginWithEmailAndPassword(String email, String password) {
         mAuth.signInWithEmailAndPassword(email, password)
@@ -101,7 +105,25 @@ public class MainActivityViewModel extends AndroidViewModel {
                 });
     }
 
+    public void subscribeToSteps(Context context) {
+        FitnessOptions fitnessOptions = FitnessOptions.builder()
+                .addDataType(DataType.TYPE_STEP_COUNT_CUMULATIVE)
+                .build();
+
+        Fitness.getRecordingClient(context, GoogleSignIn.getLastSignedInAccount(context))
+                .subscribe(DataType.TYPE_STEP_COUNT_CUMULATIVE)
+                .addOnSuccessListener(aVoid -> Log.i("MyApp", "Subscription was successful!"))
+                .addOnFailureListener(e -> Log.w("MyApp", "There was a problem subscribing", e));
+    }
+
     public enum LoginResult {
         SUCCESS, FAILURE
+    }
+
+    public void checkSignInStatus(Context context) {
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(context);
+        if (account == null) {
+            signInWithGoogle(context);
+        }
     }
 }

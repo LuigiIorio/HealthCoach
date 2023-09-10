@@ -1,7 +1,10 @@
 package com.example.healthcoach.fragments;
 
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,37 +46,45 @@ public class FragmentScreen1 extends Fragment {
         GoogleSignInAccount account = viewModel.getGoogleSignInAccount();
 
         if (account == null) {
-            // Handle this case
-        } else {
-            stepTextView = view.findViewById(R.id.stepTextView);
-            distanceTextView = view.findViewById(R.id.distanceTextView);
-            caloriesTextView = view.findViewById(R.id.caloriesTextView);
-
-            stepViewModel = new ViewModelProvider(this).get(StepViewModel.class);
-            distanceDeltaViewModel = new ViewModelProvider(this).get(DistanceDeltaViewModel.class);
-            caloriesExpendedViewModel = new ViewModelProvider(this).get(CaloriesExpendedViewModel.class);
-
-            stepViewModel.getSteps().observe(getViewLifecycleOwner(), steps -> stepTextView.setText("Steps: " + steps));
-            distanceDeltaViewModel.getTotalDistance().observe(getViewLifecycleOwner(), distance -> distanceTextView.setText("Distance: " + distance + " meters"));
-            caloriesExpendedViewModel.getTotalCalories().observe(getViewLifecycleOwner(), calories -> caloriesTextView.setText("Calories: " + calories + " kcal"));
-
-            initUI(view);
-
-            handler = new Handler();
-            final int delay = 10000;
-
-            handler.postDelayed(new Runnable() {
-                public void run() {
-                    distanceDeltaViewModel.queryTodayDistance(getContext());
-                    caloriesExpendedViewModel.queryTodayCalories(getContext());
-                    stepCountDelta.readTodaySteps(getContext(), getActivity());
-
-                    handler.postDelayed(this, delay);
-                }
-            }, delay);
+            viewModel.checkSignInStatus(getContext());
+            return view;  // Return the view early if account is null, to avoid NullPointerException
         }
+
+        stepTextView = view.findViewById(R.id.stepTextView);
+        distanceTextView = view.findViewById(R.id.distanceTextView);
+        caloriesTextView = view.findViewById(R.id.caloriesTextView);
+
+        stepViewModel = new ViewModelProvider(this).get(StepViewModel.class);
+        distanceDeltaViewModel = new ViewModelProvider(this).get(DistanceDeltaViewModel.class);
+        caloriesExpendedViewModel = new ViewModelProvider(this).get(CaloriesExpendedViewModel.class);
+
+        stepViewModel.getSteps().observe(getViewLifecycleOwner(), steps -> {
+            stepTextView.setText("Steps: " + steps);
+        });
+
+        distanceDeltaViewModel.getTotalDistance().observe(getViewLifecycleOwner(), distance -> distanceTextView.setText("Distance: " + distance + " meters"));
+        caloriesExpendedViewModel.getTotalCalories().observe(getViewLifecycleOwner(), calories -> caloriesTextView.setText("Calories: " + calories + " kcal"));
+
+        initUI(view);
+
+        handler = new Handler();
+        final int delay = 10000;
+
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                distanceDeltaViewModel.queryTodayDistance(getContext());
+                caloriesExpendedViewModel.queryTodayCalories(getContext());
+                stepCountDelta.readTodaySteps(getContext(), getActivity());
+
+                handler.postDelayed(this, delay);
+            }
+        }, delay);
+
         return view;
     }
+
+
+
 
     @Override
     public void onPause() {

@@ -42,6 +42,10 @@ public class MainActivity extends AppCompatActivity {
 
         // Get GoogleSignInAccount
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        if (account == null) {
+            viewModel.checkSignInStatus(this);
+        }
+
 
         if (account != null) {
             // Navigate to HomeActivity if already signed in

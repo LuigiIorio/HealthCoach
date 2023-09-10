@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.healthcoach.viewmodels.MainActivityViewModel;
 import com.example.healthcoach.viewmodels.StepViewModel;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -26,17 +27,19 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import java.util.concurrent.TimeUnit;
 
 
+
 public class StepCountDelta {
     private GoogleSignInAccount googleSignInAccount;
     private DataSource dataSource;
 
 
 
-    public StepCountDelta(Context context, GoogleSignInAccount account) {
+    public StepCountDelta(Context context, GoogleSignInAccount account, FragmentActivity fragmentActivity) {
         this.googleSignInAccount = account;
 
         if (googleSignInAccount == null) {
-            throw new IllegalArgumentException("GoogleSignInAccount cannot be null");
+            MainActivityViewModel viewModel = new ViewModelProvider(fragmentActivity).get(MainActivityViewModel.class);
+            viewModel.checkSignInStatus(context);
         }
 
         FitnessOptions fitnessOptions = FitnessOptions.builder()
@@ -51,7 +54,7 @@ public class StepCountDelta {
                 .setAppPackageName(context.getPackageName())
                 .setDataType(DataType.TYPE_STEP_COUNT_DELTA)
                 .setType(DataSource.TYPE_RAW)
-                .setStreamName("StepCountDeltaStream")  // Unique stream name
+                .setStreamName("StepCountDeltaStream")
                 .build();
     }
 
