@@ -30,7 +30,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:text="User Info"
+            android:text="@string/user_info"
             android:textAlignment="center"
             android:textColor="?attr/textFillColor"
             android:textSize="20sp"
@@ -133,7 +133,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:text="Height (cm)"
+                android:text="@string/height_cm"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -159,12 +159,43 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="75dp">
+
+            <TextView
+                android:id="@+id/textView13"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/night_mode"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Switch
+                android:id="@+id/switch1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:checked="false"
+                android:thumbTint="?attr/colorPrimary"
+                android:trackTint="?attr/colorPrimaryDark"
+                app:layout_constraintBottom_toBottomOf="@+id/textView13"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toEndOf="@+id/textView13"
+                app:layout_constraintTop_toTopOf="@+id/textView13"
+                tools:checked="false" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
         <TextView
             android:id="@+id/textView7"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginVertical="8dp"
-            android:text="Daily Goal"
+            android:text="@string/daily_goal"
             android:textAlignment="center"
             android:textColor="?attr/textFillColor"
             android:textSize="20sp"
@@ -213,7 +244,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:text="Daily Water"
+                android:text="@string/daily_water"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -279,7 +310,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginVertical="8dp"
-            android:text="Update Password"
+            android:text="@string/update_password"
             android:textAlignment="center"
             android:textColor="?attr/textFillColor"
             android:textSize="20sp"
@@ -394,19 +425,35 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <Button
-            android:id="@+id/button"
-            android:layout_width="match_parent"
+            android:id="@+id/submitButton"
+            android:layout_width="250dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_marginHorizontal="16dp"
-            android:layout_marginVertical="8dp"
+            android:layout_marginVertical="16dp"
             android:background="@drawable/rounded_button"
             android:backgroundTint="@color/green_dark"
             android:paddingHorizontal="16dp"
             android:paddingVertical="16dp"
-            android:text="Submit"
+            android:text="@string/submit"
             android:textColor="@color/green_light"
             android:textStyle="bold" />
 
+        <Button
+            android:id="@+id/logoutButton"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/rounded_button"
+            android:backgroundTint="@color/green_dark"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="16dp"
+            android:text="@string/logout"
+            android:textColor="@color/green_light"
+            android:textStyle="bold" />
 
     </LinearLayout>
 </ScrollView>

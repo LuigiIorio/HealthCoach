@@ -12,5 +12,6 @@
         <!-- Text & BackgroundColor -->
         <item name="textFillColor">@color/dark</item>
         <item name="backgroundColor">@color/light</item>
+        <item name="backgroundInsetTop">@color/material_white</item>
     </style>
 </resources>

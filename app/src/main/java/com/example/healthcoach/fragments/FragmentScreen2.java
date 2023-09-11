@@ -53,7 +53,7 @@ public class FragmentScreen2 extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_screen2, container, false);
+        View view = inflater.inflate(R.layout.fragment_profile, container, false);
         journalTextView = view.findViewById(R.id.journalTextView);
         waterIntakeEditText = view.findViewById(R.id.waterIntakeEditText);
         addWaterIntakeButton = view.findViewById(R.id.addWaterIntakeButton);
