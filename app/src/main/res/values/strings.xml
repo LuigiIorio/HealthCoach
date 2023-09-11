@@ -15,9 +15,22 @@
     <string name="forget_password">Forget Password?</string>
     <string name="forget_password_info">Enter the mail address associated with your account.</string>
     <string name="remember_password">Remember the password? Log in.</string>
+    <string name="new_password">New Password</string>
     <string name="reset_password">Reset Password</string>
+    <string name="old_password">Old Password</string>
     <string name="already_have_account">Already have an account? Sign In!</string>
     <string name="not_have_account">Don\'t have an account? Sign Up!</string>
+    <string name="steps">Steps</string>
+    <string name="full_name">Full Name</string>
+    <string name="gender">Gender</string>
+    <string name="daily_kcal">Daily Kcal</string>
+    <string name="daily_steps">Daily Steps</string>
+    <string name="profile_picture">Profile Picture</string>
+    <string name="click_to_edit">Click to Edit</string>
+    <string name="weight_kg">Weight (Kg)</string>
+    <string name="birth_date">Birth Date</string>
+    <string name="registration_disclamer">Attention: You cannot edit your birth date, your gender or your full name once you submit!</string>
+    <string name="setting">Settings</string>
 
     <!-- Gender values -->
     <string-array name="gender_values">

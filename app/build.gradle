@@ -4,12 +4,13 @@ plugins {
 }
 
 android {
-    compileSdk 33
+    compileSdk 34
+    namespace "com.example.healthcoach"
 
     defaultConfig {
         applicationId "com.example.healthcoach"
         minSdk 27
-        targetSdk 33
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
@@ -46,9 +47,15 @@ dependencies {
     implementation 'androidx.activity:activity:1.7.2'
     implementation 'androidx.fragment:fragment:1.6.1'
 
-
     // Explicitly include kotlin-stdlib-jdk8 to ensure compatibility
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.10'
+
+    implementation("com.patrykandpatrick.vico:compose-m3:1.11.1")
+    implementation("com.patrykandpatrick.vico:core:1.11.1")
+
+    implementation 'com.github.AnyChart:AnyChart-Android:1.1.5'
+
+
 }
 
 configurations.all {

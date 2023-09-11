@@ -36,8 +36,8 @@ public class FragmentScreen4 extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_screen4, container, false);
-
+        View view = inflater.inflate(R.layout.fragment_setting, container, false);
+/*
         weightViewModel = new ViewModelProvider(this).get(WeightViewModel.class);
         weightEditText = view.findViewById(R.id.weightEditText);
         setupWeightSubmitButton(view);
@@ -81,10 +81,10 @@ public class FragmentScreen4 extends Fragment {
 
         userProfileViewModel.getGender().observe(getViewLifecycleOwner(), gender -> {});
         userProfileViewModel.getAge().observe(getViewLifecycleOwner(), age -> ageNumberPicker.setValue(age));
-
+*/
         return view;
     }
-
+/*
     private void setupWeightSubmitButton(View view) {
         Button submitWeightButton = view.findViewById(R.id.submitWeightButton);
         submitWeightButton.setOnClickListener(v -> {
@@ -130,5 +130,5 @@ public class FragmentScreen4 extends Fragment {
                 Toast.makeText(getContext(), "Permission denied!", Toast.LENGTH_SHORT).show();
             }
         }
-    }
+    }*/
 }

@@ -19,12 +19,16 @@
 
     <Button
         android:id="@+id/addWaterIntakeButton"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/waterIntakeEditText"
-        android:text="Add Water Intake (ml)"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="16dp"
+        android:background="@drawable/rounded_button"
+        android:backgroundTint="@color/green_dark"
+        android:text="Add Water Intake (ml)"
+        android:textColor="@color/green_light"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/weightLabel"
@@ -48,12 +52,16 @@
 
     <Button
         android:id="@+id/submitWeightButton2"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Submit Weight"
         android:layout_below="@id/weightEditText2"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="16dp"
+        android:background="@drawable/rounded_button"
+        android:backgroundTint="@color/green_dark"
+        android:text="Submit Weight"
+        android:textColor="@color/green_light"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/bodyFatLabel"
@@ -75,12 +83,16 @@
 
     <Button
         android:id="@+id/submitBodyFatButton"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Submit Body Fat"
         android:layout_below="@id/bodyFatEditText"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="16dp"
+        android:background="@drawable/rounded_button"
+        android:backgroundTint="@color/green_dark"
+        android:text="Submit Body Fat"
+        android:textColor="@color/green_light"
+        android:textStyle="bold" />
 
 
 

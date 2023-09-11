@@ -1,44 +1,154 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp">
 
-    <TextView
-        android:id="@+id/messageTextView"
-        android:layout_width="224dp"
+    <include
+        android:id="@+id/include"
+        layout="@layout/progression_main"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Welcome to Screen 1"
-        android:textSize="18sp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/stepTextView"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/include">
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/stepsCircle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="24dp"
+            android:progress="0"
+            app:indicatorColor="@color/red"
+            app:indicatorSize="75dp"
+            app:layout_constraintEnd_toStartOf="@+id/bpmCircle"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:trackColor="?attr/backgroundColor"
+            app:trackCornerRadius="64dp"
+            app:trackThickness="5dp" />
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/waterCircle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="24dp"
+            android:progress="0"
+            app:indicatorColor="@color/heart"
+            app:indicatorSize="75dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/bpmCircle"
+            app:layout_constraintTop_toTopOf="parent"
+            app:trackColor="?attr/backgroundColor"
+            app:trackCornerRadius="64dp"
+            app:trackThickness="5dp" />
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/bpmCircle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="24dp"
+            android:progress="0"
+            app:indicatorColor="@color/aqua"
+            app:indicatorSize="75dp"
+            app:layout_constraintEnd_toStartOf="@+id/waterCircle"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/stepsCircle"
+            app:layout_constraintTop_toTopOf="parent"
+            app:trackColor="?attr/backgroundColor"
+            app:trackCornerRadius="64dp"
+            app:trackThickness="5dp" />
+
+        <ImageView
+            android:id="@+id/imageView3"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:layout_constraintBottom_toBottomOf="@+id/stepsCircle"
+            app:layout_constraintEnd_toEndOf="@+id/stepsCircle"
+            app:layout_constraintStart_toStartOf="@+id/stepsCircle"
+            app:layout_constraintTop_toTopOf="@+id/stepsCircle"
+            app:srcCompat="@drawable/ic_kcal"
+            app:tint="@color/red" />
+
+        <ImageView
+            android:id="@+id/imageView4"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:layout_constraintBottom_toBottomOf="@+id/bpmCircle"
+            app:layout_constraintEnd_toEndOf="@+id/bpmCircle"
+            app:layout_constraintStart_toStartOf="@+id/bpmCircle"
+            app:layout_constraintTop_toTopOf="@+id/bpmCircle"
+            app:srcCompat="@drawable/ic_water"
+            app:tint="@color/aqua" />
+
+        <ImageView
+            android:id="@+id/imageView5"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:layout_constraintBottom_toBottomOf="@+id/waterCircle"
+            app:layout_constraintEnd_toEndOf="@+id/waterCircle"
+            app:layout_constraintStart_toStartOf="@+id/waterCircle"
+            app:layout_constraintTop_toTopOf="@+id/waterCircle"
+            app:srcCompat="@drawable/ic_heart"
+            app:tint="@color/heart" />
+
+        <TextView
+            android:id="@+id/kcalValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text=""
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="@+id/stepsCircle"
+            app:layout_constraintStart_toStartOf="@+id/stepsCircle"
+            app:layout_constraintTop_toBottomOf="@+id/stepsCircle" />
+
+        <TextView
+            android:id="@+id/waterValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text=""
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="@+id/bpmCircle"
+            app:layout_constraintStart_toStartOf="@+id/bpmCircle"
+            app:layout_constraintTop_toBottomOf="@+id/bpmCircle" />
+
+        <TextView
+            android:id="@+id/bpmValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text=""
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="@+id/waterCircle"
+            app:layout_constraintStart_toStartOf="@+id/waterCircle"
+            app:layout_constraintTop_toBottomOf="@+id/waterCircle" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.anychart.AnyChartView
+        android:id="@+id/historyChart"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Steps: "
-        android:textSize="18sp"
-        android:layout_below="@+id/messageTextView"
-        android:layout_marginTop="16dp"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
 
-    <TextView
-        android:id="@+id/distanceTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Distance: "
-        android:textSize="18sp"
-        android:layout_below="@+id/stepTextView"
-        android:layout_marginTop="16dp"/>
-
-    <TextView
-        android:id="@+id/caloriesTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Calories: "
-        android:textSize="18sp"
-        android:layout_below="@+id/distanceTextView"
-        android:layout_marginTop="16dp"/>
-
-
-
-
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

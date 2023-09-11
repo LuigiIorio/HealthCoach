@@ -14,11 +14,14 @@
     <color name="material_teal_700">#FF018786</color>
     <color name="material_black">#FF000000</color>
 
-    <color name="green_light">#FFC8E6C9</color>
+    <color name="green_light">#FFA5D6A7</color>
     <color name="green">#FF4CAF50</color>
     <color name="green_dark">#FF2E7D32</color>
     <color name="green_night">#FF1B5E20</color>
     <color name="dark">#FF323232</color>
     <color name="light">#FFDDDDDD</color>
     <color name="background_green">#FFC8E6C9</color>
+    <color name="red">#FFFF5722</color>
+    <color name="aqua">#FF00E5FF</color>
+    <color name="heart">#FFF06292</color>
 </resources>
