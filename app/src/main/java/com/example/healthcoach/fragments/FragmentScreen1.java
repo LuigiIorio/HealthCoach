@@ -50,9 +50,9 @@ public class FragmentScreen1 extends Fragment {
             return view;  // Return the view early if account is null, to avoid NullPointerException
         }
 
-        stepTextView = view.findViewById(R.id.stepTextView);
-        distanceTextView = view.findViewById(R.id.distanceTextView);
-        caloriesTextView = view.findViewById(R.id.caloriesTextView);
+        //stepTextView = view.findViewById(R.id.stepTextView);
+        //distanceTextView = view.findViewById(R.id.distanceTextView);
+        //caloriesTextView = view.findViewById(R.id.caloriesTextView);
 
         stepViewModel = new ViewModelProvider(this).get(StepViewModel.class);
         distanceDeltaViewModel = new ViewModelProvider(this).get(DistanceDeltaViewModel.class);
@@ -82,10 +82,6 @@ public class FragmentScreen1 extends Fragment {
 
         return view;
     }
-
-
-
-
     @Override
     public void onPause() {
         super.onPause();
@@ -95,6 +91,6 @@ public class FragmentScreen1 extends Fragment {
     }
 
     private void initUI(View view) {
-        messageTextView = view.findViewById(R.id.messageTextView);
+        // messageTextView = view.findViewById(R.id.messageTextView);
     }
 }
