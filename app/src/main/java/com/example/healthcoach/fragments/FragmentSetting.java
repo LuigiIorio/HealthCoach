@@ -27,8 +27,11 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.healthcoach.R;
 import com.example.healthcoach.viewmodels.SettingsViewModel;
+import com.example.healthcoach.viewmodels.SettingsViewModelFactory;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
+
+
 
 
 public class FragmentSetting extends Fragment {
@@ -61,41 +64,52 @@ public class FragmentSetting extends Fragment {
         submitButton = view.findViewById(R.id.submitButton);
         logoutButton = view.findViewById(R.id.logoutButton);
 
-        viewModel = new ViewModelProvider(this).get(SettingsViewModel.class);
+        viewModel = new ViewModelProvider(this, new SettingsViewModelFactory(requireContext())).get(SettingsViewModel.class);
 
-        viewModel.getUploadStatus().observe(getViewLifecycleOwner(), isSuccess -> {
-            if (isSuccess) {
-                // Handle successful upload
+
+        Uri lastCachedUri = viewModel.getLastCachedUri(requireContext());
+        if (lastCachedUri != null) {
+            Picasso.get().load(lastCachedUri).into(profilePic);
+        }
+
+
+        viewModel.getUploadedImageUri().observe(getViewLifecycleOwner(), uri -> {
+            if (uri != null) {
+                Log.d("Observer", "URI changed: " + uri.toString());
+                Picasso.get().load(uri).into(profilePic);
+
+                // Add this line to hide the TextView
+                profilePicEdit.setVisibility(View.GONE);
             } else {
-                // Handle failed upload
+                Log.e("Observer", "URI is null");
+
+                // Add this line to show the TextView
+                profilePicEdit.setVisibility(View.VISIBLE);
             }
         });
 
+        Uri lastUri = viewModel.getLastSavedUri();
+        if (lastUri != null) {
+            Picasso.get().load(lastUri).into(profilePic);
+        }
+
+
         initializeUI();
+
         return view;
     }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null && data.getData() != null) {
             imageUri = data.getData();
-            Picasso.get()
-                    .load(imageUri)
-                    .into(profilePic, new Callback() {
-                        @Override
-                        public void onSuccess() {
-                            Log.d("Picasso", "Image loaded successfully. Uri: " + imageUri.toString());
-                        }
-
-                        @Override
-                        public void onError(Exception e) {
-                            Log.e("Picasso", "Error loading image: " + e.getMessage() + ", Uri: " + imageUri.toString());
-                        }
-                    });
-            viewModel.uploadImage(imageUri);
+            viewModel.uploadImage(imageUri, requireContext());
         }
     }
+
 
     private void openImageChooser() {
         Intent intent = new Intent();
@@ -131,10 +145,24 @@ public class FragmentSetting extends Fragment {
         profilePicEdit.setOnClickListener(v -> openImageChooser());
         submitButton.setOnClickListener(v -> {
             if (imageUri != null) {
-                viewModel.uploadImage(imageUri);
+                viewModel.uploadImage(imageUri, requireContext());
+                viewModel.setLastSavedUri(imageUri);
+                viewModel.cacheLastUri(requireContext(), imageUri);
             } else {
                 // Handle case when imageUri is null
             }
         });
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Uri lastUri = viewModel.getLastCachedUri(requireContext());
+        if (lastUri != null) {
+            Picasso.get().load(lastUri).into(profilePic);
+        }
+    }
+
 }
+
+
