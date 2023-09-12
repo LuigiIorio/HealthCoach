@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.healthcoach.R;
+import com.example.healthcoach.fragments.FragmentHome;
 import com.example.healthcoach.fragments.FragmentScreen1;
 import com.example.healthcoach.fragments.FragmentScreen2;
 import com.example.healthcoach.fragments.FragmentScreen3;
@@ -38,7 +39,7 @@ public class HomeActivity extends AppCompatActivity {
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
 
         // Initialize fragments
-        fragment1 = new FragmentScreen1();
+        fragment1 = new FragmentHome();
         fragment2 = new FragmentScreen2();
         fragment3 = new FragmentScreen3();
         fragment4 = new FragmentScreen4();

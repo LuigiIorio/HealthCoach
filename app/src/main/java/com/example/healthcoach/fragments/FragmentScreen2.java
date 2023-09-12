@@ -53,13 +53,13 @@ public class FragmentScreen2 extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_profile, container, false);
+        View view = inflater.inflate(R.layout.fragment_profile, container, false);/*
         journalTextView = view.findViewById(R.id.journalTextView);
         waterIntakeEditText = view.findViewById(R.id.waterIntakeEditText);
         addWaterIntakeButton = view.findViewById(R.id.addWaterIntakeButton);
         weightEditText = view.findViewById(R.id.weightEditText2);
         bodyFatEditText = view.findViewById(R.id.bodyFatEditText);
-        submitBodyFatButton = view.findViewById(R.id.submitBodyFatButton);
+        submitBodyFatButton = view.findViewById(R.id.submitBodyFatButton);*/
 
         observeData();
         initWaterIntakeUI();
@@ -115,10 +115,10 @@ public class FragmentScreen2 extends Fragment {
     }
 
     private void setupWeightSubmitButton(View view) {
-        Button submitWeightButton = view.findViewById(R.id.submitWeightButton2);
+        /*Button submitWeightButton = view.findViewById(R.id.submitWeightButton2);
         submitWeightButton.setOnClickListener(v -> {
             String weightString = weightEditText.getText().toString().trim();
             weightViewModel.validateAndSubmitWeight(getContext(), weightString);
-        });
+        });*/
     }
 }

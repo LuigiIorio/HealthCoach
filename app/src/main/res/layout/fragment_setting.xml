@@ -64,7 +64,7 @@
                 app:layout_constraintTop_toTopOf="parent">
 
                 <ImageView
-                    android:id="@+id/roundedImageView"
+                    android:id="@+id/profilePic"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
@@ -74,7 +74,7 @@
             </androidx.cardview.widget.CardView>
 
             <TextView
-                android:id="@+id/textView11"
+                android:id="@+id/infoProfileTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:elevation="100dp"
@@ -321,24 +321,24 @@
             android:layout_height="225dp">
 
             <TextView
-                android:id="@+id/newPasswordInputLayout"
+                android:id="@+id/newPasswordText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="9dp"
                 android:text="@string/new_password"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="@+id/newPasswordInput"
-                app:layout_constraintEnd_toStartOf="@+id/newPasswordInput"
+                app:layout_constraintBottom_toBottomOf="@+id/newPasswordInputLayout"
+                app:layout_constraintEnd_toStartOf="@+id/newPasswordInputLayout"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/newPasswordInput"
+                app:layout_constraintTop_toTopOf="@+id/newPasswordInputLayout"
                 app:layout_constraintVertical_bias="0.251" />
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/newPasswordInput"
+                android:id="@+id/newPasswordInputLayout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
-                app:layout_constraintBottom_toTopOf="@+id/confirmPasswordInput"
+                app:layout_constraintBottom_toTopOf="@+id/confirmPasswordInputLayout"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="@+id/guideline"
@@ -346,56 +346,58 @@
                 app:layout_constraintVertical_chainStyle="spread">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/newPasswordInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPassword" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/confirmPasswordInput"
+                android:id="@+id/confirmPasswordInputLayout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
-                app:layout_constraintBottom_toTopOf="@+id/oldPasswordInput"
+                app:layout_constraintBottom_toTopOf="@+id/oldPasswordInputLayout"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/confirmPasswordInputLayout"
-                app:layout_constraintTop_toBottomOf="@+id/newPasswordInput">
+                app:layout_constraintStart_toEndOf="@+id/confirmPasswordText"
+                app:layout_constraintTop_toBottomOf="@+id/newPasswordInputLayout">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/confirmPasswordInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPassword" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
-                android:id="@+id/confirmPasswordInputLayout"
+                android:id="@+id/confirmPasswordText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:text="@string/confirm_password"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="@+id/confirmPasswordInput"
-                app:layout_constraintEnd_toStartOf="@+id/confirmPasswordInput"
+                app:layout_constraintBottom_toBottomOf="@+id/confirmPasswordInputLayout"
+                app:layout_constraintEnd_toStartOf="@+id/confirmPasswordInputLayout"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintHorizontal_chainStyle="spread_inside"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/confirmPasswordInput" />
+                app:layout_constraintTop_toTopOf="@+id/confirmPasswordInputLayout" />
 
             <TextView
-                android:id="@+id/oldPasswordInputLayout"
+                android:id="@+id/oldPasswordText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/old_password"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="@+id/oldPasswordInput"
-                app:layout_constraintEnd_toStartOf="@+id/oldPasswordInput"
+                app:layout_constraintBottom_toBottomOf="@+id/oldPasswordInputLayout"
+                app:layout_constraintEnd_toStartOf="@+id/oldPasswordInputLayout"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/oldPasswordInput" />
+                app:layout_constraintTop_toTopOf="@+id/oldPasswordInputLayout" />
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/oldPasswordInput"
+                android:id="@+id/oldPasswordInputLayout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
@@ -403,10 +405,11 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="@+id/guideline"
-                app:layout_constraintTop_toBottomOf="@+id/confirmPasswordInput"
+                app:layout_constraintTop_toBottomOf="@+id/confirmPasswordInputLayout"
                 app:layout_constraintVertical_chainStyle="spread">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/oldPasswordInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPassword" />
