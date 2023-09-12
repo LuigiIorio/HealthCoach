@@ -10,6 +10,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModel;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -74,6 +75,16 @@ public class SettingsViewModel extends ViewModel {
 
     public void setLastSavedUri(Uri uri) {
         savedStateHandle.set("lastSavedUri", uri.toString());
+    }
+
+    public boolean logoutUser() {
+        try {
+            FirebaseAuth.getInstance().signOut();
+            return true;
+        } catch (Exception e) {
+            Log.e("LogoutError", "Failed to logout: " + e.getMessage());
+            return false;
+        }
     }
 
 }

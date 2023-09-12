@@ -17,6 +17,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import android.Manifest;
+import android.widget.Toast;
+
 import androidx.core.content.ContextCompat;
 import androidx.core.app.ActivityCompat;
 import androidx.annotation.NonNull;
@@ -26,10 +28,13 @@ import androidx.lifecycle.ViewModelProvider;
 
 
 import com.example.healthcoach.R;
+import com.example.healthcoach.activities.LoginActivity;
+import com.example.healthcoach.viewmodels.HomeActivityViewModel;
 import com.example.healthcoach.viewmodels.SettingsViewModel;
 import com.example.healthcoach.viewmodels.SettingsViewModelFactory;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
+import com.example.healthcoach.viewmodels.Event;
 
 
 
@@ -46,6 +51,9 @@ public class FragmentSetting extends Fragment {
     private Uri imageUri;
     private Button submitButton, logoutButton;
     private SettingsViewModel viewModel;
+
+    private HomeActivityViewModel homeViewModel;
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -65,25 +73,31 @@ public class FragmentSetting extends Fragment {
         logoutButton = view.findViewById(R.id.logoutButton);
 
         viewModel = new ViewModelProvider(this, new SettingsViewModelFactory(requireContext())).get(SettingsViewModel.class);
+        homeViewModel = new ViewModelProvider(requireActivity()).get(HomeActivityViewModel.class);
 
+        homeViewModel.getLogoutState().observe(getViewLifecycleOwner(), event -> {
+            Boolean result = ((com.example.healthcoach.viewmodels.Event<Boolean>) event).getContentIfNotHandled();
+            if (result != null && result) {
+                Intent intent = new Intent(getActivity(), LoginActivity.class);
+                startActivity(intent);
+                getActivity().finish();
+            }
+        });
+
+        logoutButton.setOnClickListener(v -> {
+            homeViewModel.logoutUser();
+        });
 
         Uri lastCachedUri = viewModel.getLastCachedUri(requireContext());
         if (lastCachedUri != null) {
             Picasso.get().load(lastCachedUri).into(profilePic);
         }
 
-
         viewModel.getUploadedImageUri().observe(getViewLifecycleOwner(), uri -> {
             if (uri != null) {
-                Log.d("Observer", "URI changed: " + uri.toString());
                 Picasso.get().load(uri).into(profilePic);
-
-                // Add this line to hide the TextView
                 profilePicEdit.setVisibility(View.GONE);
             } else {
-                Log.e("Observer", "URI is null");
-
-                // Add this line to show the TextView
                 profilePicEdit.setVisibility(View.VISIBLE);
             }
         });
@@ -93,11 +107,12 @@ public class FragmentSetting extends Fragment {
             Picasso.get().load(lastUri).into(profilePic);
         }
 
-
         initializeUI();
 
         return view;
     }
+
+
 
 
     @Override
@@ -152,7 +167,21 @@ public class FragmentSetting extends Fragment {
                 // Handle case when imageUri is null
             }
         });
+
+        logoutButton.setOnClickListener(v -> {
+            if (viewModel.logoutUser()) {
+                // Navigate to login screen
+                Intent intent = new Intent(getActivity(), LoginActivity.class);
+                startActivity(intent);
+                getActivity().finish();
+            } else {
+                // Show error message
+                Toast.makeText(requireContext(), "Failed to logout", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
+
 
     @Override
     public void onResume() {
