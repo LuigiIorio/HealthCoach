@@ -6,9 +6,8 @@ import android.util.Log;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.healthcoach.viewmodels.MainActivityViewModel;
+import com.example.healthcoach.viewmodels.LoginActivityViewModel;
 import com.example.healthcoach.viewmodels.StepViewModel;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessOptions;
@@ -38,7 +37,7 @@ public class StepCountDelta {
         this.googleSignInAccount = account;
 
         if (googleSignInAccount == null) {
-            MainActivityViewModel viewModel = new ViewModelProvider(fragmentActivity).get(MainActivityViewModel.class);
+            LoginActivityViewModel viewModel = new ViewModelProvider(fragmentActivity).get(LoginActivityViewModel.class);
             viewModel.checkSignInStatus(context);
         }
 

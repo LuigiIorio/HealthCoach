@@ -11,16 +11,10 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.healthcoach.R;
 import com.example.healthcoach.fragments.FragmentHome;
 import com.example.healthcoach.fragments.FragmentProfile;
-import com.example.healthcoach.fragments.FragmentScreen1;
-import com.example.healthcoach.fragments.FragmentScreen2;
 import com.example.healthcoach.fragments.FragmentScreen3;
-import com.example.healthcoach.fragments.FragmentScreen4;
+import com.example.healthcoach.viewmodels.HomeActivityViewModel;
 import com.example.healthcoach.fragments.FragmentSetting;
-import com.example.healthcoach.viewmodels.HomeViewModel;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.auth.FirebaseAuth;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -30,7 +24,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private Fragment fragment1, fragment2, fragment3, fragment4;
     private Fragment activeFragment;
-    private HomeViewModel homeViewModel;
+    private HomeActivityViewModel homeViewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -38,7 +32,7 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.home_activity);
 
         // Initialize ViewModel
-        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+        homeViewModel = new ViewModelProvider(this).get(HomeActivityViewModel.class);
 
         // Initialize fragments
         fragment1 = new FragmentHome();
@@ -91,16 +85,5 @@ public class HomeActivity extends AppCompatActivity {
 
                 return true;
             };
-
-    public void logout(View view) {
-        homeViewModel.signOut(this, task -> {
-            startActivity(new Intent(HomeActivity.this, MainActivity.class));
-            finish();
-        });
-    }
-
-
-
-
 
 }

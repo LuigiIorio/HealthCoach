@@ -14,14 +14,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.healthcoach.R;
-import com.example.healthcoach.viewmodels.MainActivityViewModel;
+import com.example.healthcoach.viewmodels.LoginActivityViewModel;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 
 
 
-public class MainActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity {
 
     private EditText emailEditText;
     private EditText passwordEditText;
@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private Button googleLoginButton;
 
 
-    private MainActivityViewModel viewModel;
+    private LoginActivityViewModel viewModel;
 
     private ActivityResultLauncher<Intent> googleSignInResultLauncher;
 
@@ -43,37 +43,40 @@ public class MainActivity extends AppCompatActivity {
         FirebaseApp.initializeApp(this);
 
         // Initialize ViewModel
-        viewModel = new ViewModelProvider(this, new ViewModelProvider.AndroidViewModelFactory(getApplication())).get(MainActivityViewModel.class);
+        viewModel = new ViewModelProvider(this, new ViewModelProvider.AndroidViewModelFactory(getApplication())).get(LoginActivityViewModel.class);
 
-        // Get GoogleSignInAccount
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        if (account == null) {
-            viewModel.checkSignInStatus(this);
-        }
+        if(viewModel.checkSignInStatus(this)) {
 
-
-        if (account != null) {
-            // Navigate to HomeActivity if already signed in
-            Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
             startActivity(intent);
             finish();
-        } else {
-            viewModel.signInWithGoogle(this);
+
         }
 
-        // Initialize UI components
+        inizialiseUI();
+
+        setupListeners();
+
+    }
+
+    private void inizialiseUI() {
+
         emailEditText = findViewById(R.id.emailText);
         passwordEditText = findViewById(R.id.passwordText);
         loginButton = findViewById(R.id.loginButton);
         signUpTextView = findViewById(R.id.signUpTextView);
         googleLoginButton = findViewById(R.id.googleLoginButton);
 
+    }
+
+    public void setupListeners() {
+
         loginButton.setOnClickListener(v -> {
             String email = emailEditText.getText().toString().trim();
             String password = passwordEditText.getText().toString().trim();
 
             if (email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(MainActivity.this, "Email and password are required", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, "Email and password are required", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -81,13 +84,14 @@ public class MainActivity extends AppCompatActivity {
         });
 
         signUpTextView.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, SignUpActivity.class);
+            Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
             startActivity(intent);
+            finish();
         });
 
         googleSignInResultLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
-                result -> viewModel.handleGoogleSignInResult(MainActivity.this, result.getData())
+                result -> viewModel.handleGoogleSignInResult(LoginActivity.this, result.getData())
         );
 
         googleLoginButton.setOnClickListener(v -> {
@@ -97,18 +101,23 @@ public class MainActivity extends AppCompatActivity {
 
         TextView forgotPasswordButton = findViewById(R.id.forgetPassword);
         forgotPasswordButton.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, ForgotPasswordActivity.class);
+            Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
             startActivity(intent);
+            finish();
         });
 
         viewModel.getLoginResult().observe(this, loginResult -> {
-            if (loginResult == MainActivityViewModel.LoginResult.SUCCESS) {
-                Toast.makeText(MainActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+
+            if (loginResult == LoginActivityViewModel.LoginResult.SUCCESS) {
+                Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                 startActivity(intent);
-            } else if (loginResult == MainActivityViewModel.LoginResult.FAILURE) {
-                Toast.makeText(MainActivity.this, "Login failed", Toast.LENGTH_SHORT).show();
+
+            } else if (loginResult == LoginActivityViewModel.LoginResult.FAILURE) {
+                Toast.makeText(LoginActivity.this, "Login failed", Toast.LENGTH_SHORT).show();
             }
+
         });
+
     }
 }

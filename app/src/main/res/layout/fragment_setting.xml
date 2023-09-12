@@ -443,6 +443,20 @@
             android:textStyle="bold" />
 
         <Button
+            android:id="@+id/googleLoginButton"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/rounded_button"
+            android:backgroundTint="?attr/backgroundInsetTop"
+            android:drawableLeft="@drawable/ic_google"
+            android:text="Merge Google"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/signUpTextView" />
+
+        <Button
             android:id="@+id/logoutButton"
             android:layout_width="200dp"
             android:layout_height="wrap_content"

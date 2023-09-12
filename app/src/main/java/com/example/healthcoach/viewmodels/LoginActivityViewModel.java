@@ -1,12 +1,11 @@
 package com.example.healthcoach.viewmodels;
 
-import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
-
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -28,7 +27,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 
 
 
-public class MainActivityViewModel extends AndroidViewModel {
+public class LoginActivityViewModel extends AndroidViewModel {
 
     public static final int RC_SIGN_IN = 9001;
     private final Application application;
@@ -37,7 +36,7 @@ public class MainActivityViewModel extends AndroidViewModel {
     private GoogleSignInClient mGoogleSignInClient;
     private FirebaseAuth mAuth;
 
-    public MainActivityViewModel(@NonNull Application application) {
+    public LoginActivityViewModel(@NonNull Application application) {
         super(application);
         this.application = application;
         mAuth = FirebaseAuth.getInstance();  // Initialize Firebase Auth
@@ -98,6 +97,11 @@ public class MainActivityViewModel extends AndroidViewModel {
     }
 
 
+    /**
+     * Esegue il login qualora email e password siano corrette
+     * @param email
+     * @param password
+     */
     public void loginWithEmailAndPassword(String email, String password) {
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
@@ -120,6 +124,8 @@ public class MainActivityViewModel extends AndroidViewModel {
                 .addOnFailureListener(e -> Log.w("MyApp", "There was a problem subscribing", e));
     }
 
+
+
     public enum LoginResult {
         SUCCESS, FAILURE
     }
@@ -139,10 +145,13 @@ public class MainActivityViewModel extends AndroidViewModel {
                 });
     }
 
-    public void checkSignInStatus(Context context) {
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(context);
-        if (account == null) {
-            signInWithGoogle(context);
-        }
+    /**
+     * Controlla che l'account sia già connesso a Google.
+     * Qualora sia connesso avvia la Home Activity e chiude la Login Activity
+     * @param context
+     */
+    public boolean checkSignInStatus(Context context) {
+        return GoogleSignIn.getLastSignedInAccount(context) != null;
     }
+
 }

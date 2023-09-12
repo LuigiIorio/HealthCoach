@@ -16,7 +16,7 @@ import com.example.healthcoach.R;
 import com.example.healthcoach.recordingapi.StepCountDelta;
 import com.example.healthcoach.viewmodels.CaloriesExpendedViewModel;
 import com.example.healthcoach.viewmodels.DistanceDeltaViewModel;
-import com.example.healthcoach.viewmodels.MainActivityViewModel;
+import com.example.healthcoach.viewmodels.LoginActivityViewModel;
 import com.example.healthcoach.viewmodels.StepViewModel;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
@@ -39,7 +39,7 @@ public class FragmentScreen1 extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        MainActivityViewModel viewModel = new ViewModelProvider(requireActivity()).get(MainActivityViewModel.class);
+        LoginActivityViewModel viewModel = new ViewModelProvider(requireActivity()).get(LoginActivityViewModel.class);
         GoogleSignInAccount account = viewModel.getGoogleSignInAccount();
 
         if (account == null) {
