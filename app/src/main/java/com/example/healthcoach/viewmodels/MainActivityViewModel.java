@@ -22,7 +22,9 @@ import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessOptions;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.GoogleAuthProvider;
 
 
 
@@ -77,12 +79,14 @@ public class MainActivityViewModel extends AndroidViewModel {
         mGoogleSignInClient = GoogleSignIn.getClient(context, gso);
     }
 
+    // Modified method
     public void handleGoogleSignInResult(Activity activity, Intent data) {
         Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
         try {
             GoogleSignInAccount account = task.getResult(ApiException.class);
             if (account != null) {
-                loginResult.setValue(LoginResult.SUCCESS);
+                // Call Firebase authentication method here
+                firebaseAuthWithGoogle(account);
                 subscribeToSteps(activity);
             } else {
                 loginResult.setValue(LoginResult.FAILURE);
@@ -118,6 +122,21 @@ public class MainActivityViewModel extends AndroidViewModel {
 
     public enum LoginResult {
         SUCCESS, FAILURE
+    }
+
+    // New method to handle Firebase authentication with Google
+    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        // Firebase Sign in success
+                        loginResult.setValue(LoginResult.SUCCESS);
+                    } else {
+                        // Firebase Sign in failure
+                        loginResult.setValue(LoginResult.FAILURE);
+                    }
+                });
     }
 
     public void checkSignInStatus(Context context) {

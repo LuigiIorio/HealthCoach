@@ -10,10 +10,12 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.healthcoach.R;
 import com.example.healthcoach.fragments.FragmentHome;
+import com.example.healthcoach.fragments.FragmentProfile;
 import com.example.healthcoach.fragments.FragmentScreen1;
 import com.example.healthcoach.fragments.FragmentScreen2;
 import com.example.healthcoach.fragments.FragmentScreen3;
 import com.example.healthcoach.fragments.FragmentScreen4;
+import com.example.healthcoach.fragments.FragmentSetting;
 import com.example.healthcoach.viewmodels.HomeViewModel;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -40,9 +42,9 @@ public class HomeActivity extends AppCompatActivity {
 
         // Initialize fragments
         fragment1 = new FragmentHome();
-        fragment2 = new FragmentScreen2();
+        fragment2 = new FragmentProfile();
         fragment3 = new FragmentScreen3();
-        fragment4 = new FragmentScreen4();
+        fragment4 = new FragmentSetting();
 
         // Set initial active fragment
         activeFragment = fragment1;

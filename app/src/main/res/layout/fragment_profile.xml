@@ -217,6 +217,7 @@
                     android:textAlignment="center"
                     app:layout_constraintBottom_toBottomOf="@+id/activitySpinner"
                     app:layout_constraintEnd_toEndOf="parent"
+                    android:entries="@array/times"
                     app:layout_constraintTop_toBottomOf="@+id/registerActivity" />
 
                 <com.google.android.material.textfield.TextInputLayout
