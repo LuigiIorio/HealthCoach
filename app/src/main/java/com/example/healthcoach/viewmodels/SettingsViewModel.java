@@ -14,6 +14,16 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
 import java.util.UUID;
 
 
@@ -24,8 +34,38 @@ public class SettingsViewModel extends ViewModel {
     private final MutableLiveData<Uri> uploadedImageUri = new MutableLiveData<>();
     private final StorageReference mStorageRef = FirebaseStorage.getInstance().getReference("profile_pics");
 
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private ListenerRegistration profileUrlListener;
+
     public LiveData<Uri> getUploadedImageUri() {
         return uploadedImageUri;
+    }
+
+    public void saveProfileUrlToFirebase(String userId, String url) {
+        DocumentReference userRef = db.collection("users").document(userId);
+        userRef.update("profileUrl", url)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("FirestoreUpdate", "Profile URL updated successfully");
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("FirestoreUpdate", "Error updating profile URL: " + e.getMessage());
+                });
+    }
+
+    public void fetchProfileUrlFromFirebase(String userId) {
+        DocumentReference userRef = db.collection("users").document(userId);
+        profileUrlListener = userRef.addSnapshotListener((documentSnapshot, e) -> {
+            if (e != null) {
+                Log.e("FirestoreListener", "Error fetching profile URL: " + e.getMessage());
+                return;
+            }
+            if (documentSnapshot != null && documentSnapshot.exists()) {
+                String url = documentSnapshot.getString("profileUrl");
+                if (url != null) {
+                    uploadedImageUri.setValue(Uri.parse(url));
+                }
+            }
+        });
     }
 
     public void uploadImage(Uri filePath, Context context) {
@@ -35,7 +75,6 @@ public class SettingsViewModel extends ViewModel {
                     ref.getDownloadUrl().addOnSuccessListener(uri -> {
                         uploadedImageUri.setValue(uri);
                         cacheLastUri(context, uri);
-                        Log.d("FirebaseUpload", "Download Uri: " + uri.toString());
                     }).addOnFailureListener(e -> {
                         Log.e("FirebaseUpload", "Error getting download URL: " + e.getMessage());
                     });
@@ -72,7 +111,6 @@ public class SettingsViewModel extends ViewModel {
         return uriString != null ? Uri.parse(uriString) : null;
     }
 
-
     public void setLastSavedUri(Uri uri) {
         savedStateHandle.set("lastSavedUri", uri.toString());
     }
@@ -86,5 +124,4 @@ public class SettingsViewModel extends ViewModel {
             return false;
         }
     }
-
 }

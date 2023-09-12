@@ -32,6 +32,8 @@ import com.example.healthcoach.activities.LoginActivity;
 import com.example.healthcoach.viewmodels.HomeActivityViewModel;
 import com.example.healthcoach.viewmodels.SettingsViewModel;
 import com.example.healthcoach.viewmodels.SettingsViewModelFactory;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.example.healthcoach.viewmodels.Event;
@@ -54,7 +56,6 @@ public class FragmentSetting extends Fragment {
 
     private HomeActivityViewModel homeViewModel;
 
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_setting, container, false);
@@ -75,18 +76,39 @@ public class FragmentSetting extends Fragment {
         viewModel = new ViewModelProvider(this, new SettingsViewModelFactory(requireContext())).get(SettingsViewModel.class);
         homeViewModel = new ViewModelProvider(requireActivity()).get(HomeActivityViewModel.class);
 
-        homeViewModel.getLogoutState().observe(getViewLifecycleOwner(), event -> {
-            Boolean result = ((com.example.healthcoach.viewmodels.Event<Boolean>) event).getContentIfNotHandled();
-            if (result != null && result) {
-                Intent intent = new Intent(getActivity(), LoginActivity.class);
-                startActivity(intent);
-                getActivity().finish();
-            }
-        });
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            String userId = currentUser.getUid();
+            viewModel.fetchProfileUrlFromFirebase(userId);
 
-        logoutButton.setOnClickListener(v -> {
-            homeViewModel.logoutUser();
-        });
+            submitButton.setOnClickListener(v -> {
+                if (imageUri != null) {
+                    viewModel.uploadImage(imageUri, requireContext());
+                    viewModel.saveProfileUrlToFirebase(userId, imageUri.toString());
+                    viewModel.cacheLastUri(requireContext(), imageUri);
+                } else {
+                    // Handle case when imageUri is null
+                }
+            });
+
+            logoutButton.setOnClickListener(v -> {
+                if (viewModel.logoutUser()) {
+                    // Navigate to login screen
+                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+                    startActivity(intent);
+                    getActivity().finish();
+                } else {
+                    // Show error message
+                    Toast.makeText(requireContext(), "Failed to logout", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            // Handle the case when the user is not authenticated
+            // You may want to show a login screen or take appropriate action.
+            // For now, you can disable certain UI elements or display a message.
+            submitButton.setEnabled(false);
+            logoutButton.setEnabled(false);
+        }
 
         Uri lastCachedUri = viewModel.getLastCachedUri(requireContext());
         if (lastCachedUri != null) {
@@ -102,17 +124,10 @@ public class FragmentSetting extends Fragment {
             }
         });
 
-        Uri lastUri = viewModel.getLastSavedUri();
-        if (lastUri != null) {
-            Picasso.get().load(lastUri).into(profilePic);
-        }
-
         initializeUI();
 
         return view;
     }
-
-
 
 
     @Override
@@ -155,13 +170,17 @@ public class FragmentSetting extends Fragment {
         }
     }
 
+
     private void initializeUI() {
         profilePic.setOnClickListener(v -> openImageChooser());
         profilePicEdit.setOnClickListener(v -> openImageChooser());
+
+        // Unified submitButton onClickListener
         submitButton.setOnClickListener(v -> {
             if (imageUri != null) {
+                String userId = FirebaseAuth.getInstance().getCurrentUser().getUid(); // get user id
                 viewModel.uploadImage(imageUri, requireContext());
-                viewModel.setLastSavedUri(imageUri);
+                viewModel.saveProfileUrlToFirebase(userId, imageUri.toString()); // Save URL to Firebase
                 viewModel.cacheLastUri(requireContext(), imageUri);
             } else {
                 // Handle case when imageUri is null
@@ -180,8 +199,6 @@ public class FragmentSetting extends Fragment {
             }
         });
     }
-
-
 
     @Override
     public void onResume() {
