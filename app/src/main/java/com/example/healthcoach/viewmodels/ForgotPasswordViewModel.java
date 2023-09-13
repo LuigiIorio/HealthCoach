@@ -26,15 +26,12 @@ public class ForgotPasswordViewModel extends ViewModel {
 
     public void resetPassword(String email) {
         mAuth.sendPasswordResetEmail(email)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            toastMessage.setValue("Password reset email sent");
-                            closeActivityEvent.setValue(true);
-                        } else {
-                            toastMessage.setValue("Failed to send password reset email");
-                        }
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        toastMessage.setValue("Password reset email sent");
+                        closeActivityEvent.setValue(true);
+                    } else {
+                        toastMessage.setValue("Failed to send password reset email");
                     }
                 });
     }

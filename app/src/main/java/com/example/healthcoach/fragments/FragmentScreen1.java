@@ -38,7 +38,7 @@ public class FragmentScreen1 extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-
+/*
         LoginActivityViewModel viewModel = new ViewModelProvider(requireActivity()).get(LoginActivityViewModel.class);
         GoogleSignInAccount account = viewModel.getGoogleSignInAccount();
 
@@ -76,7 +76,7 @@ public class FragmentScreen1 extends Fragment {
                 handler.postDelayed(this, delay);
             }
         }, delay);
-
+*/
         return view;
     }
     @Override

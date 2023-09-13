@@ -1,20 +1,32 @@
 package com.example.healthcoach.activities;
 
+import static com.example.healthcoach.viewmodels.LoginActivityViewModel.RC_SIGN_IN;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.identity.BeginSignInRequest;
+import com.google.android.gms.auth.api.identity.Identity;
+import com.google.android.gms.auth.api.identity.SignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptionsExtension;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.fitness.FitnessOptions;
 import com.google.android.gms.fitness.data.DataType;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -23,8 +35,8 @@ import com.example.healthcoach.R;
 import com.example.healthcoach.viewmodels.LoginActivityViewModel;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-
-
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
 
 
 public class LoginActivity extends AppCompatActivity {
@@ -36,8 +48,6 @@ public class LoginActivity extends AppCompatActivity {
     private Button googleLoginButton;
 
     private static final int REQUEST_CODE_GOOGLE_FIT_PERMISSIONS = 1;
-
-
 
     private LoginActivityViewModel viewModel;
 
@@ -103,6 +113,33 @@ public class LoginActivity extends AppCompatActivity {
             } else {
                 // Permission not granted
             }
+            return;
+        }
+
+        if (requestCode == RC_SIGN_IN) {
+
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+
+            try {
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                AuthCredential credential = viewModel.getGoogleAuthCredential(account.getIdToken());
+
+                viewModel.signInWithGoogle(credential, task1 -> {
+                    if (task1.isSuccessful()) {
+                        // Login con Google riuscito
+                        if (viewModel.isUserLoggedIn()) {
+                            Toast.makeText(this, "Loggato", Toast.LENGTH_SHORT).show();
+                            viewModel.firebaseAuthViaGoogle(account.getIdToken(), this);
+                        }
+                    } else {
+                        // Gestisci il fallimento del login con Google
+                        Toast.makeText(this, "Non Loggato", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            } catch (ApiException e) {
+                // Gestisci l'errore di accesso con Google
+                Toast.makeText(this, "Errore", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -137,22 +174,14 @@ public class LoginActivity extends AppCompatActivity {
             finish();
         });
 
-        googleSignInResultLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> viewModel.handleGoogleSignInResult(LoginActivity.this, result.getData())
-        );
-
-        googleLoginButton.setOnClickListener(v -> {
-            Intent signInIntent = viewModel.getGoogleSignInIntent();
-            googleSignInResultLauncher.launch(signInIntent);
-        });
-
         TextView forgotPasswordButton = findViewById(R.id.forgetPassword);
         forgotPasswordButton.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
             startActivity(intent);
             finish();
         });
+
+        googleLoginButton.setOnClickListener(view -> signInWithGoogle());
 
         viewModel.getLoginResult().observe(this, loginResult -> {
 
@@ -168,4 +197,19 @@ public class LoginActivity extends AppCompatActivity {
         });
 
     }
+
+    private void signInWithGoogle() {
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+
+        viewModel.signInWithGoogle(this, gso);
+
+        GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        Intent signInIntent = googleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
 }
