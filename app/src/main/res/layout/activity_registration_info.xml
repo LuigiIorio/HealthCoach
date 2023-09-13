@@ -60,6 +60,7 @@
                 app:layout_constraintVertical_bias="0.0">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/fullNameText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -94,7 +95,7 @@
                 app:layout_constraintTop_toTopOf="parent">
 
                 <ImageView
-                    android:id="@+id/roundedImageView"
+                    android:id="@+id/profilePicImg"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
@@ -104,7 +105,7 @@
             </androidx.cardview.widget.CardView>
 
             <TextView
-                android:id="@+id/textView11"
+                android:id="@+id/hoverProfilePic"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:elevation="100dp"
@@ -137,6 +138,7 @@
 
 
             <Spinner
+                android:id="@+id/genderList"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
@@ -162,7 +164,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <DatePicker
-                android:id="@+id/datePicker"
+                android:id="@+id/birthDatePicker"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -359,7 +361,7 @@
             android:textStyle="bold" />
 
         <Button
-            android:id="@+id/button"
+            android:id="@+id/submitButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
