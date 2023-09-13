@@ -14,6 +14,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+
 public class BodyFatViewModel extends ViewModel {
 
     private BodyFat bodyFat;

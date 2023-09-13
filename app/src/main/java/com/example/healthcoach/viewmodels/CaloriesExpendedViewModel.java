@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.healthcoach.recordingapi.CaloriesExpended;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.fitness.Fitness;
@@ -18,7 +19,10 @@ import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.request.DataReadRequest;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
+
+
 
 public class CaloriesExpendedViewModel extends ViewModel {
 
@@ -64,4 +68,22 @@ public class CaloriesExpendedViewModel extends ViewModel {
                 })
                 .addOnFailureListener(e -> Log.e("CaloriesExpendedViewModel", "Failed to read data", e));
     }
+
+    public void fetchCaloriesData(Context context, GoogleSignInAccount googleSignInAccount, Date selectedDate) {
+        long startTime = selectedDate.getTime();
+        long endTime = startTime + 24 * 60 * 60 * 1000;
+
+        new CaloriesExpended(context, googleSignInAccount).readCaloriesData(context, googleSignInAccount, startTime, endTime, dataReadResponse -> {
+            float sum = 0;
+            for (DataSet dataSet : dataReadResponse.getDataSets()) {
+                for (DataPoint dp : dataSet.getDataPoints()) {
+                    for (Field field : dp.getDataType().getFields()) {
+                        sum += dp.getValue(field).asFloat();
+                    }
+                }
+            }
+            totalCalories.setValue(sum);
+        });
+    }
+
 }

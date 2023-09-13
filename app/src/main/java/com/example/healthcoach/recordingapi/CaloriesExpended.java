@@ -10,8 +10,12 @@ import com.google.android.gms.fitness.FitnessOptions;
 import com.google.android.gms.fitness.RecordingClient;
 import com.google.android.gms.fitness.data.DataSource;
 import com.google.android.gms.fitness.data.DataType;
+import com.google.android.gms.fitness.request.DataReadRequest;
+import com.google.android.gms.fitness.result.DataReadResponse;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+
+import java.util.concurrent.TimeUnit;
 
 
 public class CaloriesExpended {
@@ -53,6 +57,29 @@ public class CaloriesExpended {
                     }
                 });
     }
+
+    public void readCaloriesData(Context context, GoogleSignInAccount googleSignInAccount, long startTime, long endTime, OnSuccessListener<DataReadResponse> listener) {
+        Log.d("CaloriesExpended", "Start Time: " + startTime + ", End Time: " + endTime);
+
+        DataReadRequest readRequest = new DataReadRequest.Builder()
+                .read(DataType.TYPE_CALORIES_EXPENDED)
+                .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+                .build();
+
+        Fitness.getHistoryClient(context, googleSignInAccount)
+                .readData(readRequest)
+                .addOnSuccessListener(response -> {
+                    Log.d("CaloriesExpended", "Successfully read data.");
+                    listener.onSuccess(response);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("CaloriesExpended", "Failed to read data", e);
+                    Log.e("CaloriesExpended", "Error Message: " + e.getMessage());
+                });
+    }
+
+
+
 
     public void stopRecording(Context context) {
         // Create a Fitness recording client

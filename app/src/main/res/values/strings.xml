@@ -55,6 +55,7 @@
         <item>Weight</item>
         <item>BodyFat</item>
         <item>Steps</item>
+        <item>Kcal</item>
     </string-array>
 
     <string-array name="workout">

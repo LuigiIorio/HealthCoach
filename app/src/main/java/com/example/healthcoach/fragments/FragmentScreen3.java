@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.healthcoach.R;
 import com.example.healthcoach.recordingapi.BodyFat;
+import com.example.healthcoach.recordingapi.CaloriesExpended;
 import com.example.healthcoach.recordingapi.Hydration;
 import com.example.healthcoach.recordingapi.StepCountDelta;
 import com.example.healthcoach.recordingapi.Weight;
@@ -112,12 +113,40 @@ public class FragmentScreen3 extends Fragment {
                     updateDataHydration(selectedType, startTime, endTime);
                 } else if ("Steps".equals(selectedType)) {
                     updateDataSteps(selectedType, startTime, endTime);
+                } else if ("Kcal".equals(selectedType)) {
+                    updateDataCaloriesExpended(selectedType, startTime, endTime);
                 }
 
                 // Add additional conditions for other data types like Steps, Distance, Kcal
             }
         });
     }
+
+    private void updateDataCaloriesExpended(String type, long startTime, long endTime) {
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
+        if (account == null) {
+            historyTextView.setText("Not signed in");
+            return;
+        }
+
+        if ("Kcal".equals(type)) {
+            new CaloriesExpended(getActivity(), account).readCaloriesData(getActivity(), account, startTime, endTime, new OnSuccessListener<DataReadResponse>() {
+                @Override
+                public void onSuccess(DataReadResponse dataReadResponse) {
+                    float totalCalories = 0;
+                    for (DataSet dataSet : dataReadResponse.getDataSets()) {
+                        for (DataPoint point : dataSet.getDataPoints()) {
+                            for (Field field : point.getDataType().getFields()) {
+                                totalCalories += point.getValue(field).asFloat();
+                            }
+                        }
+                    }
+                    historyTextView.setText(String.format("Total Calories Expended: %.2f kcal", totalCalories));
+                }
+            });
+        }
+    }
+
 
     private void updateDataSteps(String type, long startTime, long endTime) {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
