@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 
-
 public class SettingsViewModelFactory implements ViewModelProvider.Factory {
     private final Context context;
 

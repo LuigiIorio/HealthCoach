@@ -11,8 +11,10 @@ import androidx.lifecycle.ViewModel;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptionsExtension;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessOptions;
+import com.google.android.gms.fitness.RecordingClient;
 import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
@@ -20,59 +22,54 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 
-
 public class StepViewModel extends ViewModel {
-    private MutableLiveData<Integer> steps;
 
-    private static final String TAG = "StepViewModel";
+    private MutableLiveData<Integer> steps = new MutableLiveData<>();
 
     public MutableLiveData<Integer> getSteps() {
-        if (steps == null) {
-            steps = new MutableLiveData<Integer>();
-        }
         return steps;
     }
 
-    public void setSteps(int stepCount) {
-        steps.setValue(stepCount);
+    public void setSteps(int stepsCount) {
+        steps.postValue(stepsCount);
     }
 
-    public void fetchDailySteps(Context context) {
-        Log.i(TAG, "Fetching daily steps");
-
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(context);
-        if (account == null) {
-            Log.w(TAG, "GoogleSignInAccount is null in fetchDailySteps");
-            return;
+    public void startRecordingSteps(Context context) {
+        GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(context);
+        if (googleSignInAccount != null) {
+            RecordingClient recordingClient = Fitness.getRecordingClient(context, googleSignInAccount);
+            recordingClient.subscribe(DataType.TYPE_STEP_COUNT_DELTA)
+                    .addOnSuccessListener(aVoid -> {
+                        Log.d("StepViewModel", "Successfully subscribed to recording steps");
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("StepViewModel", "Failed to subscribe to recording steps", e);
+                    });
+        } else {
+            Log.e("StepViewModel", "User is not signed in");
         }
+    }
 
-        FitnessOptions fitnessOptions = FitnessOptions.builder()
-                .addDataType(DataType.TYPE_STEP_COUNT_DELTA)
+
+
+    public void stopRecordingSteps(Context context) {
+        GoogleSignInOptionsExtension fitnessOptions = FitnessOptions.builder()
+                .addDataType(DataType.TYPE_STEP_COUNT_DELTA, FitnessOptions.ACCESS_WRITE)
                 .build();
 
-        Fitness.getHistoryClient(context, account)
-                .readDailyTotal(DataType.TYPE_STEP_COUNT_DELTA)
-                .addOnSuccessListener(new OnSuccessListener<DataSet>() {
-                    @Override
-                    public void onSuccess(DataSet dataSet) {
-                        if (!dataSet.isEmpty()) {
-                            int totalSteps = dataSet.getDataPoints().get(0).getValue(Field.FIELD_STEPS).asInt();
-                            steps.setValue(totalSteps);
-                            Log.i(TAG, "Fetched steps: " + totalSteps);
-                        } else {
-                            steps.setValue(0);
-                            Log.i(TAG, "No steps data found");
-                        }
-                    }
+        GoogleSignInAccount googleSignInAccount =
+                GoogleSignIn.getAccountForExtension(context, fitnessOptions);
+
+        RecordingClient recordingClient = Fitness.getRecordingClient(context, googleSignInAccount);
+
+        recordingClient.unsubscribe(DataType.TYPE_STEP_COUNT_DELTA)
+                .addOnSuccessListener(aVoid -> {
+                    // Successfully unsubscribed to recording steps
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.i(TAG, "There was a problem getting steps.", e);
-                    }
+                .addOnFailureListener(e -> {
+                    // Handle failure here
                 });
     }
-
 
 
 }

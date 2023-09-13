@@ -75,6 +75,7 @@ public class StepCountDelta {
                 });
     }
 
+
     public void stopRecording(Context context) {
         // Unsubscribe from the data source
         RecordingClient recordingClient = Fitness.getRecordingClient(context, googleSignInAccount);
@@ -92,6 +93,7 @@ public class StepCountDelta {
                     }
                 });
     }
+
 
     public void readTodaySteps(Context context, FragmentActivity activity) {
         HistoryClient historyClient = Fitness.getHistoryClient(context, googleSignInAccount);

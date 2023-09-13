@@ -14,6 +14,7 @@ import com.example.healthcoach.fragments.FragmentProfile;
 import com.example.healthcoach.fragments.FragmentScreen3;
 import com.example.healthcoach.viewmodels.HomeActivityViewModel;
 import com.example.healthcoach.fragments.FragmentSetting;
+import com.example.healthcoach.viewmodels.StepViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.jetbrains.annotations.Nullable;
@@ -25,11 +26,16 @@ public class HomeActivity extends AppCompatActivity {
     private Fragment fragment1, fragment2, fragment3, fragment4;
     private Fragment activeFragment;
     private HomeActivityViewModel homeViewModel;
+    private HomeActivityViewModel homeActivityViewModel;
+    private StepViewModel stepViewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home_activity);
+
+        homeActivityViewModel = new ViewModelProvider(this).get(HomeActivityViewModel.class);
+        stepViewModel = new ViewModelProvider(this).get(StepViewModel.class);
 
         // Initialize ViewModel
         homeViewModel = new ViewModelProvider(this).get(HomeActivityViewModel.class);
