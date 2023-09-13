@@ -10,6 +10,11 @@ import com.google.android.gms.fitness.FitnessOptions;
 import com.google.android.gms.fitness.RecordingClient;
 import com.google.android.gms.fitness.data.DataSource;
 import com.google.android.gms.fitness.data.DataType;
+import com.google.android.gms.fitness.request.DataReadRequest;
+import com.google.android.gms.fitness.result.DataReadResponse;
+import com.google.android.gms.tasks.OnSuccessListener;
+
+import java.util.concurrent.TimeUnit;
 
 public class DistanceDelta {
 
@@ -35,6 +40,22 @@ public class DistanceDelta {
                 .addOnSuccessListener(aVoid -> Log.d("DistanceDelta", "Subscribed to distance delta"))
                 .addOnFailureListener(e -> Log.e("DistanceDelta", "Failed to subscribe to distance delta", e));
     }
+
+
+    public void readDistanceData(Context context, long startTime, long endTime, OnSuccessListener<DataReadResponse> listener) {
+        DataReadRequest readRequest = new DataReadRequest.Builder()
+                .read(DataType.TYPE_DISTANCE_DELTA)
+                .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+                .build();
+
+        Fitness.getHistoryClient(context, googleSignInAccount)
+                .readData(readRequest)
+                .addOnSuccessListener(listener)
+                .addOnFailureListener(e -> Log.e("DistanceDelta", "Failed to read data", e));
+    }
+
+
+
 
     public void stopRecording(Context context) {
         RecordingClient recordingClient = Fitness.getRecordingClient(context, googleSignInAccount);

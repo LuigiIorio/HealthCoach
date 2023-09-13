@@ -1,5 +1,7 @@
 package com.example.healthcoach.fragments;
 
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,11 +14,14 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import android.Manifest;
 import com.example.healthcoach.R;
 import com.example.healthcoach.recordingapi.BodyFat;
 import com.example.healthcoach.recordingapi.CaloriesExpended;
+import com.example.healthcoach.recordingapi.DistanceDelta;
 import com.example.healthcoach.recordingapi.Hydration;
 import com.example.healthcoach.recordingapi.StepCountDelta;
 import com.example.healthcoach.recordingapi.Weight;
@@ -48,6 +53,9 @@ public class FragmentScreen3 extends Fragment {
     private int selectedMonth;
     private int selectedDay;
 
+    private static final int PERMISSIONS_REQUEST_CODE = 1;
+
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,11 +64,33 @@ public class FragmentScreen3 extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_screen3, container, false);
+
+        requestPermissions();
+
         initializeVariables(view);
         setupCalendarView(view);
         setupSpinner(view);
         setupFetchDataButton();
         return view;
+    }
+
+    private void requestPermissions() {
+        String[] permissions = {
+                Manifest.permission.ACCESS_FINE_LOCATION
+        };
+
+        if (!hasPermissions(requireContext(), permissions)) {
+            requestPermissions(permissions, PERMISSIONS_REQUEST_CODE);
+        }
+    }
+
+    private static boolean hasPermissions(Context context, String... permissions) {
+        for (String permission : permissions) {
+            if (ContextCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void initializeVariables(View view) {
@@ -115,12 +145,41 @@ public class FragmentScreen3 extends Fragment {
                     updateDataSteps(selectedType, startTime, endTime);
                 } else if ("Kcal".equals(selectedType)) {
                     updateDataCaloriesExpended(selectedType, startTime, endTime);
+                } else if ("Distance".equals(selectedType)) {
+                    updateDataDistance(selectedType, startTime, endTime);
                 }
 
-                // Add additional conditions for other data types like Steps, Distance, Kcal
             }
         });
     }
+
+    private void updateDataDistance(String type, long startTime, long endTime) {
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
+        if (account == null) {
+            historyTextView.setText("Not signed in");
+            return;
+        }
+
+        if ("Distance".equals(type)) {
+            new DistanceDelta(getActivity(), account).readDistanceData(getActivity(), startTime, endTime, new OnSuccessListener<DataReadResponse>() {
+                @Override
+                public void onSuccess(DataReadResponse dataReadResponse) {
+                    float totalDistance = 0;
+                    for (DataSet dataSet : dataReadResponse.getDataSets()) {
+                        for (DataPoint point : dataSet.getDataPoints()) {
+                            for (Field field : point.getDataType().getFields()) {
+                                if (field.getName().equals("distance")) {
+                                    totalDistance += point.getValue(field).asFloat();
+                                }
+                            }
+                        }
+                    }
+                    historyTextView.setText(String.format("Total Distance Covered: %.2f meters", totalDistance));
+                }
+            });
+        }
+    }
+
 
     private void updateDataCaloriesExpended(String type, long startTime, long endTime) {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
@@ -264,7 +323,7 @@ public class FragmentScreen3 extends Fragment {
                             }
                         }
                     }
-                    historyTextView.setText(String.format("Total water intake: %.2f L", totalHydration));
+                    historyTextView.setText(String.format("Total water intake: %.2f ml", totalHydration));
                 }
             });
         }
