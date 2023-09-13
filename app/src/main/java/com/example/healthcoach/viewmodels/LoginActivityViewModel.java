@@ -30,10 +30,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.concurrent.Executor;
-
 
 public class LoginActivityViewModel extends AndroidViewModel {
 
@@ -41,7 +37,6 @@ public class LoginActivityViewModel extends AndroidViewModel {
     private final Application application;
     private MutableLiveData<LoginResult> loginResult = new MutableLiveData<>();
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    private FirebaseFirestore mFirestore = FirebaseFirestore.getInstance();
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
     private GoogleSignInClient googleSignInClient;
 
@@ -114,33 +109,30 @@ public class LoginActivityViewModel extends AndroidViewModel {
     public void firebaseAuthViaGoogle(String idToken, Activity activity) {
 
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
-        mAuth.signInWithCredential(credential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
+        mAuth.signInWithCredential(credential).addOnCompleteListener(task -> {
 
-                if(task.isSuccessful()) {
+            if(task.isSuccessful()) {
 
-                    FirebaseUser user = mAuth.getCurrentUser();
+                FirebaseUser user = mAuth.getCurrentUser();
 
-                    UserProfile profile = new UserProfile();
-                    profile.setUid(user.getUid());
-                    profile.setMail(user.getEmail());
-                    profile.setImage(user.getPhotoUrl().toString());
+                UserProfile profile = new UserProfile();
+                profile.setUid(user.getUid());
+                profile.setMail(user.getEmail());
+                profile.setImage(user.getPhotoUrl().toString());
 
-                    database.getReference().child("Users").child(user.getUid()).setValue(profile);
+                database.getReference().child("Users").child(user.getUid()).setValue(profile);
 
-                    Intent intent = new Intent(activity, HomeActivity.class);
-                    activity.startActivity(intent);
-
-                }
-
-                else {
-
-                    Toast.makeText(activity, "Non Loggato", Toast.LENGTH_SHORT).show();
-
-                }
+                Intent intent = new Intent(activity, HomeActivity.class);
+                activity.startActivity(intent);
 
             }
+
+            else {
+
+                Toast.makeText(activity, "Non Loggato", Toast.LENGTH_SHORT).show();
+
+            }
+
         });
 
     }

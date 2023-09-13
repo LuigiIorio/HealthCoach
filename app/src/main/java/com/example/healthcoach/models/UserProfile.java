@@ -1,7 +1,16 @@
 package com.example.healthcoach.models;
 
 
-public class UserProfile {
+import android.os.Bundle;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
+public class UserProfile implements Serializable {
     private String mail;
     private String password;
     private String fullName;
@@ -36,6 +45,49 @@ public class UserProfile {
 
     // Costruttore vuoto
     public UserProfile() {}
+
+    public Bundle toBundle() {
+        Bundle bundle = new Bundle();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutputStream out = null;
+        try {
+            out = new ObjectOutputStream(bos);
+            out.writeObject(this);
+            out.flush();
+            byte[] userData = bos.toByteArray();
+            bundle.putByteArray("userProfile", userData);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (out != null) {
+                    out.close();
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+        return bundle;
+    }
+
+    public static UserProfile getUserProfile(Bundle bundle) {
+
+        byte[] userData = bundle.getByteArray("userProfile");
+        UserProfile userProfile = null;
+
+        if (userData != null) {
+            try {
+                ByteArrayInputStream bis = new ByteArrayInputStream(userData);
+                ObjectInputStream in = new ObjectInputStream(bis);
+                userProfile = (UserProfile) in.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return userProfile;
+
+    }
 
     // Getter e Setter per ogni variabile
 

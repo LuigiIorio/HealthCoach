@@ -5,6 +5,8 @@
     <string name="diary">Diary</string>
     <string name="user_profile">User Profile</string>
 
+    <string name="LoginError">Login Error</string>
+
     <string name="confirm">Confirm</string>
     <string name="login">Login</string>
     <string name="register">Register</string>
