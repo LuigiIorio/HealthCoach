@@ -23,6 +23,8 @@ import com.google.android.gms.fitness.result.DataReadResponse;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import java.util.Calendar;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 
@@ -31,10 +33,13 @@ public class StepCountDelta {
     private GoogleSignInAccount googleSignInAccount;
     private DataSource dataSource;
 
+    private Context context;
+
 
 
     public StepCountDelta(Context context, GoogleSignInAccount account, FragmentActivity fragmentActivity) {
         this.googleSignInAccount = account;
+        this.context = context;
 
         if (googleSignInAccount == null) {
             LoginActivityViewModel viewModel = new ViewModelProvider(fragmentActivity).get(LoginActivityViewModel.class);
@@ -94,40 +99,42 @@ public class StepCountDelta {
                 });
     }
 
-
-    public void readTodaySteps(Context context, FragmentActivity activity) {
+    public void readStepsForRange(long startTime, long endTime, OnSuccessListener<DataReadResponse> onSuccessListener) {
         HistoryClient historyClient = Fitness.getHistoryClient(context, googleSignInAccount);
-        long endTime = System.currentTimeMillis();
-        long startTime = endTime - 86400000;  // 24 hours in milliseconds
 
-        DataReadRequest readRequest = new DataReadRequest.Builder()
-                .read(DataType.TYPE_STEP_COUNT_DELTA)
-                .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
-                .build();
+        // Check if today is the day we're interested in
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        long todayStartTime = cal.getTimeInMillis();
 
-        historyClient.readData(readRequest)
-                .addOnSuccessListener(new OnSuccessListener<DataReadResponse>() {
-                    @Override
-                    public void onSuccess(DataReadResponse dataReadResponse) {
-                        int totalSteps = 0;
-                        for (DataSet dataSet : dataReadResponse.getDataSets()) {
-                            for (DataPoint dataPoint : dataSet.getDataPoints()) {
-                                for (Field field : dataPoint.getDataType().getFields()) {
-                                    int steps = dataPoint.getValue(field).asInt();
-                                    totalSteps += steps;
-                                }
-                            }
+        if (startTime == todayStartTime) {
+            // Adjust the endTime to current time for today
+            endTime = System.currentTimeMillis();
+        }
+
+        if (endTime > startTime) {
+            DataReadRequest readRequest = new DataReadRequest.Builder()
+                    .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
+                    .bucketByTime(1, TimeUnit.DAYS)
+                    .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+                    .enableServerQueries()
+                    .build();
+
+            historyClient.readData(readRequest)
+                    .addOnSuccessListener(onSuccessListener)
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(Exception e) {
+                            Log.e("StepCountDelta", "Failed to read step count for the range", e);
                         }
-                        // Update ViewModel
-                        StepViewModel stepViewModel = new ViewModelProvider(activity).get(StepViewModel.class);
-                        stepViewModel.setSteps(totalSteps);
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(Exception e) {
-                        Log.e("StepCountDelta", "Failed to read step count", e);
-                    }
-                });
+                    });
+        } else {
+            Log.e("StepCountDelta", "Invalid time range specified");
+        }
     }
+
+
 }

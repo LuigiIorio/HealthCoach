@@ -116,6 +116,7 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
+
         if (requestCode == RC_SIGN_IN) {
 
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);

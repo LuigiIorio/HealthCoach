@@ -106,6 +106,7 @@ public class HomeActivityViewModel extends ViewModel {
                             for(Field field : dp.getDataType().getFields()) {
                                 int steps = dp.getValue(field).asInt();
                                 totalSteps += steps;
+                                Log.e("StepCount", ""+steps);
                             }
                         }
                         stepCount.postValue(totalSteps);

@@ -17,11 +17,14 @@ import androidx.fragment.app.Fragment;
 import com.example.healthcoach.R;
 import com.example.healthcoach.recordingapi.BodyFat;
 import com.example.healthcoach.recordingapi.Hydration;
+import com.example.healthcoach.recordingapi.StepCountDelta;
 import com.example.healthcoach.recordingapi.Weight;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.fitness.data.Bucket;
 import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
+import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.result.DataReadResponse;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -99,18 +102,120 @@ public class FragmentScreen3 extends Fragment {
             public void onClick(View v) {
                 long startTime = getDateInMillis(selectedYear, selectedMonth, selectedDay);
                 long endTime = startTime + 24 * 60 * 60 * 1000;
-                updateDataBasedOnType(dataTypeSpinner.getSelectedItem().toString(), startTime, endTime);
+                String selectedType = dataTypeSpinner.getSelectedItem().toString();
+
+                if ("Weight".equals(selectedType)) {
+                    updateDataWeight(selectedType, startTime, endTime);
+                } else if ("BodyFat".equals(selectedType)) {
+                    updateDataBodyFat(selectedType, startTime, endTime);
+                } else if ("Hydration".equals(selectedType)) {
+                    updateDataHydration(selectedType, startTime, endTime);
+                } else if ("Steps".equals(selectedType)) {
+                    updateDataSteps(selectedType, startTime, endTime);
+                }
+
+                // Add additional conditions for other data types like Steps, Distance, Kcal
             }
         });
     }
 
-    private long getDateInMillis(int year, int month, int day) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(year, month, day);
-        return calendar.getTimeInMillis();
+    private void updateDataSteps(String type, long startTime, long endTime) {
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
+        if (account == null) {
+            historyTextView.setText("Not signed in");
+            return;
+        }
+
+        if ("Steps".equals(type)) {
+            StepCountDelta stepCountDelta = new StepCountDelta(getActivity(), account, getActivity());
+            stepCountDelta.readStepsForRange(startTime, endTime, new OnSuccessListener<DataReadResponse>() {
+                @Override
+                public void onSuccess(DataReadResponse dataReadResponse) {
+                    int totalSteps = 0;
+                    if (dataReadResponse.getBuckets().size() > 0) {
+                        for (Bucket bucket : dataReadResponse.getBuckets()) {
+                            DataSet dataSet = bucket.getDataSet(DataType.AGGREGATE_STEP_COUNT_DELTA);
+                            for (DataPoint point : dataSet.getDataPoints()) {
+                                for (Field field : point.getDataType().getFields()) {
+                                    int steps = point.getValue(field).asInt();
+                                    totalSteps += steps;
+                                }
+                            }
+                        }
+                    }
+                    historyTextView.setText(String.format("Total steps: %d", totalSteps));
+                }
+            });
+        }
     }
 
-    private void updateDataBasedOnType(String type, long startTime, long endTime) {
+
+
+    private void updateDataWeight(String type, long startTime, long endTime){
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
+        if (account == null) {
+            historyTextView.setText("Not signed in");
+            return;
+        }
+
+        if ("Weight".equals(type)) {
+            weight.readWeightData(startTime, endTime, new OnSuccessListener<DataReadResponse>() {
+                @Override
+                public void onSuccess(DataReadResponse dataReadResponse) {
+                    float latestWeight = 0;
+                    long latestTime = 0;
+                    for (DataSet dataSet : dataReadResponse.getDataSets()) {
+                        for (DataPoint point : dataSet.getDataPoints()) {
+                            for (Field field : point.getDataType().getFields()) {
+                                float weightValue = point.getValue(field).asFloat();
+                                long endTime = point.getEndTime(TimeUnit.MILLISECONDS);
+                                if (endTime > latestTime) {
+                                    latestTime = endTime;
+                                    latestWeight = weightValue;
+                                }
+                            }
+                        }
+                    }
+                    historyTextView.setText(String.format("Latest weight: %.2f kg", latestWeight));
+                }
+            });
+        }
+
+    }
+
+    private void updateDataBodyFat(String type, long startTime, long endTime){
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
+        if (account == null) {
+            historyTextView.setText("Not signed in");
+            return;
+        }
+
+        if ("BodyFat".equals(type)) {
+            bodyFat.readBodyFatData(getActivity(), account, startTime, endTime, new OnSuccessListener<DataReadResponse>() {
+                @Override
+                public void onSuccess(DataReadResponse dataReadResponse) {
+                    float latestBodyFat = 0;
+                    long latestTime = 0;
+                    for (DataSet dataSet : dataReadResponse.getDataSets()) {
+                        for (DataPoint point : dataSet.getDataPoints()) {
+                            for (Field field : point.getDataType().getFields()) {
+                                float bodyFatValue = point.getValue(field).asFloat();
+                                long endTime = point.getEndTime(TimeUnit.MILLISECONDS);
+                                if (endTime > latestTime) {
+                                    latestTime = endTime;
+                                    latestBodyFat = bodyFatValue;
+                                }
+                            }
+                        }
+                    }
+                    historyTextView.setText(String.format("Latest body fat: %.2f%%", latestBodyFat));
+                }
+            });
+        }
+
+    }
+
+    private void updateDataHydration(String type, long startTime, long endTime) {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
         if (account == null) {
             historyTextView.setText("Not signed in");
@@ -133,48 +238,15 @@ public class FragmentScreen3 extends Fragment {
                     historyTextView.setText(String.format("Total water intake: %.2f L", totalHydration));
                 }
             });
-        } else if ("Weight".equals(type)) {
-            weight.readWeightData(startTime, endTime, new OnSuccessListener<DataReadResponse>() {
-                @Override
-                public void onSuccess(DataReadResponse dataReadResponse) {
-                    float latestWeight = 0;
-                    long latestTime = 0;
-                    for (DataSet dataSet : dataReadResponse.getDataSets()) {
-                        for (DataPoint point : dataSet.getDataPoints()) {
-                            for (Field field : point.getDataType().getFields()) {
-                                float weightValue = point.getValue(field).asFloat();
-                                long endTime = point.getEndTime(TimeUnit.MILLISECONDS);
-                                if (endTime > latestTime) {
-                                    latestTime = endTime;
-                                    latestWeight = weightValue;
-                                }
-                            }
-                        }
-                    }
-                    historyTextView.setText(String.format("Latest weight: %.2f kg", latestWeight));
-                }
-            });
-        } else if ("BodyFat".equals(type)) {
-            bodyFat.readBodyFatData(getActivity(), account, startTime, endTime, new OnSuccessListener<DataReadResponse>() {
-                @Override
-                public void onSuccess(DataReadResponse dataReadResponse) {
-                    float latestBodyFat = 0;
-                    long latestTime = 0;
-                    for (DataSet dataSet : dataReadResponse.getDataSets()) {
-                        for (DataPoint point : dataSet.getDataPoints()) {
-                            for (Field field : point.getDataType().getFields()) {
-                                float bodyFatValue = point.getValue(field).asFloat();
-                                long endTime = point.getEndTime(TimeUnit.MILLISECONDS);
-                                if (endTime > latestTime) {
-                                    latestTime = endTime;
-                                    latestBodyFat = bodyFatValue;
-                                }
-                            }
-                        }
-                    }
-                    historyTextView.setText(String.format("Latest body fat: %.2f%%", latestBodyFat));
-                }
-            });
         }
+
     }
+
+    private long getDateInMillis(int year, int month, int day) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month, day);
+        return calendar.getTimeInMillis();
+    }
+
+
 }

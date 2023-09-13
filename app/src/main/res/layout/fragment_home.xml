@@ -163,7 +163,7 @@
         android:padding="8dp"
         android:text="Steps: 0"
         android:textSize="18sp"
-        tools:layout_editor_absoluteX="206dp"
-        tools:layout_editor_absoluteY="82dp" />
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="124dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -68,6 +68,8 @@ public class LoginActivityViewModel extends AndroidViewModel {
                 });
     }
 
+
+
     /**
      * Controlla che l'account sia già connesso a Google.
      * Qualora sia connesso avvia la Home Activity e chiude la Login Activity
@@ -107,6 +109,7 @@ public class LoginActivityViewModel extends AndroidViewModel {
         googleSignInClient = GoogleSignIn.getClient(activity, gso);
 
     }
+
 
     public void firebaseAuthViaGoogle(String idToken, Activity activity) {
 

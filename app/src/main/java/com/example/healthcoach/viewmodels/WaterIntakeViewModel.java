@@ -32,4 +32,6 @@ public class WaterIntakeViewModel extends ViewModel {
             repository.insertWaterIntake(intake); // Insert into data source directly from ViewModel
         }
     }
+
+
 }
