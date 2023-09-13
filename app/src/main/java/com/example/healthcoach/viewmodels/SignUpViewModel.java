@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.healthcoach.activities.HomeActivity;
+import com.example.healthcoach.activities.SignUpInformationActivity;
 import com.example.healthcoach.models.UserProfile;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthCredential;
@@ -22,7 +23,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.EmailAuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.UidIdentifier;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -39,9 +41,20 @@ public class SignUpViewModel extends ViewModel {
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseDatabase = FirebaseDatabase.getInstance();
         firebaseStorage = FirebaseStorage.getInstance();
+
     }
 
     public LiveData<UserProfile> getUser() {
+
+        if(user.getValue() == null) {
+            UserProfile profile = new UserProfile();
+            FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+            profile.setMail(firebaseUser.getEmail());
+            profile.setUid(firebaseUser.getUid());
+
+            this.user.setValue(profile);
+        }
+
         return user;
     }
 
@@ -56,6 +69,7 @@ public class SignUpViewModel extends ViewModel {
 
         usersReference.child(user.getValue().getUid()).setValue(user.getValue());
 
+
         StorageReference userImageRef = imageReference.child(uid + ".jpg");
 
         Uri imageUri = Uri.parse(user.getValue().getImage());
@@ -69,7 +83,7 @@ public class SignUpViewModel extends ViewModel {
                         user.getValue().setImage(imageUrl);
 
                         Intent intent = new Intent(activity, HomeActivity.class);
-                        activity.startActivity(intent, user.getValue().toBundle());
+                        activity.startActivity(intent);
                         activity.finish();
 
                     });
@@ -85,9 +99,9 @@ public class SignUpViewModel extends ViewModel {
      *
      * @param email
      * @param password
-     * @param context
+     * @param activity
      */
-    public void createUser(String email, String password, Context context) {
+    public void createUser(String email, String password, Activity activity) {
         firebaseAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -96,8 +110,19 @@ public class SignUpViewModel extends ViewModel {
                         profile.setPassword(password);
                         profile.setUid(firebaseAuth.getUid());
                         user.setValue(profile);
+
+                        Intent intent = new Intent(activity, SignUpInformationActivity.class);
+                        activity.startActivity(intent, new Bundle(profile.toBundle()));
+                        activity.finish();
+
                     } else {
-                        Toast.makeText(context, "Email already exists", Toast.LENGTH_SHORT);
+                        // La registrazione ha fallito. Gestisci l'errore.
+                        Exception exception = task.getException();
+                        if (exception instanceof FirebaseAuthUserCollisionException) {
+                            // Indirizzo email già in uso.
+                            // Mostra un messaggio Toast all'utente.
+                            Toast.makeText(activity, "The email address is already in use", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
     }

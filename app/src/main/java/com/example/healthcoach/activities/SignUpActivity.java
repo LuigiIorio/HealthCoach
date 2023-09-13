@@ -2,7 +2,6 @@ package com.example.healthcoach.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -58,9 +57,10 @@ public class SignUpActivity extends AppCompatActivity {
 
             if(password.equals(confirmPassword)) {
 
-                if(!email.isEmpty())
+                if(!email.isEmpty()) {
                     signUpViewModel.createUser(email, password, this);
-                else
+
+                } else
                     Toast.makeText(this, "Please insert mail", Toast.LENGTH_SHORT).show();
 
             }
@@ -83,9 +83,4 @@ public class SignUpActivity extends AppCompatActivity {
 
     }
 
-    private void navigateToNextScreen() {
-        Intent intent = new Intent(SignUpActivity.this, HomeActivity.class); // Navigate to HomeActivity or desired activity
-        startActivity(intent);
-        finish(); // Close the current activity
-    }
 }

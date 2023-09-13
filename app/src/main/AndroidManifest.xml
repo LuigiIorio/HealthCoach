@@ -53,6 +53,11 @@
             android:label="Forgot Password">
         </activity>
 
+        <activity
+            android:name=".activities.SignUpInformationActivity"
+            android:label="SignUp Information">
+        </activity>
+
     </application>
 
 </manifest>

@@ -1,9 +1,11 @@
 package com.example.healthcoach.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,6 +19,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
 
     private EditText emailEditText;
     private Button resetButton;
+    private TextView backToLogin;
     private ForgotPasswordViewModel viewModel;
 
     @Override
@@ -26,6 +29,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
 
         emailEditText = findViewById(R.id.emailText);
         resetButton = findViewById(R.id.resetButton);
+        backToLogin = findViewById(R.id.backToLogin);
 
         viewModel = new ViewModelProvider(this).get(ForgotPasswordViewModel.class);
 
@@ -47,6 +51,14 @@ public class ForgotPasswordActivity extends AppCompatActivity {
             } else {
                 viewModel.resetPassword(email);
             }
+        });
+
+        backToLogin.setOnClickListener(view -> {
+
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+            finish();
+
         });
     }
 }

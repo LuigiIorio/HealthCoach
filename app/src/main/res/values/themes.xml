@@ -14,4 +14,7 @@
         <item name="backgroundColor">@color/light</item>
         <item name="backgroundInsetTop">@color/material_white</item>
     </style>
+
+    <attr name="colorOnPrimary" format="reference" />
+
 </resources>

@@ -1,10 +1,11 @@
 package com.example.healthcoach.activities;
 
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
+import android.content.res.ColorStateList;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
+import android.util.TypedValue;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -23,8 +24,9 @@ import com.example.healthcoach.R;
 import com.example.healthcoach.models.UserProfile;
 import com.example.healthcoach.viewmodels.SignUpViewModel;
 
-public class SignUpInformation extends AppCompatActivity {
+public class SignUpInformationActivity extends AppCompatActivity {
 
+    private static final int PICK_IMAGE_REQUEST = 1;
     private SignUpViewModel viewModel;
     private EditText fullNameText, weightInput, heightInput, stepsInput, waterInput, kcalInput;
     private ImageView profilePic;
@@ -32,6 +34,7 @@ public class SignUpInformation extends AppCompatActivity {
     private Spinner genderInfo;
     private DatePicker birthdayPicker;
     private Button submitButton;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,9 +44,38 @@ public class SignUpInformation extends AppCompatActivity {
 
         viewModel = new ViewModelProvider(this).get(SignUpViewModel.class);
 
+
         inizialiseUI();
         setupListeners();
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PICK_IMAGE_REQUEST) {
+            if (data != null) {
+                // Ottieni l'URI dell'immagine selezionata
+                Uri selectedImageUri = data.getData();
+
+                profilePic.setImageURI(selectedImageUri);
+                profilePic.setImageTintList(null);
+                hoverProfilePic.setText("");
+
+                viewModel.getUser().getValue().setImage(selectedImageUri.toString());
+            } else {
+
+                TypedValue typedValue = new TypedValue();
+                getTheme().resolveAttribute(R.attr.colorOnPrimary, typedValue, true);
+                int colorOnPrimary = typedValue.data;
+
+                profilePic.setImageResource(R.drawable.ic_profile);
+                profilePic.setImageTintList(ColorStateList.valueOf(colorOnPrimary));
+                hoverProfilePic.setText(R.string.click_to_edit);
+
+            }
+        }
     }
 
     private void inizialiseUI() {
@@ -54,12 +86,24 @@ public class SignUpInformation extends AppCompatActivity {
         stepsInput = findViewById(R.id.stepsInput);
         waterInput = findViewById(R.id.waterInput);
         kcalInput = findViewById(R.id.kcalInput);
+        profilePic = findViewById(R.id.profilePicImg);
+        hoverProfilePic = findViewById(R.id.hoverProfilePic);
+        genderInfo = findViewById(R.id.genderList);
+        birthdayPicker = findViewById(R.id.birthDatePicker);
+        submitButton = findViewById(R.id.submitButton);
 
     }
 
     private void setupListeners() {
 
-        profilePic.setOnClickListener(view -> openGallery());
+        profilePic.setOnClickListener(view -> {
+            // Creazione di un intent per aprire la galleria delle immagini
+            Intent intent = new Intent(Intent.ACTION_PICK);
+            intent.setType("image/*"); // Filtraggio solo per file di immagine
+
+            // Avvio dell'attività per selezionare un'immagine
+            startActivityForResult(intent, PICK_IMAGE_REQUEST);
+        });
 
         submitButton.setOnClickListener(view -> {
 
@@ -106,26 +150,5 @@ public class SignUpInformation extends AppCompatActivity {
         });
 
     }
-
-    private void openGallery() {
-        ActivityResultLauncher<PickVisualMediaRequest> pickMedia =
-                registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
-                    // Callback is invoked after the user selects a media item or closes the
-                    // photo picker.
-                    if (uri != null) {
-                        profilePic.setImageURI(uri);
-                        hoverProfilePic.setText("");
-                    } else {
-                        profilePic.setImageResource(R.drawable.ic_profile);
-                        hoverProfilePic.setText(R.string.click_to_edit);
-                    }
-                });
-
-        String mimeType = "image/*";
-        pickMedia.launch(new PickVisualMediaRequest.Builder()
-                .setMediaType(new ActivityResultContracts.PickVisualMedia.SingleMimeType(mimeType))
-                .build());
-    }
-
 
 }
