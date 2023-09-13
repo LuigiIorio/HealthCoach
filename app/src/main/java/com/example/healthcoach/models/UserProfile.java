@@ -7,7 +7,7 @@ public class UserProfile {
     private String fullName;
     private String gender;
     private String uid;
-    private int[] birth = new int[3];
+    private int day, month, year;
     private int weight;
     private int height;
     private int dailySteps;
@@ -16,14 +16,16 @@ public class UserProfile {
     private String image;
 
     // Costruttore con tutti i dati
-    public UserProfile(String mail, String password, String fullName, String gender, String uid, int[] birth,
+    public UserProfile(String mail, String password, String fullName, String gender, String uid, int day, int month, int year,
                        int weight, int height, int dailySteps, int dailyWater, int dailyKcal, String image) {
         this.mail = mail;
         this.password = password;
         this.fullName = fullName;
         this.gender = gender;
         this.uid = uid;
-        this.birth = birth;
+        this.day = day;
+        this.month = month;
+        this.year = year;
         this.weight = weight;
         this.height = height;
         this.dailySteps = dailySteps;
@@ -77,12 +79,28 @@ public class UserProfile {
         this.uid = uid;
     }
 
-    public int[] getBirth() {
-        return birth;
+    public int getDay() {
+        return day;
     }
 
-    public void setBirth(int[] birth) {
-        this.birth = birth;
+    public void setDay(int day) {
+        this.day = day;
+    }
+
+    public int getMonth() {
+        return month;
+    }
+
+    public void setMonth(int month) {
+        this.month = month;
+    }
+
+    public int getYear() {
+        return year;
+    }
+
+    public void setYear(int year) {
+        this.year = year;
     }
 
     public int getWeight() {
