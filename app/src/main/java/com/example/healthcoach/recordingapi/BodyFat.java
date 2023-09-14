@@ -33,9 +33,7 @@ public class BodyFat {
         // Constructor with FragmentActivity
     }
 
-
-
-    public void insertBodyFatData(Context context, float bodyFatPercentage) {
+    public void insertBodyFatData(Context context, float bodyFatPercentage, OnSuccessListener<Void> onSuccessListener) {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(context);
         if (account == null) {
             Log.w("BodyFat", "Not signed in, skipping data insert");
@@ -57,9 +55,19 @@ public class BodyFat {
 
         Fitness.getHistoryClient(context, account)
                 .insertData(bodyFatDataSet)
-                .addOnSuccessListener(data -> Log.d("BodyFat", "Successfully inserted body fat data"))
-                .addOnFailureListener(e -> Log.e("BodyFat", "Failed to insert body fat data", e));
+                .addOnSuccessListener(data -> {
+                    Log.d("BodyFat", "Successfully inserted body fat data");
+                    onSuccessListener.onSuccess(null);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("BodyFat", "Failed to insert body fat data", e);
+                    onSuccessListener.onSuccess(null); // You can handle failure here if needed
+                });
     }
+
+
+
+
 
     public void readBodyFatData(Context context, GoogleSignInAccount googleSignInAccount, long startTime, long endTime, OnSuccessListener<DataReadResponse> listener) {
         Fitness.getHistoryClient(context, googleSignInAccount)
@@ -75,4 +83,10 @@ public class BodyFat {
                     }
                 });
     }
+
+
+
+
+
+
 }

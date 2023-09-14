@@ -3,6 +3,7 @@ package com.example.healthcoach.fragments;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,8 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.Manifest;
+import android.widget.Toast;
+
 import com.example.healthcoach.R;
 import com.example.healthcoach.recordingapi.BodyFat;
 import com.example.healthcoach.recordingapi.CaloriesExpended;
@@ -91,10 +94,49 @@ public class FragmentScreen3 extends Fragment {
         insertDataButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Insert your logic here for what should happen when the insertDataButton is clicked
+                String selectedType = insertDataTypeSpinner.getSelectedItem().toString();
+                if (dataInputEditText.getText().toString().isEmpty()) {
+                    Toast.makeText(getActivity(), "Please enter a value", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                float inputValue = Float.parseFloat(dataInputEditText.getText().toString());
+
+                if ("Hydration".equals(selectedType)) {
+                    insertHydrationData(inputValue);
+                } else if ("BodyFat".equals(selectedType)) {
+                    insertBodyFatData(inputValue);
+                } else if ("Weight".equals(selectedType)) {
+                    insertWeightData(inputValue);
+                }
             }
         });
     }
+
+    private void insertHydrationData(float hydrationValue) {
+        hydration.insertWaterIntake(hydrationValue);
+        Toast.makeText(getActivity(), "Inserted hydration data successfully", Toast.LENGTH_SHORT).show();
+    }
+
+    private void insertBodyFatData(float bodyFatValue) {
+        bodyFat.insertBodyFatData(getActivity(), bodyFatValue, new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d("BodyFat", "Body fat data inserted successfully");
+                Toast.makeText(getActivity(), "Inserted body fat data successfully", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
+    private void insertWeightData(float weightValue) {
+        weight.insertWeightData(weightValue, new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d("Weight", "Weight data inserted successfully");
+            }
+        });
+    }
+
 
     private static boolean hasPermissions(Context context, String... permissions) {
         for (String permission : permissions) {
@@ -168,8 +210,6 @@ public class FragmentScreen3 extends Fragment {
             }
         });
     }
-
-
     private void updateDataCaloriesExpended(String type, long startTime, long endTime) {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
         if (account == null) {
@@ -198,10 +238,6 @@ public class FragmentScreen3 extends Fragment {
             });
         }
     }
-
-
-
-
     private void updateDataDistance(String type, long startTime, long endTime) {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
         if (account == null) {
@@ -257,9 +293,6 @@ public class FragmentScreen3 extends Fragment {
             });
         }
     }
-
-
-
     private void updateDataWeight(String type, long startTime, long endTime){
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
         if (account == null) {
@@ -323,7 +356,6 @@ public class FragmentScreen3 extends Fragment {
         }
 
     }
-
     private void updateDataHydration(String type, long startTime, long endTime) {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
         if (account == null) {

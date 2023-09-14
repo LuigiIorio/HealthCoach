@@ -2,6 +2,8 @@ package com.example.healthcoach.viewmodels;
 
 import android.content.Context;
 import android.icu.util.Calendar;
+import android.util.Log;
+
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import com.example.healthcoach.recordingapi.BodyFat;
@@ -55,9 +57,15 @@ public class BodyFatViewModel extends ViewModel {
     }
 
     public void insertBodyFat(Context context, float bodyFatPercentage) {
-        bodyFat.insertBodyFatData(context, bodyFatPercentage);
-        bodyFatData.setValue(bodyFatData.getValue() + bodyFatPercentage);
+        bodyFat.insertBodyFatData(context, bodyFatPercentage, new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d("BodyFat", "Body fat data inserted successfully");
+                bodyFatData.setValue(bodyFatData.getValue() + bodyFatPercentage);
+            }
+        });
     }
+
 
 
     public MutableLiveData<Float> getBodyFatData() {

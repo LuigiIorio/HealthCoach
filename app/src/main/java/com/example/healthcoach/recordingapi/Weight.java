@@ -13,8 +13,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessOptions;
 import com.google.android.gms.fitness.RecordingClient;
+import com.google.android.gms.fitness.data.DataPoint;
+import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataSource;
 import com.google.android.gms.fitness.data.DataType;
+import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.request.DataReadRequest;
 import com.google.android.gms.fitness.result.DataReadResponse;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -48,6 +51,34 @@ public class Weight {
                 .addOnSuccessListener(aVoid -> Log.d("Weight", "Weight recording started"))
                 .addOnFailureListener(e -> Log.e("Weight", "Failed to start weight recording", e));
     }
+
+    public void insertWeightData(float weightValue, OnSuccessListener<Void> onSuccessListener) {
+        GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(context);
+
+        DataSource weightDataSource = new DataSource.Builder()
+                .setDataType(DataType.TYPE_WEIGHT)
+                .setAppPackageName(context.getPackageName())
+                .setStreamName("user weight")
+                .setType(DataSource.TYPE_RAW)
+                .build();
+
+        DataPoint weightDataPoint = DataPoint.builder(weightDataSource)
+                .setField(Field.FIELD_WEIGHT, weightValue)
+                .setTimeInterval(System.currentTimeMillis(), System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+                .build();
+
+        DataSet weightDataSet = DataSet.builder(weightDataSource)
+                .add(weightDataPoint)
+                .build();
+
+        Fitness.getHistoryClient(context, googleSignInAccount)
+                .insertData(weightDataSet)
+                .addOnSuccessListener(onSuccessListener)
+                .addOnFailureListener(e -> {
+                    Log.e("Weight", "Failed to insert weight data: " + e.getMessage(), e);
+                });
+    }
+
 
     public void refreshGoogleSignInAccount() {
         googleSignInAccount = GoogleSignIn.getAccountForExtension(context, fitnessOptions);
