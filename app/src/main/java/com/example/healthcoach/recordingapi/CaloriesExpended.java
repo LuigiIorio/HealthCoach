@@ -58,6 +58,7 @@ public class CaloriesExpended {
                 });
     }
 
+
     public void readCaloriesData(Context context, GoogleSignInAccount googleSignInAccount, long startTime, long endTime, OnSuccessListener<DataReadResponse> listener) {
         Log.d("CaloriesExpended", "Start Time: " + startTime + ", End Time: " + endTime);
 
@@ -77,6 +78,7 @@ public class CaloriesExpended {
                     Log.e("CaloriesExpended", "Error Message: " + e.getMessage());
                 });
     }
+
 
 
 

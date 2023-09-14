@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CalendarView;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -40,21 +41,21 @@ import java.util.concurrent.TimeUnit;
 
 
 
-
 public class FragmentScreen3 extends Fragment {
-
     private Hydration hydration;
     private Weight weight;
-    private BodyFat bodyFat; // added this
+    private BodyFat bodyFat;
     private TextView historyTextView;
     private Spinner dataTypeSpinner;
+    private Spinner insertDataTypeSpinner;
+    private EditText dataInputEditText;
     private Button fetchDataButton;
+    private Button insertDataButton;
     private int selectedYear;
     private int selectedMonth;
     private int selectedDay;
 
     private static final int PERMISSIONS_REQUEST_CODE = 1;
-
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -71,6 +72,8 @@ public class FragmentScreen3 extends Fragment {
         setupCalendarView(view);
         setupSpinner(view);
         setupFetchDataButton();
+        setupInsertDataButton();
+
         return view;
     }
 
@@ -82,6 +85,15 @@ public class FragmentScreen3 extends Fragment {
         if (!hasPermissions(requireContext(), permissions)) {
             requestPermissions(permissions, PERMISSIONS_REQUEST_CODE);
         }
+    }
+
+    private void setupInsertDataButton() {
+        insertDataButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Insert your logic here for what should happen when the insertDataButton is clicked
+            }
+        });
     }
 
     private static boolean hasPermissions(Context context, String... permissions) {
@@ -98,10 +110,12 @@ public class FragmentScreen3 extends Fragment {
         weight = new Weight(getActivity());
         bodyFat = new BodyFat(getActivity());
         historyTextView = view.findViewById(R.id.historyTextView);
-        dataTypeSpinner = view.findViewById(R.id.dataTypeSpinner);
+        dataTypeSpinner = view.findViewById(R.id.fetchDataTypeSpinner);
         fetchDataButton = view.findViewById(R.id.fetchDataButton);
+        insertDataTypeSpinner = view.findViewById(R.id.insertDataTypeSpinner);
+        dataInputEditText = view.findViewById(R.id.dataInputEditText);
+        insertDataButton = view.findViewById(R.id.insertDataButton);
 
-        // Initialize selectedYear, selectedMonth, and selectedDay
         Calendar calendar = Calendar.getInstance();
         selectedYear = calendar.get(Calendar.YEAR);
         selectedMonth = calendar.get(Calendar.MONTH);
@@ -110,21 +124,23 @@ public class FragmentScreen3 extends Fragment {
 
     private void setupCalendarView(View view) {
         CalendarView calendarView = view.findViewById(R.id.calendarView);
-        calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
-            @Override
-            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
-                selectedYear = year;
-                selectedMonth = month;
-                selectedDay = dayOfMonth;
-            }
+        calendarView.setOnDateChangeListener((view1, year, month, dayOfMonth) -> {
+            selectedYear = year;
+            selectedMonth = month;
+            selectedDay = dayOfMonth;
         });
     }
 
     private void setupSpinner(View view) {
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
+        ArrayAdapter<CharSequence> fetchAdapter = ArrayAdapter.createFromResource(getActivity(),
                 R.array.data_types, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        dataTypeSpinner.setAdapter(adapter);
+        fetchAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        dataTypeSpinner.setAdapter(fetchAdapter);
+
+        ArrayAdapter<CharSequence> insertAdapter = ArrayAdapter.createFromResource(getActivity(),
+                R.array.data_types2, android.R.layout.simple_spinner_item);
+        insertAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        insertDataTypeSpinner.setAdapter(insertAdapter);
     }
 
     private void setupFetchDataButton() {
@@ -153,6 +169,39 @@ public class FragmentScreen3 extends Fragment {
         });
     }
 
+
+    private void updateDataCaloriesExpended(String type, long startTime, long endTime) {
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
+        if (account == null) {
+            historyTextView.setText("Not signed in");
+            return;
+        }
+
+        if ("Kcal".equals(type)) {
+            new CaloriesExpended(getActivity(), account).readCaloriesData(getActivity(), account, startTime, endTime, new OnSuccessListener<DataReadResponse>() {
+                @Override
+                public void onSuccess(DataReadResponse dataReadResponse) {
+                    float totalCalories = 0;
+                    for (DataSet dataSet : dataReadResponse.getDataSets()) {
+                        for (DataPoint point : dataSet.getDataPoints()) {
+                            for (Field field : point.getDataType().getFields()) {
+                                totalCalories += point.getValue(field).asFloat();
+                            }
+                        }
+                    }
+                    if (totalCalories == 0) {
+                        historyTextView.setText("No data available for the selected date");
+                    } else {
+                        historyTextView.setText(String.format("Total Calories Expended: %.2f kcal", totalCalories));
+                    }
+                }
+            });
+        }
+    }
+
+
+
+
     private void updateDataDistance(String type, long startTime, long endTime) {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
         if (account == null) {
@@ -179,34 +228,6 @@ public class FragmentScreen3 extends Fragment {
             });
         }
     }
-
-
-    private void updateDataCaloriesExpended(String type, long startTime, long endTime) {
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
-        if (account == null) {
-            historyTextView.setText("Not signed in");
-            return;
-        }
-
-        if ("Kcal".equals(type)) {
-            new CaloriesExpended(getActivity(), account).readCaloriesData(getActivity(), account, startTime, endTime, new OnSuccessListener<DataReadResponse>() {
-                @Override
-                public void onSuccess(DataReadResponse dataReadResponse) {
-                    float totalCalories = 0;
-                    for (DataSet dataSet : dataReadResponse.getDataSets()) {
-                        for (DataPoint point : dataSet.getDataPoints()) {
-                            for (Field field : point.getDataType().getFields()) {
-                                totalCalories += point.getValue(field).asFloat();
-                            }
-                        }
-                    }
-                    historyTextView.setText(String.format("Total Calories Expended: %.2f kcal", totalCalories));
-                }
-            });
-        }
-    }
-
-
     private void updateDataSteps(String type, long startTime, long endTime) {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
         if (account == null) {
@@ -338,3 +359,4 @@ public class FragmentScreen3 extends Fragment {
 
 
 }
+

@@ -1,40 +1,91 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:padding="16dp">
 
-    <CalendarView
-        android:id="@+id/calendarView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <Spinner
-        android:id="@+id/dataTypeSpinner"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/historyRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
-    <TextView
-        android:id="@+id/historyTextView"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="History Data Here" />
+        android:orientation="vertical">
 
-    <!-- ... existing layout ... -->
-    <Button
-        android:id="@+id/fetchDataButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Fetch Data" />
-    <!-- ... existing layout ... -->
+        <!-- Calendar View -->
+        <CalendarView
+            android:id="@+id/calendarView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp" />
 
+        <!-- Insert Data Layout -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:background="@android:color/darker_gray">
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Insert Data" />
 
-</LinearLayout>
+            <Spinner
+                android:id="@+id/insertDataTypeSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:entries="@array/data_types2" />
+
+            <EditText
+                android:id="@+id/dataInputEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Enter Data"
+                android:inputType="numberDecimal" />
+
+            <Button
+                android:id="@+id/insertDataButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Insert Data" />
+        </LinearLayout>
+
+        <!-- Fetch Data Layout -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:background="@android:color/holo_blue_light">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Fetch Data" />
+
+            <Spinner
+                android:id="@+id/fetchDataTypeSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:entries="@array/data_types" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/historyRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/historyTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="History Data Here" />
+
+            <Button
+                android:id="@+id/fetchDataButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Fetch Data" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
