@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -17,6 +18,8 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.healthcoach.activities.HomeActivity;
 import com.example.healthcoach.activities.SignUpInformationActivity;
 import com.example.healthcoach.models.UserProfile;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -25,8 +28,11 @@ import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -47,15 +53,35 @@ public class SignUpViewModel extends ViewModel {
     public LiveData<UserProfile> getUser() {
 
         if(user.getValue() == null) {
-            UserProfile profile = new UserProfile();
-            FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-            profile.setMail(firebaseUser.getEmail());
-            profile.setUid(firebaseUser.getUid());
-
-            this.user.setValue(profile);
+            retriveUserInformation();
         }
 
         return user;
+    }
+
+    public void retriveUserInformation() {
+
+        UserProfile profile = new UserProfile();
+        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance()
+                .getReference("users").child(firebaseUser.getUid()).child("password");
+
+        profile.setMail(firebaseUser.getEmail());
+        profile.setUid(firebaseUser.getUid());
+
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                profile.setPassword(snapshot.getValue(String.class));
+                user.setValue(profile);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
     }
 
     public void setUser(UserProfile profile, Activity activity) {
@@ -111,9 +137,18 @@ public class SignUpViewModel extends ViewModel {
                         profile.setUid(firebaseAuth.getUid());
                         user.setValue(profile);
 
-                        Intent intent = new Intent(activity, SignUpInformationActivity.class);
-                        activity.startActivity(intent, new Bundle(profile.toBundle()));
-                        activity.finish();
+                        DatabaseReference usersReference = firebaseDatabase.getReference("users");
+
+                        usersReference.child(user.getValue().getUid()).setValue(user.getValue())
+                                .addOnCompleteListener(task1 -> {
+                                    Intent intent = new Intent(activity, SignUpInformationActivity.class);
+                                    activity.startActivity(intent, new Bundle(profile.toBundle()));
+                                    activity.finish();
+                        });
+
+
+
+
 
                     } else {
                         // La registrazione ha fallito. Gestisci l'errore.

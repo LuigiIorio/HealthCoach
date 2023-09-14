@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "99729341904",
+    "firebase_url": "https://healthcoach-7bec9-default-rtdb.europe-west1.firebasedatabase.app",
     "project_id": "healthcoach-7bec9",
     "storage_bucket": "healthcoach-7bec9.appspot.com"
   },
@@ -14,7 +15,15 @@
       },
       "oauth_client": [
         {
-          "client_id": "99729341904-on4htetl569e2ehr9n5rkprfsjcqouqr.apps.googleusercontent.com",
+          "client_id": "99729341904-g6lsbmfvta5b8m6ogrmkubbsbosuf335.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.healthcoach",
+            "certificate_hash": "b71b7c78e791d9e86368ee84d486974fcc6e0582"
+          }
+        },
+        {
+          "client_id": "99729341904-qlls8u6lhkf63fc4n68s2dvt9mnncpg2.apps.googleusercontent.com",
           "client_type": 3
         }
       ],

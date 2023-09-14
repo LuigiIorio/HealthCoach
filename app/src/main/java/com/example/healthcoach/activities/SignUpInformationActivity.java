@@ -34,6 +34,7 @@ public class SignUpInformationActivity extends AppCompatActivity {
     private Spinner genderInfo;
     private DatePicker birthdayPicker;
     private Button submitButton;
+    private String imageUri;
 
 
     @Override
@@ -43,7 +44,7 @@ public class SignUpInformationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_registration_info);
 
         viewModel = new ViewModelProvider(this).get(SignUpViewModel.class);
-
+        viewModel.retriveUserInformation();
 
         inizialiseUI();
         setupListeners();
@@ -62,8 +63,9 @@ public class SignUpInformationActivity extends AppCompatActivity {
                 profilePic.setImageURI(selectedImageUri);
                 profilePic.setImageTintList(null);
                 hoverProfilePic.setText("");
+                imageUri = selectedImageUri.toString();
 
-                viewModel.getUser().getValue().setImage(selectedImageUri.toString());
+
             } else {
 
                 TypedValue typedValue = new TypedValue();
@@ -121,6 +123,7 @@ public class SignUpInformationActivity extends AppCompatActivity {
                 String gender = genderInfo.getSelectedItem().toString();
 
 
+
                 if(fullName.equals("")) {
                     Toast.makeText(view.getContext(), "Full Name cannot be empty", Toast.LENGTH_SHORT).show();
                 }
@@ -138,6 +141,7 @@ public class SignUpInformationActivity extends AppCompatActivity {
                     user.setMonth(month);
                     user.setYear(year);
                     user.setGender(gender);
+                    user.setImage(imageUri);
 
                     viewModel.setUser(user, this);
 

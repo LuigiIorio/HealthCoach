@@ -59,7 +59,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         // Initialize Firebase
-        FirebaseApp.initializeApp(this);
+        FirebaseApp.initializeApp(this.getApplication());
 
         // Initialize ViewModel
         viewModel = new ViewModelProvider(this, new ViewModelProvider.AndroidViewModelFactory(getApplication())).get(LoginActivityViewModel.class);

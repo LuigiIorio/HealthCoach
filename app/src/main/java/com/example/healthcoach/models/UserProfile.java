@@ -70,6 +70,8 @@ public class UserProfile implements Serializable {
         return bundle;
     }
 
+
+
     public static UserProfile getUserProfile(Bundle bundle) {
 
         byte[] userData = bundle.getByteArray("userProfile");
