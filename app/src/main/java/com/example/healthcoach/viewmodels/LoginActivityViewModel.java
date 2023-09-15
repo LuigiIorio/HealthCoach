@@ -13,6 +13,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.healthcoach.activities.HomeActivity;
+import com.example.healthcoach.activities.SignUpInformationActivity;
 import com.example.healthcoach.models.UserProfile;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -29,7 +30,11 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class LoginActivityViewModel extends AndroidViewModel {
 
@@ -37,6 +42,7 @@ public class LoginActivityViewModel extends AndroidViewModel {
     private final Application application;
     private MutableLiveData<LoginResult> loginResult = new MutableLiveData<>();
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    private MutableLiveData<FirebaseUser> userLiveData;
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
     private GoogleSignInClient googleSignInClient;
 
@@ -44,6 +50,8 @@ public class LoginActivityViewModel extends AndroidViewModel {
     public LoginActivityViewModel(@NonNull Application application) {
         super(application);
         this.application = application;
+        userLiveData = new MutableLiveData<>();
+        userLiveData.setValue(mAuth.getCurrentUser());
     }
 
     /**
@@ -137,8 +145,42 @@ public class LoginActivityViewModel extends AndroidViewModel {
 
     }
 
+    public void checkDatabaseValues(Activity activity) {
+
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("users"); // Riferimento al nodo "users" nel database
+
+        // Cerca l'utente nel database in base al suo ID
+        databaseReference.child(mAuth.getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+
+                    Intent intent = new Intent(activity, HomeActivity.class);
+                    activity.startActivity(intent);
+                    activity.finish();
+
+                } else {
+
+                    Intent intent = new Intent(activity, SignUpInformationActivity.class);
+                    activity.startActivity(intent);
+                    activity.finish();
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Gestione degli errori (opzionale)
+            }
+        });
+
+    }
+
     public enum LoginResult {
         SUCCESS, FAILURE
     }
 
+    public MutableLiveData<FirebaseUser> getUserLiveData() {
+        return userLiveData;
+    }
 }

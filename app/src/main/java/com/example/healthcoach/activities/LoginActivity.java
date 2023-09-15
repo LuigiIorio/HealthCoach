@@ -64,13 +64,14 @@ public class LoginActivity extends AppCompatActivity {
         // Initialize ViewModel
         viewModel = new ViewModelProvider(this, new ViewModelProvider.AndroidViewModelFactory(getApplication())).get(LoginActivityViewModel.class);
 
-        if(viewModel.checkSignInStatus(this)) {
+        viewModel.getUserLiveData().observe(this, firebaseUser -> {
+            if(firebaseUser != null) {
 
-            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-            startActivity(intent);
-            finish();
+                viewModel.checkDatabaseValues(this);
 
-        }
+            }
+
+        });
 
         inizialiseUI();
 

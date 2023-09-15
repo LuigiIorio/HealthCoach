@@ -1,5 +1,6 @@
 package com.example.healthcoach.viewmodels;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -12,6 +13,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.healthcoach.activities.HomeActivity;
+import com.example.healthcoach.activities.LoginActivity;
 import com.example.healthcoach.fragments.FragmentSetting;
 import com.example.healthcoach.models.UserProfile;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -32,8 +34,11 @@ import com.google.android.gms.fitness.request.DataUpdateRequest;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.auth.UserInfo;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -50,11 +55,13 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.util.Calendar;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
 public class HomeActivityViewModel extends ViewModel {
 
+    private static final String TAG = "GMERGE";
     private final FirebaseAuth auth = FirebaseAuth.getInstance();
     private final FirebaseDatabase database = FirebaseDatabase.getInstance();
     private FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
@@ -174,10 +181,12 @@ public class HomeActivityViewModel extends ViewModel {
         }
     }
 
-    public void logoutUser() {
+    public void logoutUser(Activity activity) {
         try {
             FirebaseAuth.getInstance().signOut();
-            logoutState.setValue(new com.example.healthcoach.viewmodels.Event<Boolean>(true));
+            Intent intent = new Intent(activity, LoginActivity.class);
+            activity.startActivity(intent);
+            activity.finish();
         } catch (Exception e) {
             logoutState.setValue(new com.example.healthcoach.viewmodels.Event<Boolean>(false));
         }
@@ -371,6 +380,48 @@ public class HomeActivityViewModel extends ViewModel {
         calendar.set(Calendar.SECOND, 59);
         calendar.set(Calendar.MILLISECOND, 999);
         return calendar.getTimeInMillis();
+    }
+
+    public void mergeGoogleAccount(Context context) {
+
+        GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(context);
+
+        AuthCredential credential = GoogleAuthProvider.getCredential(googleSignInAccount.getIdToken(), null);
+
+        auth.getCurrentUser().linkWithCredential(credential)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        FirebaseUser firebaseUser = task.getResult().getUser();
+                        Log.d(TAG, "Unione riuscita: " + firebaseUser.getUid());
+                    } else {
+                        Exception exception = task.getException();
+                        Log.w(TAG, "Unione non riuscita", exception);
+                    }
+                });
+
+
+    }
+
+    public boolean checkGoogleMerge(Context context) {
+
+        FirebaseUser currentUser = auth.getCurrentUser();
+
+        if (currentUser != null) {
+            // Ottieni i provider di accesso collegati all'account Firebase
+            List<? extends UserInfo> providers = currentUser.getProviderData();
+
+            for (UserInfo userInfo : providers) {
+                String providerId = userInfo.getProviderId();
+
+                if (providerId.equals(GoogleAuthProvider.PROVIDER_ID)) {
+                    Log.d(TAG, "L'account Firebase è collegato a un account Google");
+                    return true;
+                }
+            }
+        }
+
+        return false;
+
     }
 
     public MutableLiveData<Integer> getSteps() {

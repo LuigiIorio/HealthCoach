@@ -38,7 +38,7 @@ public class FragmentSetting extends Fragment {
 
     private static final int PICK_IMAGE_REQUEST = 1;
     private Uri imageUri;
-    private Button submitButton, logoutButton;
+    private Button submitButton, logoutButton, googleButton;
     private HomeActivityViewModel viewModel;
     private boolean newImage = false;
 
@@ -96,6 +96,7 @@ public class FragmentSetting extends Fragment {
         oldPasswordInput = view.findViewById(R.id.oldPasswordInput);
         submitButton = view.findViewById(R.id.submitButton);
         logoutButton = view.findViewById(R.id.logoutButton);
+        googleButton = view.findViewById(R.id.googleLoginButton);
 
         viewModel.getProfileImage().observe(getViewLifecycleOwner(), uri -> {
             if (uri != null) {
@@ -104,6 +105,13 @@ public class FragmentSetting extends Fragment {
                 profilePic.setImageResource(R.drawable.ic_profile);
             }
         });
+
+        if(viewModel.checkGoogleMerge(this.getContext())) {
+
+            googleButton.setVisibility(View.INVISIBLE);
+            ((ViewGroup) googleButton.getParent()).removeView(googleButton);
+
+        }
 
     }
 
@@ -136,6 +144,18 @@ public class FragmentSetting extends Fragment {
                 transaction.commit();
 
             }
+
+        });
+
+        googleButton.setOnClickListener(view -> {
+
+            viewModel.mergeGoogleAccount(this.getContext());
+
+        });
+
+        logoutButton.setOnClickListener(view -> {
+
+            viewModel.logoutUser(this.getActivity());
 
         });
 
