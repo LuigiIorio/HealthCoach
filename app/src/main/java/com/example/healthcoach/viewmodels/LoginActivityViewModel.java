@@ -149,6 +149,9 @@ public class LoginActivityViewModel extends AndroidViewModel {
 
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("users"); // Riferimento al nodo "users" nel database
 
+        if(mAuth.getCurrentUser() == null)
+            return;
+
         // Cerca l'utente nel database in base al suo ID
         databaseReference.child(mAuth.getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
