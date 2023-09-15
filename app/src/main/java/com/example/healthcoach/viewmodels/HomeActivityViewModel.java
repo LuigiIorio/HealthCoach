@@ -23,6 +23,7 @@ import com.google.android.gms.common.internal.safeparcel.SafeParcelable;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessOptions;
 import com.google.android.gms.fitness.HistoryClient;
+import com.google.android.gms.fitness.data.Bucket;
 import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataSource;
@@ -104,7 +105,6 @@ public class HomeActivityViewModel extends ViewModel {
 
             }
         });
-
     }
 
     public LiveData<Uri> getProfileImage() {
@@ -240,24 +240,27 @@ public class HomeActivityViewModel extends ViewModel {
 
         DataReadRequest readRequest = new DataReadRequest.Builder()
                 .aggregate(type, type)
+                .bucketByTime(1, TimeUnit.DAYS) // Add this line to specify bucketing
                 .setTimeRange(getStartTimeOfToday(), getEndTimeOfToday(), TimeUnit.MILLISECONDS)
                 .build();
 
-        // Esegui la query
+        // Execute the query
         Fitness.getHistoryClient(context, GoogleSignIn.getLastSignedInAccount(context))
                 .readData(readRequest)
                 .addOnSuccessListener(dataReadResponse -> {
-                    DataSet dataSet = dataReadResponse.getDataSet(type);
-                    if (dataSet != null) {
-                        for (DataPoint dataPoint : dataSet.getDataPoints()) {
-                            updateLiveData(type, dataPoint.getValue(getTypeField(type)));
+                    for (Bucket bucket : dataReadResponse.getBuckets()) {
+                        DataSet dataSet = bucket.getDataSet(type);
+                        if (dataSet != null) {
+                            for (DataPoint dataPoint : dataSet.getDataPoints()) {
+                                updateLiveData(type, dataPoint.getValue(getTypeField(type)));
+                            }
                         }
                     }
                 })
                 .addOnFailureListener(e -> {
                 });
-
     }
+
 
     public void uploadWaterIntake(Context context, int value) {
 
