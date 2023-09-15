@@ -1,6 +1,8 @@
 package com.example.healthcoach.fragments;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +20,10 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.example.healthcoach.R;
 import com.example.healthcoach.models.UserProfile;
 import com.example.healthcoach.viewmodels.HomeActivityViewModel;
@@ -61,8 +67,7 @@ public class FragmentProfile extends Fragment {
     }
 
     private void inizialiseUI(View view) {
-
-        profilePic = view.findViewById(R.id.cardView2).findViewById(R.id.profilePic);
+        profilePic = view.findViewById(R.id.profilePic);
         nickname = view.findViewById(R.id.nickname);
         weight = view.findViewById(R.id.weightValue);
         height = view.findViewById(R.id.heightValue);
@@ -72,27 +77,42 @@ public class FragmentProfile extends Fragment {
         waterIntake = view.findViewById(R.id.waterIntake);
         submitButton = view.findViewById(R.id.submitButton);
 
-        viewModel.getProfileImage().observe(this, uri -> {
+        viewModel.getProfileImage().observe(getViewLifecycleOwner(), uri -> {
             if (uri != null) {
-                // Carica l'immagine nella ImageView quando viene ricevuto un Uri
+                Log.d("ProfileImage", "URI is not null: " + uri.toString());
                 Glide.with(this)
                         .load(uri)
+                        .listener(new RequestListener<Drawable>() {
+                            @Override
+                            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                                Log.e("Glide", "Load failed", e);
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                                Log.d("Glide", "Resource ready");
+                                return false;
+                            }
+                        })
                         .into(profilePic);
+            } else {
+                Log.d("ProfileImage", "URI is null");
             }
         });
 
         viewModel.getUser().observe(this, userProfile -> {
             if (userProfile != null) {
-
                 weight.setText(userProfile.getWeight() + "Kg");
                 height.setText(userProfile.getHeight() + "cm");
                 nickname.setText(userProfile.getFullName() + " (" + getYears(userProfile) + ")");
                 dailySteps = userProfile.getDailySteps();
                 dailyWater = userProfile.getDailyWater();
                 dailyKcal = userProfile.getDailyKcal();
-
             }
         });
+
+        updateDailyGoal();
 
         viewModel.getSteps().observe(this, steps -> {
             this.steps = steps;
@@ -108,8 +128,9 @@ public class FragmentProfile extends Fragment {
             this.kcal = kcal;
             updateDailyGoal();
         });
-
     }
+
+
 
     private void setupListener() {
 
