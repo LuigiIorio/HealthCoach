@@ -14,7 +14,6 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -44,7 +43,7 @@ import java.util.concurrent.TimeUnit;
 
 
 
-public class FragmentScreen3 extends Fragment {
+public class FragmentHistory extends Fragment {
     private Hydration hydration;
     private Weight weight;
     private BodyFat bodyFat;

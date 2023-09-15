@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -12,9 +13,22 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.anychart.AnyChart;
+import com.anychart.AnyChartView;
+import com.anychart.chart.common.dataentry.DataEntry;
+import com.anychart.chart.common.dataentry.ValueDataEntry;
+import com.anychart.charts.Cartesian;
+import com.anychart.core.cartesian.series.Line;
+import com.anychart.data.Mapping;
+import com.anychart.data.Set;
+import com.anychart.enums.Anchor;
+import com.anychart.enums.MarkerType;
+import com.anychart.enums.TooltipPositionMode;
+import com.anychart.graphics.vector.Stroke;
 import com.example.healthcoach.activities.HomeActivity;
 import com.example.healthcoach.activities.LoginActivity;
 import com.example.healthcoach.fragments.FragmentSetting;
+import com.example.healthcoach.models.GoogleFitDailyData;
 import com.example.healthcoach.models.UserProfile;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -32,7 +46,10 @@ import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.data.Value;
 import com.google.android.gms.fitness.request.DataReadRequest;
 import com.google.android.gms.fitness.request.DataUpdateRequest;
+import com.google.android.gms.fitness.request.OnDataPointListener;
+import com.google.android.gms.fitness.result.DataReadResponse;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
@@ -55,22 +72,27 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 
 public class HomeActivityViewModel extends ViewModel {
 
     private static final String TAG = "GMERGE";
+    private static final int DAYS_TO_FETCH = 7;
     private final FirebaseAuth auth = FirebaseAuth.getInstance();
     private final FirebaseDatabase database = FirebaseDatabase.getInstance();
     private FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
     private final MutableLiveData<UserProfile> userProfileLiveData = new MutableLiveData<>();
     private MutableLiveData<Uri> profileImageUri = new MutableLiveData<>();
     private final MutableLiveData<com.example.healthcoach.viewmodels.Event<Boolean>> logoutState = new MutableLiveData<>();
-
     private MutableLiveData<Integer> stepCount = new MutableLiveData<>();
+    private MutableLiveData<List<GoogleFitDailyData>> history = new MutableLiveData<>();
 
     public MutableLiveData<Integer> getStepCount() {
         return stepCount;
@@ -229,6 +251,15 @@ public class HomeActivityViewModel extends ViewModel {
     }
 
     public void updateFitValues(Context context) {
+
+        GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(context);
+
+        if (googleSignInAccount == null) {
+            Toast.makeText(context,
+                    "Google Account not found!\nConsider merging one to unlock full version",
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
 
         updateFitValue(context, DataType.TYPE_STEP_COUNT_DELTA);
         updateFitValue(context, DataType.TYPE_HYDRATION);
@@ -438,4 +469,187 @@ public class HomeActivityViewModel extends ViewModel {
     public MutableLiveData<Integer> getKcal() {
         return kcal;
     }
+
+    public void fetchData(Context context, AnyChartView lineChart) {
+
+        if (GoogleSignIn.getLastSignedInAccount(context) == null)
+            return;
+
+        if (history.getValue() == null) {
+
+            List<GoogleFitDailyData> data = new ArrayList<>();
+            for (int i = 0; i < 7; i++)
+                data.add(new GoogleFitDailyData());
+
+            history.setValue(data);
+
+        }
+
+        // Impostazione dell'intervallo di tempo
+        Calendar calendar = Calendar.getInstance();
+        long endTime = calendar.getTimeInMillis();
+        calendar.add(Calendar.DAY_OF_YEAR, -DAYS_TO_FETCH);
+        long startTime = calendar.getTimeInMillis();
+
+        // Creazione della richiesta per i dati di Google Fit
+        DataReadRequest readRequest = new DataReadRequest.Builder()
+                .aggregate(DataType.TYPE_STEP_COUNT_DELTA)
+                .aggregate(DataType.TYPE_HYDRATION)
+                .aggregate(DataType.TYPE_CALORIES_EXPENDED)
+                .bucketByTime(DAYS_TO_FETCH, TimeUnit.DAYS)
+                .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+                .build();
+
+        HistoryClient historyClient = Fitness.getHistoryClient(context, GoogleSignIn.getLastSignedInAccount(context));
+
+        // Eseguire la richiesta
+        historyClient.readData(readRequest)
+                .addOnSuccessListener(dataReadResult -> {
+                    List<Bucket> buckets = dataReadResult.getBuckets();
+                    parseBuckets(buckets);
+                    inizialiseLineChart(lineChart);
+                });
+    }
+
+    private void parseBuckets(List<Bucket> buckets) {
+
+        for (Bucket bucket : buckets) {
+
+            List<DataSet> dataSets = bucket.getDataSets();
+
+            for (DataSet dataSet : dataSets) {
+                for (DataPoint dataPoint : dataSet.getDataPoints()) {
+
+                    GoogleFitDailyData data = history.getValue()
+                            .get((int) (DAYS_TO_FETCH - 1 - calculateDaysSince(
+                                    dataPoint.getEndTime(TimeUnit.MILLISECONDS) -
+                                            dataPoint.getStartTime(TimeUnit.MILLISECONDS)
+                            )));
+
+                    if(dataPoint.getDataType() == DataType.TYPE_STEP_COUNT_DELTA)
+                        data.setSteps(dataPoint.getValue(Field.FIELD_STEPS).asInt());
+                    else if(dataPoint.getDataType() == DataType.TYPE_HYDRATION)
+                        data.setHydration(dataPoint.getValue(Field.FIELD_VOLUME).asFloat());
+                    else if(dataPoint.getDataType() == DataType.TYPE_CALORIES_EXPENDED)
+                        data.setCalories(dataPoint.getValue(Field.FIELD_CALORIES).asFloat());
+
+                }
+            }
+        }
+
+    }
+
+    public static long calculateDaysSince(long timestampInMillis) {
+        long currentTimeInMillis = System.currentTimeMillis();
+        long timeDifference = currentTimeInMillis - timestampInMillis;
+        return TimeUnit.MILLISECONDS.toDays(timeDifference);
+    }
+
+    public void inizialiseLineChart(AnyChartView lineChart) {
+
+        Cartesian cartesian = AnyChart.line();
+
+        cartesian.animation(true);
+
+        cartesian.padding(10d, 20d, 5d, 20d);
+
+        cartesian.crosshair().enabled(true);
+        cartesian.crosshair()
+                .yLabel(true)
+                .yStroke((Stroke) null, null, null, (String) null, (String) null);
+
+        cartesian.tooltip().positionMode(TooltipPositionMode.POINT);
+
+        cartesian.yAxis(0).title("% Completed");
+        cartesian.xAxis(0).labels().padding(5d, 5d, 5d, 5d);
+
+        List<DataEntry> seriesData = new ArrayList<>();
+        UserProfile user = userProfileLiveData.getValue();
+
+        for(int i = history.getValue().size() - 1; i >= 0; i--) {
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.DAY_OF_YEAR, -i);
+
+            GoogleFitDailyData data = history.getValue().get(i);
+
+            seriesData.add(new CustomDataEntry(
+                    formatToDDMMM(calendar),
+                    (data.getSteps() / user.getDailySteps()) * 100,
+                    (data.getHydration() / user.getDailyWater()) * 100,
+                    (data.getCalories() / user.getDailyKcal()) * 100
+            ));
+
+        }
+
+        Set set = Set.instantiate();
+        set.data(seriesData);
+        Mapping series1Mapping = set.mapAs("{ x: 'x', value: 'value' }");
+        Mapping series2Mapping = set.mapAs("{ x: 'x', value: 'value2' }");
+        Mapping series3Mapping = set.mapAs("{ x: 'x', value: 'value3' }");
+
+        Line series1 = cartesian.line(series1Mapping);
+        series1.name("Steps");
+        series1.hovered().markers().enabled(true);
+        series1.hovered().markers()
+                .type(MarkerType.CIRCLE)
+                .size(4d);
+        series1.tooltip()
+                .position("right")
+                .anchor(Anchor.LEFT_CENTER)
+                .offsetX(5d)
+                .offsetY(5d);
+
+        Line series2 = cartesian.line(series2Mapping);
+        series2.name("Water");
+        series2.hovered().markers().enabled(true);
+        series2.hovered().markers()
+                .type(MarkerType.CIRCLE)
+                .size(4d);
+        series2.tooltip()
+                .position("right")
+                .anchor(Anchor.LEFT_CENTER)
+                .offsetX(5d)
+                .offsetY(5d);
+
+        Line series3 = cartesian.line(series3Mapping);
+        series3.name("Calories");
+        series3.hovered().markers().enabled(true);
+        series3.hovered().markers()
+                .type(MarkerType.CIRCLE)
+                .size(4d);
+        series3.tooltip()
+                .position("right")
+                .anchor(Anchor.LEFT_CENTER)
+                .offsetX(5d)
+                .offsetY(5d);
+
+        cartesian.legend().enabled(true);
+        cartesian.legend().fontSize(13d);
+        cartesian.legend().padding(0d, 0d, 10d, 0d);
+
+        lineChart.setChart(cartesian);
+
+    }
+
+    public static String formatToDDMMM(Date date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd MMM", Locale.getDefault());
+        return sdf.format(date);
+    }
+
+    // Metodo per formattare una data nel formato "DD MMM"
+    public static String formatToDDMMM(Calendar calendar) {
+        return formatToDDMMM(calendar.getTime());
+    }
+
+    private class CustomDataEntry extends ValueDataEntry {
+
+        CustomDataEntry(String x, Number value, Number value2, Number value3) {
+            super(x, value);
+            setValue("value2", value2);
+            setValue("value3", value3);
+        }
+
+    }
+
 }
