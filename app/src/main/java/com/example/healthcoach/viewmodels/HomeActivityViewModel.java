@@ -17,14 +17,18 @@ import com.example.healthcoach.models.UserProfile;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptionsExtension;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessOptions;
 import com.google.android.gms.fitness.HistoryClient;
 import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
+import com.google.android.gms.fitness.data.DataSource;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
+import com.google.android.gms.fitness.data.Value;
 import com.google.android.gms.fitness.request.DataReadRequest;
+import com.google.android.gms.fitness.request.DataUpdateRequest;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -65,6 +69,10 @@ public class HomeActivityViewModel extends ViewModel {
     }
 
     private ListenerRegistration userProfileListener;
+
+    private MutableLiveData<Integer> steps = new MutableLiveData<>();
+    private MutableLiveData<Integer> water = new MutableLiveData<>();
+    private MutableLiveData<Integer> kcal = new MutableLiveData<>();
 
     public HomeActivityViewModel() {
 
@@ -142,10 +150,10 @@ public class HomeActivityViewModel extends ViewModel {
                     .addOnSuccessListener(dataReadResponse -> {
                         int totalSteps = 0;
                         for (DataPoint dp : dataReadResponse.getDataSet(DataType.TYPE_STEP_COUNT_DELTA).getDataPoints()) {
-                            for(Field field : dp.getDataType().getFields()) {
+                            for (Field field : dp.getDataType().getFields()) {
                                 int steps = dp.getValue(field).asInt();
                                 totalSteps += steps;
-                                Log.e("StepCount", ""+steps);
+                                Log.e("StepCount", "" + steps);
                             }
                         }
                         stepCount.postValue(totalSteps);
@@ -157,7 +165,6 @@ public class HomeActivityViewModel extends ViewModel {
             Log.e("HomeActivityViewModel", "User is not signed in");
         }
     }
-
 
 
     @Override
@@ -212,4 +219,169 @@ public class HomeActivityViewModel extends ViewModel {
 
     }
 
+    public void updateFitValues(Context context) {
+
+        updateFitValue(context, DataType.TYPE_STEP_COUNT_DELTA);
+        updateFitValue(context, DataType.TYPE_HYDRATION);
+        updateFitValue(context, DataType.TYPE_CALORIES_EXPENDED);
+
+    }
+
+    public void updateFitValue(Context context, DataType type) {
+
+        DataReadRequest readRequest = new DataReadRequest.Builder()
+                .aggregate(type, type)
+                .setTimeRange(getStartTimeOfToday(), getEndTimeOfToday(), TimeUnit.MILLISECONDS)
+                .build();
+
+        // Esegui la query
+        Fitness.getHistoryClient(context, GoogleSignIn.getLastSignedInAccount(context))
+                .readData(readRequest)
+                .addOnSuccessListener(dataReadResponse -> {
+                    DataSet dataSet = dataReadResponse.getDataSet(type);
+                    if (dataSet != null) {
+                        for (DataPoint dataPoint : dataSet.getDataPoints()) {
+                            updateLiveData(type, dataPoint.getValue(getTypeField(type)));
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> {
+                });
+
+    }
+
+    public void uploadWaterIntake(Context context, int value) {
+
+        FitnessOptions fitnessOptions = FitnessOptions.builder()
+                .addDataType(DataType.TYPE_HYDRATION, FitnessOptions.ACCESS_WRITE)
+                .build();
+
+
+        GoogleSignInAccount googleSignInAccount = GoogleSignIn.getAccountForExtension(context, fitnessOptions);
+
+        // Create a data source
+        DataSource dataSource = new DataSource.Builder()
+                .setAppPackageName(context)
+                .setDataType(DataType.TYPE_HYDRATION)
+                .setStreamName("$TAG - water intake")
+                .setType(DataSource.TYPE_RAW)
+                .build();
+
+        Calendar calendar = Calendar.getInstance();
+        long now = calendar.getTimeInMillis();
+
+        // For each data point, specify a start time, end time, and the
+        // data value -- in this case, 950 new steps.
+        DataPoint dataPoint = DataPoint.builder(dataSource)
+                .setField(getTypeField(DataType.TYPE_HYDRATION), value)
+                .setTimestamp(now, TimeUnit.MILLISECONDS)
+                .build();
+
+        DataSet dataSet = DataSet.builder(dataSource)
+                .add(dataPoint)
+                .build();
+
+        Fitness.getHistoryClient(context, googleSignInAccount)
+                .insertData(dataSet)
+                .addOnSuccessListener(unused -> {
+                    water.setValue(water.getValue() + value);
+                });
+
+    }
+
+    public void uploadKcalUsed(Context context, int value) {
+
+        FitnessOptions fitnessOptions = FitnessOptions.builder()
+                .addDataType(DataType.TYPE_CALORIES_EXPENDED, FitnessOptions.ACCESS_WRITE)
+                .build();
+
+
+        GoogleSignInAccount googleSignInAccount = GoogleSignIn.getAccountForExtension(context, fitnessOptions);
+
+        // Create a data source
+        DataSource dataSource = new DataSource.Builder()
+                .setAppPackageName(context)
+                .setDataType(DataType.TYPE_CALORIES_EXPENDED)
+                .setStreamName("$TAG - water intake")
+                .setType(DataSource.TYPE_RAW)
+                .build();
+
+        Calendar calendar = Calendar.getInstance();
+        long now = calendar.getTimeInMillis();
+
+        // For each data point, specify a start time, end time, and the
+        // data value -- in this case, 950 new steps.
+        DataPoint dataPoint = DataPoint.builder(dataSource)
+                .setField(getTypeField(DataType.TYPE_CALORIES_EXPENDED), value)
+                .setTimestamp(now, TimeUnit.MILLISECONDS)
+                .build();
+
+        DataSet dataSet = DataSet.builder(dataSource)
+                .add(dataPoint)
+                .build();
+
+        Fitness.getHistoryClient(context, googleSignInAccount)
+                .insertData(dataSet)
+                .addOnSuccessListener(unused -> {
+                    kcal.setValue(kcal.getValue() + value);
+                });
+
+    }
+
+    private Field getTypeField(DataType type) {
+
+        if (type.equals(DataType.TYPE_STEP_COUNT_DELTA)) {
+            return Field.FIELD_STEPS;
+        } else if (type.equals(DataType.TYPE_HYDRATION)) {
+            return Field.FIELD_VOLUME;
+        } else if (type.equals(DataType.TYPE_CALORIES_EXPENDED)) {
+            return Field.FIELD_CALORIES;
+        }
+
+        return null;
+
+    }
+
+    private void updateLiveData(DataType type, Value value) {
+
+        if (type.equals(DataType.TYPE_STEP_COUNT_DELTA)) {
+            steps.setValue(value.asInt());
+        } else if (type.equals(DataType.TYPE_HYDRATION)) {
+            water.setValue((int) value.asFloat());
+        } else if (type.equals(DataType.TYPE_CALORIES_EXPENDED)) {
+            kcal.setValue((int) value.asFloat());
+        }
+
+    }
+
+    private static long getStartTimeOfToday() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTimeInMillis();
+    }
+
+    // Ottieni l'orario di fine di oggi (23:59:59)
+    private static long getEndTimeOfToday() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        calendar.set(Calendar.MILLISECOND, 999);
+        return calendar.getTimeInMillis();
+    }
+
+    public MutableLiveData<Integer> getSteps() {
+        return steps;
+    }
+
+    public MutableLiveData<Integer> getWater() {
+        return water;
+    }
+
+    public MutableLiveData<Integer> getKcal() {
+        return kcal;
+    }
 }
