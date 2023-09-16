@@ -128,10 +128,7 @@ public class LoginActivityViewModel extends AndroidViewModel {
                 profile.setMail(user.getEmail());
                 profile.setImage(user.getPhotoUrl().toString());
 
-                database.getReference().child("Users").child(user.getUid()).setValue(profile);
-
-                Intent intent = new Intent(activity, HomeActivity.class);
-                activity.startActivity(intent);
+                checkDatabaseValues(activity, profile);
 
             }
 
@@ -163,6 +160,42 @@ public class LoginActivityViewModel extends AndroidViewModel {
                     activity.finish();
 
                 } else {
+
+                    Intent intent = new Intent(activity, SignUpInformationActivity.class);
+                    activity.startActivity(intent);
+                    activity.finish();
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Gestione degli errori (opzionale)
+            }
+        });
+
+    }
+
+    public void checkDatabaseValues(Activity activity, UserProfile profile) {
+
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("users"); // Riferimento al nodo "users" nel database
+
+        if(mAuth.getCurrentUser() == null)
+            return;
+
+        // Cerca l'utente nel database in base al suo ID
+        databaseReference.child(mAuth.getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+
+                    Intent intent = new Intent(activity, HomeActivity.class);
+                    activity.startActivity(intent);
+                    activity.finish();
+
+                } else {
+
+                    databaseReference.child(profile.getUid()).setValue(profile);
 
                     Intent intent = new Intent(activity, SignUpInformationActivity.class);
                     activity.startActivity(intent);

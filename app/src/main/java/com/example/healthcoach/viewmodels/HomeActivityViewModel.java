@@ -420,18 +420,34 @@ public class HomeActivityViewModel extends ViewModel {
 
         GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(context);
 
-        AuthCredential credential = GoogleAuthProvider.getCredential(googleSignInAccount.getIdToken(), null);
+        if (googleSignInAccount != null) {
+            try {
+                String idToken = googleSignInAccount.getIdToken();
 
-        auth.getCurrentUser().linkWithCredential(credential)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        FirebaseUser firebaseUser = task.getResult().getUser();
-                        Log.d(TAG, "Unione riuscita: " + firebaseUser.getUid());
-                    } else {
-                        Exception exception = task.getException();
-                        Log.w(TAG, "Unione non riuscita", exception);
-                    }
-                });
+                AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
+
+                auth.getCurrentUser().linkWithCredential(credential)
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                FirebaseUser firebaseUser = task.getResult().getUser();
+                                Log.d(TAG, "Unione riuscita: " + firebaseUser.getUid());
+                            } else {
+                                Exception exception = task.getException();
+                                Log.w(TAG, "Unione non riuscita", exception);
+                            }
+                        });
+
+            } catch (NullPointerException e) {
+                Log.e("Merge", e.toString());
+            }
+        } else {
+
+            Log.e("Merge", "Not connected to Google Account");
+
+        }
+
+
+
 
 
     }

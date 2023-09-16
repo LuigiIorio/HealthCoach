@@ -142,7 +142,7 @@ public class SignUpViewModel extends ViewModel {
                         usersReference.child(user.getValue().getUid()).setValue(user.getValue())
                                 .addOnCompleteListener(task1 -> {
                                     Intent intent = new Intent(activity, SignUpInformationActivity.class);
-                                    activity.startActivity(intent, new Bundle(profile.toBundle()));
+                                    activity.startActivity(intent);
                                     activity.finish();
                         });
 

@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "99729341904-3e8cbq260kqv26ga46kb4cp3vtcfjidd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.healthcoach",
+            "certificate_hash": "b5069994d93a14b334566bb72f1dec24a63460d0"
+          }
+        },
+        {
           "client_id": "99729341904-g6lsbmfvta5b8m6ogrmkubbsbosuf335.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

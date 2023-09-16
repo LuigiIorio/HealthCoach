@@ -5,6 +5,7 @@ import static com.example.healthcoach.viewmodels.LoginActivityViewModel.RC_SIGN_
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -145,6 +146,7 @@ public class LoginActivity extends AppCompatActivity {
             } catch (ApiException e) {
                 // Gestisci l'errore di accesso con Google
                 Toast.makeText(this, "Errore", Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
             }
         }
     }
@@ -209,8 +211,6 @@ public class LoginActivity extends AppCompatActivity {
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
-
-        viewModel.signInWithGoogle(this, gso);
 
         GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(this, gso);
 

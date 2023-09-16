@@ -155,15 +155,4 @@
 
     </com.anychart.AnyChartView>
 
-    <TextView
-        android:id="@+id/step_count_text_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:padding="8dp"
-        android:text="Steps: 0"
-        android:textSize="18sp"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="124dp" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>
