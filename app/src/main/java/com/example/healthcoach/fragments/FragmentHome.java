@@ -83,7 +83,7 @@ public class FragmentHome extends Fragment {
         waterProgressBar = view.findViewById(R.id.waterCircle);
         bpmProgressBar = view.findViewById(R.id.bpmCircle);
 
-        lineChart = view.findViewById(R.id.historyChart);
+        //lineChart = view.findViewById(R.id.historyChart);
 
         homeActivityViewModel.getUser().observe(this, userProfile -> {
 
@@ -105,7 +105,7 @@ public class FragmentHome extends Fragment {
                             GoogleSignIn.getLastSignedInAccount(this.getContext()),
                             fitnessOptions);
 
-                    homeActivityViewModel.fetchData(this.getContext(), lineChart);
+                    //homeActivityViewModel.fetchData(this.getContext(), lineChart);
 
                 }
 
