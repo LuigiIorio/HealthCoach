@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit;
 
 
 
-public class FragmentHistory extends Fragment {
+public class HistoryFragment extends Fragment {
     private Hydration hydration;
     private Weight weight;
     private BodyFat bodyFat;
@@ -66,7 +66,7 @@ public class FragmentHistory extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_screen3, container, false);
+        View view = inflater.inflate(R.layout.fragment_history, container, false);
 
         requestPermissions();
 

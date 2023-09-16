@@ -1,6 +1,5 @@
 package com.example.healthcoach.fragments;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.net.Uri;
@@ -19,7 +18,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 
 
@@ -29,7 +27,7 @@ import com.example.healthcoach.models.UserProfile;
 import com.example.healthcoach.viewmodels.HomeActivityViewModel;
 
 
-public class FragmentSetting extends Fragment {
+public class SettingFragment extends Fragment {
 
     private ImageView profilePic;
     private TextView profilePicEdit;
@@ -139,7 +137,7 @@ public class FragmentSetting extends Fragment {
 
                 viewModel.updateUser(user);
                 FragmentTransaction transaction = this.getActivity().getSupportFragmentManager().beginTransaction();
-                FragmentSetting newFragment = new FragmentSetting();
+                SettingFragment newFragment = new SettingFragment();
                 transaction.replace(R.id.fragment_container, newFragment);
                 transaction.commit();
 

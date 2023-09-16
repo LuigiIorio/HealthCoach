@@ -9,16 +9,16 @@
     <item
         android:id="@+id/navigation_profile"
         android:icon="@drawable/ic_profile"
-        android:title="Journal" />
+        android:title="Profile" />
 
     <item
-        android:id="@+id/navigation_diary"
-        android:icon="@drawable/ic_diary"
-        android:title="Diary" />
+        android:id="@+id/navigation_history"
+        android:icon="@drawable/ic_history"
+        android:title="History" />
 
     <item
         android:id="@+id/navigation_setting"
         android:icon="@drawable/ic_setting"
-        android:title="Profile" />
+        android:title="Settings" />
 
 </menu>

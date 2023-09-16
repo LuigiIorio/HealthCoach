@@ -8,10 +8,10 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.healthcoach.R;
 import com.example.healthcoach.fragments.FragmentHome;
-import com.example.healthcoach.fragments.FragmentProfile;
-import com.example.healthcoach.fragments.FragmentHistory;
+import com.example.healthcoach.fragments.ProfileFragment;
+import com.example.healthcoach.fragments.HistoryFragment;
 import com.example.healthcoach.viewmodels.HomeActivityViewModel;
-import com.example.healthcoach.fragments.FragmentSetting;
+import com.example.healthcoach.fragments.SettingFragment;
 import com.example.healthcoach.viewmodels.StepViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -40,9 +40,9 @@ public class HomeActivity extends AppCompatActivity {
 
         // Initialize fragments
         fragment1 = new FragmentHome();
-        fragment2 = new FragmentProfile();
-        fragment3 = new FragmentHistory();
-        fragment4 = new FragmentSetting();
+        fragment2 = new ProfileFragment();
+        fragment3 = new HistoryFragment();
+        fragment4 = new SettingFragment();
 
         // Set initial active fragment
         activeFragment = fragment1;
@@ -71,7 +71,7 @@ public class HomeActivity extends AppCompatActivity {
                     case R.id.navigation_profile:
                         selectedFragment = fragment2;
                         break;
-                    case R.id.navigation_diary:
+                    case R.id.navigation_history:
                         selectedFragment = fragment3;
                         break;
                     case R.id.navigation_setting:

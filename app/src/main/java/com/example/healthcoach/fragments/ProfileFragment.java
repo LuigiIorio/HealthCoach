@@ -12,7 +12,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,15 +26,10 @@ import com.bumptech.glide.request.target.Target;
 import com.example.healthcoach.R;
 import com.example.healthcoach.models.UserProfile;
 import com.example.healthcoach.viewmodels.HomeActivityViewModel;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.fitness.FitnessOptions;
-import com.google.android.gms.fitness.data.DataType;
 
 import java.util.Calendar;
-import java.util.Date;
 
-public class FragmentProfile extends Fragment {
+public class ProfileFragment extends Fragment {
 
     private static final int KCAL_EASY = 100;
     private static final int KCAL_MEDIUM = 250;
