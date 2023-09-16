@@ -80,13 +80,13 @@ public class FragmentHome extends Fragment {
 
         lineChart = view.findViewById(R.id.historyChart);
 
-        homeActivityViewModel.getUser().observe(this, steps -> {
+        /*homeActivityViewModel.getUser().observe(this, steps -> {
 
             if(homeActivityViewModel.getUser().getValue() != null) {
                 homeActivityViewModel.fetchData(this.getContext(), lineChart);
             }
 
-        });
+        }); */
 
     }
 
