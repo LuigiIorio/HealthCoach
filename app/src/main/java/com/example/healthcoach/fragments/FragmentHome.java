@@ -81,7 +81,7 @@ public class FragmentHome extends Fragment {
 
         kcalProgressBar = view.findViewById(R.id.kcalCircle);
         waterProgressBar = view.findViewById(R.id.waterCircle);
-        bpmProgressBar = view.findViewById(R.id.bpmCircle);
+//        bpmProgressBar = view.findViewById(R.id.bpmCircle);
 
         //lineChart = view.findViewById(R.id.historyChart);
 
