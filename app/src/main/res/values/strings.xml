@@ -14,7 +14,7 @@
     <string name="mail">Email</string>
     <string name="password">Password</string>
     <string name="confirm_password">Confirm Password</string>
-    <string name="forget_password">Forget Password?</string>
+    <string name="forget_password">Forgot Password?</string>
     <string name="forget_password_info">Enter the mail address associated with your account.</string>
     <string name="remember_password">Remember the password? Log in.</string>
     <string name="new_password">New Password</string>
