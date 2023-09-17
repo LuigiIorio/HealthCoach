@@ -149,9 +149,11 @@ public class HistoryFragment extends Fragment {
     }
 
     private void initializeVariables(View view) {
+
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
         hydration = new Hydration(getActivity());
         weight = new Weight(getActivity());
-        bodyFat = new BodyFat(getActivity());
+        bodyFat = new BodyFat(getActivity(), account);
         historyTextView = view.findViewById(R.id.historyTextView);
         dataTypeSpinner = view.findViewById(R.id.fetchDataTypeSpinner);
         fetchDataButton = view.findViewById(R.id.fetchDataButton);
@@ -319,10 +321,6 @@ public class HistoryFragment extends Fragment {
             });
         }
     }
-
-
-
-
     private void updateDataWeight(String type, long startTime, long endTime){
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
         if (account == null) {
@@ -355,7 +353,7 @@ public class HistoryFragment extends Fragment {
 
     }
 
-    private void updateDataBodyFat(String type, long startTime, long endTime){
+    private void updateDataBodyFat(String type, long startTime, long endTime) {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
         if (account == null) {
             historyTextView.setText("Not signed in");
@@ -363,29 +361,41 @@ public class HistoryFragment extends Fragment {
         }
 
         if ("BodyFat".equals(type)) {
+            // Convert local time to UTC
+            TimeZone tz = TimeZone.getDefault();
+            int offsetFromUtc = tz.getOffset(startTime);
+            startTime -= offsetFromUtc;
+            endTime -= offsetFromUtc;
+
             bodyFat.readBodyFatData(getActivity(), account, startTime, endTime, new OnSuccessListener<DataReadResponse>() {
                 @Override
                 public void onSuccess(DataReadResponse dataReadResponse) {
                     float latestBodyFat = 0;
                     long latestTime = 0;
-                    for (DataSet dataSet : dataReadResponse.getDataSets()) {
-                        for (DataPoint point : dataSet.getDataPoints()) {
-                            for (Field field : point.getDataType().getFields()) {
-                                float bodyFatValue = point.getValue(field).asFloat();
-                                long endTime = point.getEndTime(TimeUnit.MILLISECONDS);
-                                if (endTime > latestTime) {
-                                    latestTime = endTime;
-                                    latestBodyFat = bodyFatValue;
+
+                    if (dataReadResponse.getBuckets().size() > 0) {
+                        for (Bucket bucket : dataReadResponse.getBuckets()) {
+                            DataSet dataSet = bucket.getDataSet(DataType.AGGREGATE_BODY_FAT_PERCENTAGE_SUMMARY);
+                            for (DataPoint point : dataSet.getDataPoints()) {
+                                for (Field field : point.getDataType().getFields()) {
+                                    float bodyFatValue = point.getValue(field).asFloat();
+                                    long endTime = point.getEndTime(TimeUnit.MILLISECONDS);
+                                    if (endTime > latestTime) {
+                                        latestTime = endTime;
+                                        latestBodyFat = bodyFatValue;
+                                    }
                                 }
                             }
                         }
                     }
+
                     historyTextView.setText(String.format("Latest body fat: %.2f%%", latestBodyFat));
                 }
             });
         }
-
     }
+
+
     private void updateDataHydration(String type, long startTime, long endTime) {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
         if (account == null) {

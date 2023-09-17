@@ -20,12 +20,14 @@ import java.util.concurrent.TimeUnit;
 public class BodyFatViewModel extends ViewModel {
 
     private BodyFat bodyFat;
-    private final MutableLiveData<Float> bodyFatData = new MutableLiveData<>(0f); // Replace totalBodyFat with bodyFatData
+    private final MutableLiveData<Float> bodyFatData = new MutableLiveData<>(0f);
 
-    public BodyFatViewModel() {
-        this.bodyFat = new BodyFat();
+    // Remove the constructor that initializes BodyFat here.
+    // It will be set externally through setBodyFat method.
+
+    public void setBodyFat(Context context, GoogleSignInAccount account) {
+        this.bodyFat = new BodyFat(context, account);
     }
-
 
     public void fetchBodyFatData(Context context, GoogleSignInAccount googleSignInAccount, Date selectedDate) {
         Calendar calendar = Calendar.getInstance();
@@ -56,6 +58,10 @@ public class BodyFatViewModel extends ViewModel {
         });
     }
 
+    public MutableLiveData<Float> getBodyFatData() {
+        return bodyFatData;
+    }
+
     public void insertBodyFat(Context context, float bodyFatPercentage) {
         bodyFat.insertBodyFatData(context, bodyFatPercentage, new OnSuccessListener<Void>() {
             @Override
@@ -66,9 +72,4 @@ public class BodyFatViewModel extends ViewModel {
         });
     }
 
-
-
-    public MutableLiveData<Float> getBodyFatData() {
-        return bodyFatData;
-    }
 }

@@ -9,6 +9,7 @@ import androidx.fragment.app.FragmentActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.fitness.Fitness;
+import com.google.android.gms.fitness.HistoryClient;
 import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataSource;
@@ -19,27 +20,21 @@ import com.google.android.gms.fitness.result.DataReadResponse;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
-
 
 
 public class BodyFat {
 
-    public BodyFat() {
-        // Default constructor code
-    }
+    private Context context;
+    private GoogleSignInAccount googleSignInAccount;
 
-    public BodyFat(FragmentActivity activity) {
-        // Constructor with FragmentActivity
+    public BodyFat(Context context, GoogleSignInAccount account) {
+        this.context = context;
+        this.googleSignInAccount = account;
     }
 
     public void insertBodyFatData(Context context, float bodyFatPercentage, OnSuccessListener<Void> onSuccessListener) {
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(context);
-        if (account == null) {
-            Log.w("BodyFat", "Not signed in, skipping data insert");
-            return;
-        }
-
         DataSource bodyFatSource = new DataSource.Builder()
                 .setAppPackageName(context.getPackageName())
                 .setDataType(DataType.TYPE_BODY_FAT_PERCENTAGE)
@@ -47,46 +42,35 @@ public class BodyFat {
                 .build();
 
         DataSet bodyFatDataSet = DataSet.create(bodyFatSource);
-
         DataPoint bodyFatPoint = bodyFatDataSet.createDataPoint()
                 .setTimeInterval(System.currentTimeMillis(), System.currentTimeMillis(), TimeUnit.MILLISECONDS);
         bodyFatPoint.getValue(Field.FIELD_PERCENTAGE).setFloat(bodyFatPercentage);
         bodyFatDataSet.add(bodyFatPoint);
 
-        Fitness.getHistoryClient(context, account)
+        Fitness.getHistoryClient(context, googleSignInAccount)
                 .insertData(bodyFatDataSet)
-                .addOnSuccessListener(data -> {
-                    Log.d("BodyFat", "Successfully inserted body fat data");
-                    onSuccessListener.onSuccess(null);
-                })
+                .addOnSuccessListener(onSuccessListener)
                 .addOnFailureListener(e -> {
                     Log.e("BodyFat", "Failed to insert body fat data", e);
-                    onSuccessListener.onSuccess(null); // You can handle failure here if needed
                 });
     }
 
 
 
+    public void readBodyFatData(Context context, GoogleSignInAccount googleSignInAccount, long startTime, long endTime, OnSuccessListener<DataReadResponse> onSuccessListener) {
+        HistoryClient historyClient = Fitness.getHistoryClient(context, googleSignInAccount);
 
+        DataReadRequest readRequest = new DataReadRequest.Builder()
+                .aggregate(DataType.TYPE_BODY_FAT_PERCENTAGE, DataType.AGGREGATE_BODY_FAT_PERCENTAGE_SUMMARY)
+                .bucketByTime(1, TimeUnit.DAYS)
+                .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+                .enableServerQueries()
+                .build();
 
-    public void readBodyFatData(Context context, GoogleSignInAccount googleSignInAccount, long startTime, long endTime, OnSuccessListener<DataReadResponse> listener) {
-        Fitness.getHistoryClient(context, googleSignInAccount)
-                .readData(new DataReadRequest.Builder()
-                        .read(DataType.TYPE_BODY_FAT_PERCENTAGE)
-                        .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
-                        .build())
-                .addOnSuccessListener(listener)
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        // Handle the failure here
-                    }
+        historyClient.readData(readRequest)
+                .addOnSuccessListener(onSuccessListener)
+                .addOnFailureListener(e -> {
+                    Log.e("BodyFat", "Failed to read body fat data", e);
                 });
     }
-
-
-
-
-
-
 }
