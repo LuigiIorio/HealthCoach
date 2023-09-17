@@ -52,7 +52,7 @@ public class Weight {
                 .addOnFailureListener(e -> Log.e("Weight", "Failed to start weight recording", e));
     }
 
-    public void insertWeightData(float weightValue, OnSuccessListener<Void> onSuccessListener) {
+    public void insertWeightData(float weightValue, long startTime, long endTime, OnSuccessListener<Void> onSuccessListener) {
         GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(context);
 
         DataSource weightDataSource = new DataSource.Builder()
@@ -64,7 +64,7 @@ public class Weight {
 
         DataPoint weightDataPoint = DataPoint.builder(weightDataSource)
                 .setField(Field.FIELD_WEIGHT, weightValue)
-                .setTimeInterval(System.currentTimeMillis(), System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+                .setTimeInterval(startTime, endTime, TimeUnit.MILLISECONDS)
                 .build();
 
         DataSet weightDataSet = DataSet.builder(weightDataSource)
@@ -78,6 +78,7 @@ public class Weight {
                     Log.e("Weight", "Failed to insert weight data: " + e.getMessage(), e);
                 });
     }
+
 
 
     public void refreshGoogleSignInAccount() {

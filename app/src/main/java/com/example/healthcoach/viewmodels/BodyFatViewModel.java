@@ -62,8 +62,8 @@ public class BodyFatViewModel extends ViewModel {
         return bodyFatData;
     }
 
-    public void insertBodyFat(Context context, float bodyFatPercentage) {
-        bodyFat.insertBodyFatData(context, bodyFatPercentage, new OnSuccessListener<Void>() {
+    public void insertBodyFat(Context context, float bodyFatPercentage, long startTime, long endTime) {
+        bodyFat.insertBodyFatData(context, bodyFatPercentage, startTime, endTime, new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
                 Log.d("BodyFat", "Body fat data inserted successfully");
@@ -71,5 +71,6 @@ public class BodyFatViewModel extends ViewModel {
             }
         });
     }
+
 
 }

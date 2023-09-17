@@ -34,7 +34,7 @@ public class BodyFat {
         this.googleSignInAccount = account;
     }
 
-    public void insertBodyFatData(Context context, float bodyFatPercentage, OnSuccessListener<Void> onSuccessListener) {
+    public void insertBodyFatData(Context context, float bodyFatPercentage, long startTime, long endTime, OnSuccessListener<Void> onSuccessListener) {
         DataSource bodyFatSource = new DataSource.Builder()
                 .setAppPackageName(context.getPackageName())
                 .setDataType(DataType.TYPE_BODY_FAT_PERCENTAGE)
@@ -43,7 +43,7 @@ public class BodyFat {
 
         DataSet bodyFatDataSet = DataSet.create(bodyFatSource);
         DataPoint bodyFatPoint = bodyFatDataSet.createDataPoint()
-                .setTimeInterval(System.currentTimeMillis(), System.currentTimeMillis(), TimeUnit.MILLISECONDS);
+                .setTimeInterval(startTime, endTime, TimeUnit.MILLISECONDS);
         bodyFatPoint.getValue(Field.FIELD_PERCENTAGE).setFloat(bodyFatPercentage);
         bodyFatDataSet.add(bodyFatPoint);
 
@@ -56,21 +56,67 @@ public class BodyFat {
     }
 
 
-
-    public void readBodyFatData(Context context, GoogleSignInAccount googleSignInAccount, long startTime, long endTime, OnSuccessListener<DataReadResponse> onSuccessListener) {
+    public void readLatestBodyFatForDay(Context context, GoogleSignInAccount googleSignInAccount, long startTime, long endTime, OnSuccessListener<Float> onSuccessListener) {
         HistoryClient historyClient = Fitness.getHistoryClient(context, googleSignInAccount);
 
         DataReadRequest readRequest = new DataReadRequest.Builder()
-                .aggregate(DataType.TYPE_BODY_FAT_PERCENTAGE, DataType.AGGREGATE_BODY_FAT_PERCENTAGE_SUMMARY)
-                .bucketByTime(1, TimeUnit.DAYS)
+                .read(DataType.TYPE_BODY_FAT_PERCENTAGE)
                 .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
                 .enableServerQueries()
                 .build();
 
         historyClient.readData(readRequest)
-                .addOnSuccessListener(onSuccessListener)
+                .addOnSuccessListener(dataReadResponse -> {
+                    float latestBodyFat = 0;
+                    long latestTime = 0;
+
+                    for (DataSet dataSet : dataReadResponse.getDataSets()) {
+                        for (DataPoint point : dataSet.getDataPoints()) {
+                            long pointEndTime = point.getEndTime(TimeUnit.MILLISECONDS);
+                            float bodyFatValue = point.getValue(Field.FIELD_PERCENTAGE).asFloat();
+
+                            if (pointEndTime > latestTime) {
+                                latestTime = pointEndTime;
+                                latestBodyFat = bodyFatValue;
+                            }
+                        }
+                    }
+
+                    Log.d("readLatestBodyFatForDay", "Latest body fat percentage: " + latestBodyFat);
+                    onSuccessListener.onSuccess(latestBodyFat);
+                })
                 .addOnFailureListener(e -> {
-                    Log.e("BodyFat", "Failed to read body fat data", e);
+                    Log.e("readLatestBodyFatForDay", "Failed to read body fat data", e);
                 });
     }
+
+
+    public void readBodyFatData(Context context, GoogleSignInAccount googleSignInAccount, long startTime, long endTime, OnSuccessListener<DataReadResponse> onSuccessListener) {
+        HistoryClient historyClient = Fitness.getHistoryClient(context, googleSignInAccount);
+
+        DataReadRequest readRequest = new DataReadRequest.Builder()
+                .read(DataType.TYPE_BODY_FAT_PERCENTAGE)
+                .read(DataType.TYPE_BODY_FAT_PERCENTAGE)
+                .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+                .enableServerQueries()
+                .build();
+
+        historyClient.readData(readRequest)
+                .addOnSuccessListener(dataReadResponse -> {
+                    Log.d("BodyFat", "Data Read Success");
+                    onSuccessListener.onSuccess(dataReadResponse);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("BodyFat", "Failed to read body fat data", e);
+                })
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.d("BodyFat", "Task not successful. Exiting.");
+                    }
+                });
+    }
+
+
+
+
 }

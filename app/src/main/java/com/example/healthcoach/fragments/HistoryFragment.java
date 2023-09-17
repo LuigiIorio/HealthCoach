@@ -30,11 +30,13 @@ import com.example.healthcoach.recordingapi.StepCount;
 import com.example.healthcoach.recordingapi.Weight;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.data.Bucket;
 import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
+import com.google.android.gms.fitness.request.DataReadRequest;
 import com.google.android.gms.fitness.result.DataReadResponse;
 import com.google.android.gms.tasks.OnSuccessListener;
 
@@ -95,6 +97,10 @@ public class HistoryFragment extends Fragment {
         insertDataButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                long[] timeBounds = getDateInMillis(selectedYear, selectedMonth, selectedDay);
+                long startTime = timeBounds[0];
+                long endTime = timeBounds[1];
+
                 String selectedType = insertDataTypeSpinner.getSelectedItem().toString();
                 if (dataInputEditText.getText().toString().isEmpty()) {
                     Toast.makeText(getActivity(), "Please enter a value", Toast.LENGTH_SHORT).show();
@@ -103,23 +109,25 @@ public class HistoryFragment extends Fragment {
                 float inputValue = Float.parseFloat(dataInputEditText.getText().toString());
 
                 if ("Hydration".equals(selectedType)) {
-                    insertHydrationData(inputValue);
+                    insertHydrationData(inputValue, startTime, endTime);
                 } else if ("BodyFat".equals(selectedType)) {
-                    insertBodyFatData(inputValue);
+                    insertBodyFatData(inputValue, startTime, endTime);
                 } else if ("Weight".equals(selectedType)) {
-                    insertWeightData(inputValue);
+                    insertWeightData(inputValue, startTime, endTime);
                 }
             }
         });
     }
 
-    private void insertHydrationData(float hydrationValue) {
-        hydration.insertWaterIntake(hydrationValue);
+
+
+    private void insertHydrationData(float hydrationValue, long startTime, long endTime) {
+        hydration.insertWaterIntake(hydrationValue, startTime, endTime);
         Toast.makeText(getActivity(), "Inserted hydration data successfully", Toast.LENGTH_SHORT).show();
     }
 
-    private void insertBodyFatData(float bodyFatValue) {
-        bodyFat.insertBodyFatData(getActivity(), bodyFatValue, new OnSuccessListener<Void>() {
+    private void insertBodyFatData(float bodyFatValue, long startTime, long endTime) {
+        bodyFat.insertBodyFatData(getActivity(), bodyFatValue, startTime, endTime, new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
                 Log.d("BodyFat", "Body fat data inserted successfully");
@@ -128,15 +136,16 @@ public class HistoryFragment extends Fragment {
         });
     }
 
-
-    private void insertWeightData(float weightValue) {
-        weight.insertWeightData(weightValue, new OnSuccessListener<Void>() {
+    private void insertWeightData(float weightValue, long startTime, long endTime) {
+        weight.insertWeightData(weightValue, startTime, endTime, new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
                 Log.d("Weight", "Weight data inserted successfully");
+                Toast.makeText(getActivity(), "Inserted weight data successfully", Toast.LENGTH_SHORT).show();
             }
         });
     }
+
 
 
     private static boolean hasPermissions(Context context, String... permissions) {
@@ -147,7 +156,6 @@ public class HistoryFragment extends Fragment {
         }
         return true;
     }
-
     private void initializeVariables(View view) {
 
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
@@ -166,7 +174,6 @@ public class HistoryFragment extends Fragment {
         selectedMonth = calendar.get(Calendar.MONTH);
         selectedDay = calendar.get(Calendar.DAY_OF_MONTH);
     }
-
     private void setupCalendarView(View view) {
         CalendarView calendarView = view.findViewById(R.id.calendarView);
         calendarView.setOnDateChangeListener((view1, year, month, dayOfMonth) -> {
@@ -175,7 +182,6 @@ public class HistoryFragment extends Fragment {
             selectedDay = dayOfMonth;
         });
     }
-
     private void setupSpinner(View view) {
         ArrayAdapter<CharSequence> fetchAdapter = ArrayAdapter.createFromResource(getActivity(),
                 R.array.data_types, android.R.layout.simple_spinner_item);
@@ -187,7 +193,6 @@ public class HistoryFragment extends Fragment {
         insertAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         insertDataTypeSpinner.setAdapter(insertAdapter);
     }
-
     private void setupFetchDataButton() {
         fetchDataButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -214,7 +219,6 @@ public class HistoryFragment extends Fragment {
             }
         });
     }
-
     private void updateDataSteps(String type, long startTime, long endTime) {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
         if (account == null) {
@@ -256,7 +260,6 @@ public class HistoryFragment extends Fragment {
             });
         }
     }
-
     private void updateDataCaloriesExpended(String type, long startTime, long endTime) {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
         if (account == null) {
@@ -289,8 +292,6 @@ public class HistoryFragment extends Fragment {
             });
         }
     }
-
-
     private void updateDataDistance(String type, long startTime, long endTime) {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
         if (account == null) {
@@ -352,7 +353,6 @@ public class HistoryFragment extends Fragment {
         }
 
     }
-
     private void updateDataBodyFat(String type, long startTime, long endTime) {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
         if (account == null) {
@@ -361,41 +361,22 @@ public class HistoryFragment extends Fragment {
         }
 
         if ("BodyFat".equals(type)) {
-            // Convert local time to UTC
             TimeZone tz = TimeZone.getDefault();
             int offsetFromUtc = tz.getOffset(startTime);
             startTime -= offsetFromUtc;
             endTime -= offsetFromUtc;
 
-            bodyFat.readBodyFatData(getActivity(), account, startTime, endTime, new OnSuccessListener<DataReadResponse>() {
+            bodyFat.readLatestBodyFatForDay(getActivity(), account, startTime, endTime, new OnSuccessListener<Float>() {
                 @Override
-                public void onSuccess(DataReadResponse dataReadResponse) {
-                    float latestBodyFat = 0;
-                    long latestTime = 0;
-
-                    if (dataReadResponse.getBuckets().size() > 0) {
-                        for (Bucket bucket : dataReadResponse.getBuckets()) {
-                            DataSet dataSet = bucket.getDataSet(DataType.AGGREGATE_BODY_FAT_PERCENTAGE_SUMMARY);
-                            for (DataPoint point : dataSet.getDataPoints()) {
-                                for (Field field : point.getDataType().getFields()) {
-                                    float bodyFatValue = point.getValue(field).asFloat();
-                                    long endTime = point.getEndTime(TimeUnit.MILLISECONDS);
-                                    if (endTime > latestTime) {
-                                        latestTime = endTime;
-                                        latestBodyFat = bodyFatValue;
-                                    }
-                                }
-                            }
-                        }
+                public void onSuccess(Float latestBodyFat) {
+                    if (latestBodyFat == 0) {
+                        Log.d("updateDataBodyFat", "Latest body fat is 0. This could mean no data or an issue.");
                     }
-
                     historyTextView.setText(String.format("Latest body fat: %.2f%%", latestBodyFat));
                 }
             });
         }
     }
-
-
     private void updateDataHydration(String type, long startTime, long endTime) {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
         if (account == null) {
@@ -404,25 +385,55 @@ public class HistoryFragment extends Fragment {
         }
 
         if ("Hydration".equals(type)) {
-            hydration.readHydrationData(startTime, endTime, new OnSuccessListener<DataReadResponse>() {
-                @Override
-                public void onSuccess(DataReadResponse dataReadResponse) {
-                    float totalHydration = 0;
-                    for (DataSet dataSet : dataReadResponse.getDataSets()) {
-                        for (DataPoint point : dataSet.getDataPoints()) {
-                            for (Field field : point.getDataType().getFields()) {
-                                float hydrationValue = point.getValue(field).asFloat();
-                                totalHydration += hydrationValue;
+            TimeZone tz = TimeZone.getDefault();
+            int offsetFromUtc = tz.getOffset(startTime);
+            startTime -= offsetFromUtc;
+            endTime -= offsetFromUtc;
+
+            DataReadRequest readRequest = new DataReadRequest.Builder()
+                    .read(DataType.TYPE_HYDRATION)
+                    .bucketByTime(1, TimeUnit.DAYS)
+                    .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+                    .enableServerQueries()
+                    .build();
+
+            Log.d("Hydration", "Start time: " + new Date(startTime).toString());
+            Log.d("Hydration", "End time: " + new Date(endTime).toString());
+
+            Fitness.getHistoryClient(getActivity(), account)
+                    .readData(readRequest)
+                    .addOnSuccessListener(new OnSuccessListener<DataReadResponse>() {
+                        @Override
+                        public void onSuccess(DataReadResponse dataReadResponse) {
+                            float totalHydration = 0;
+
+                            Log.d("Hydration", "Received DataReadResponse");
+
+                            if (dataReadResponse.getBuckets().size() > 0) {
+                                Log.d("Hydration", "Bucket size: " + dataReadResponse.getBuckets().size());
+                                for (Bucket bucket : dataReadResponse.getBuckets()) {
+                                    DataSet dataSet = bucket.getDataSet(DataType.TYPE_HYDRATION);
+                                    for (DataPoint point : dataSet.getDataPoints()) {
+                                        for (Field field : point.getDataType().getFields()) {
+                                            float hydrationValue = point.getValue(field).asFloat();
+                                            totalHydration += hydrationValue;
+
+                                            Log.d("Hydration", "Hydration Value: " + hydrationValue);
+                                        }
+                                    }
+                                }
+                            } else {
+                                Log.d("Hydration", "No buckets found");
                             }
+
+                            historyTextView.setText(String.format("Total water intake: %.2f ml", totalHydration));
                         }
-                    }
-                    historyTextView.setText(String.format("Total water intake: %.2f ml", totalHydration));
-                }
-            });
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("Hydration", "Failed to read hydration data", e);
+                    });
         }
-
     }
-
     private long[] getDateInMillis(int year, int month, int day) {
         // Set the calendar to the start of the selected day in local time
         Calendar calendar = Calendar.getInstance();
@@ -442,7 +453,6 @@ public class HistoryFragment extends Fragment {
         // Return the startTime and endTime as an array
         return new long[] {startTime, endTime};
     }
-
 
 }
 

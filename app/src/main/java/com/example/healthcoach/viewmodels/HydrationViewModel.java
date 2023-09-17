@@ -25,10 +25,13 @@ public class HydrationViewModel extends ViewModel {
         return totalWaterIntake;
     }
 
-    public void addWater(float intake) {
+    public void addWater(float intake, long startTime, long endTime) {
         totalWaterIntake.setValue(totalWaterIntake.getValue() + intake);
         if (repository != null) {
-            repository.insertWaterIntake(intake); // Insert into data source directly from ViewModel
+            repository.insertWaterIntake(intake, startTime, endTime); // Insert into data source directly from ViewModel
         }
     }
+
+
+
 }

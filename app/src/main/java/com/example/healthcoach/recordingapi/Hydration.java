@@ -59,7 +59,7 @@ public class Hydration {
                 .build();
     }
 
-    public void insertWaterIntake(float waterIntake) {
+    public void insertWaterIntake(float waterIntake, long startTime, long endTime) {
         if (!isUserSignedIn()) {
             Log.e("Hydration", "User is not signed in. Can't insert data.");
             promptSignIn();
@@ -72,12 +72,9 @@ public class Hydration {
             return;
         }
 
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(System.currentTimeMillis());
-
         DataPoint dataPoint = DataPoint.builder(hydrationDataSource)
                 .setField(Field.FIELD_VOLUME, waterIntake)
-                .setTimeInterval(cal.getTimeInMillis(), cal.getTimeInMillis(), TimeUnit.MILLISECONDS)
+                .setTimeInterval(startTime, endTime, TimeUnit.MILLISECONDS)
                 .build();
 
         DataSet dataSet = DataSet.builder(hydrationDataSource)
@@ -98,6 +95,7 @@ public class Hydration {
                     }
                 });
     }
+
 
     private boolean isUserSignedIn() {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(context);
