@@ -254,6 +254,7 @@ public class HistoryFragment extends Fragment {
             });
         }
     }
+
     private void updateDataCaloriesExpended(String type, long startTime, long endTime) {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
         if (account == null) {
@@ -262,14 +263,18 @@ public class HistoryFragment extends Fragment {
         }
 
         if ("Kcal".equals(type)) {
-            new Calories(getActivity(), account).readCaloriesData(getActivity(), account, startTime, endTime, new OnSuccessListener<DataReadResponse>() {
+            new Calories(getActivity(), account).readCaloriesData(startTime, endTime, new OnSuccessListener<DataReadResponse>() {
                 @Override
                 public void onSuccess(DataReadResponse dataReadResponse) {
                     float totalCalories = 0;
-                    for (DataSet dataSet : dataReadResponse.getDataSets()) {
-                        for (DataPoint point : dataSet.getDataPoints()) {
-                            for (Field field : point.getDataType().getFields()) {
-                                totalCalories += point.getValue(field).asFloat();
+                    if (dataReadResponse.getBuckets().size() > 0) {
+                        for (Bucket bucket : dataReadResponse.getBuckets()) {
+                            DataSet dataSet = bucket.getDataSet(DataType.AGGREGATE_CALORIES_EXPENDED);
+                            for (DataPoint point : dataSet.getDataPoints()) {
+                                for (Field field : point.getDataType().getFields()) {
+                                    float calories = point.getValue(field).asFloat();
+                                    totalCalories += calories;
+                                }
                             }
                         }
                     }
@@ -282,6 +287,7 @@ public class HistoryFragment extends Fragment {
             });
         }
     }
+
 
     private void updateDataDistance(String type, long startTime, long endTime) {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());

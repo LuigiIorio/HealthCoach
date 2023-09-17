@@ -73,7 +73,8 @@ public class CaloriesViewModel extends ViewModel {
         long startTime = selectedDate.getTime();
         long endTime = startTime + 24 * 60 * 60 * 1000;
 
-        new Calories(context, googleSignInAccount).readCaloriesData(context, googleSignInAccount, startTime, endTime, dataReadResponse -> {
+        Calories caloriesInstance = new Calories(context, googleSignInAccount);
+        caloriesInstance.readCaloriesData(startTime, endTime, dataReadResponse -> {
             float sum = 0;
             for (DataSet dataSet : dataReadResponse.getDataSets()) {
                 for (DataPoint dp : dataSet.getDataPoints()) {
@@ -85,5 +86,8 @@ public class CaloriesViewModel extends ViewModel {
             totalCalories.setValue(sum);
         });
     }
+
+
+
 
 }
