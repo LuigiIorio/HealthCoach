@@ -39,6 +39,8 @@ import com.google.android.gms.fitness.result.DataReadResponse;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 
@@ -188,10 +190,12 @@ public class HistoryFragment extends Fragment {
         fetchDataButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                long startTime = getDateInMillis(selectedYear, selectedMonth, selectedDay);
-                long endTime = startTime + 24 * 60 * 60 * 1000;
-                String selectedType = dataTypeSpinner.getSelectedItem().toString();
+                // Get the startTime and endTime correctly
+                long[] timeBounds = getDateInMillis(selectedYear, selectedMonth, selectedDay);
+                long startTime = timeBounds[0];
+                long endTime = timeBounds[1];
 
+                String selectedType = dataTypeSpinner.getSelectedItem().toString();
                 if ("Weight".equals(selectedType)) {
                     updateDataWeight(selectedType, startTime, endTime);
                 } else if ("BodyFat".equals(selectedType)) {
@@ -205,9 +209,50 @@ public class HistoryFragment extends Fragment {
                 } else if ("Distance".equals(selectedType)) {
                     updateDataDistance(selectedType, startTime, endTime);
                 }
-
             }
         });
+    }
+
+    private void updateDataSteps(String type, long startTime, long endTime) {
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
+        if (account == null) {
+            historyTextView.setText("Not signed in");
+            return;
+        }
+
+        if ("Steps".equals(type)) {
+            Log.d("TimeDebug", "Original Start Time: " + new Date(startTime).toString());
+            Log.d("TimeDebug", "Original End Time: " + new Date(endTime).toString());
+
+            // Convert local time to UTC
+            TimeZone tz = TimeZone.getDefault();
+            int offsetFromUtc = tz.getOffset(startTime);
+            startTime -= offsetFromUtc;
+            endTime -= offsetFromUtc;
+
+            Log.d("TimeDebug", "UTC Start Time: " + new Date(startTime).toString());
+            Log.d("TimeDebug", "UTC End Time: " + new Date(endTime).toString());
+
+            StepCount stepCount = new StepCount(getActivity(), account, getActivity());
+            stepCount.readStepsForRange(startTime, endTime, new OnSuccessListener<DataReadResponse>() {
+                @Override
+                public void onSuccess(DataReadResponse dataReadResponse) {
+                    int totalSteps = 0;
+                    if (dataReadResponse.getBuckets().size() > 0) {
+                        for (Bucket bucket : dataReadResponse.getBuckets()) {
+                            DataSet dataSet = bucket.getDataSet(DataType.AGGREGATE_STEP_COUNT_DELTA);
+                            for (DataPoint point : dataSet.getDataPoints()) {
+                                for (Field field : point.getDataType().getFields()) {
+                                    int steps = point.getValue(field).asInt();
+                                    totalSteps += steps;
+                                }
+                            }
+                        }
+                    }
+                    historyTextView.setText(String.format("Total steps: %d", totalSteps));
+                }
+            });
+        }
     }
     private void updateDataCaloriesExpended(String type, long startTime, long endTime) {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
@@ -237,6 +282,7 @@ public class HistoryFragment extends Fragment {
             });
         }
     }
+
     private void updateDataDistance(String type, long startTime, long endTime) {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
         if (account == null) {
@@ -244,16 +290,20 @@ public class HistoryFragment extends Fragment {
             return;
         }
 
+        // (your existing code for time conversion and other operations...)
+
         if ("Distance".equals(type)) {
-            new Distance(getActivity(), account).readDistanceData(getActivity(), startTime, endTime, new OnSuccessListener<DataReadResponse>() {
+            new Distance(getActivity(), account).readDistanceData(startTime, endTime, new OnSuccessListener<DataReadResponse>() {
                 @Override
                 public void onSuccess(DataReadResponse dataReadResponse) {
                     float totalDistance = 0;
-                    for (DataSet dataSet : dataReadResponse.getDataSets()) {
-                        for (DataPoint point : dataSet.getDataPoints()) {
-                            for (Field field : point.getDataType().getFields()) {
-                                if (field.getName().equals("distance")) {
-                                    totalDistance += point.getValue(field).asFloat();
+                    if (dataReadResponse.getBuckets().size() > 0) {
+                        for (Bucket bucket : dataReadResponse.getBuckets()) {
+                            DataSet dataSet = bucket.getDataSet(DataType.AGGREGATE_DISTANCE_DELTA);
+                            for (DataPoint point : dataSet.getDataPoints()) {
+                                for (Field field : point.getDataType().getFields()) {
+                                    float distance = point.getValue(field).asFloat();
+                                    totalDistance += distance;
                                 }
                             }
                         }
@@ -263,35 +313,10 @@ public class HistoryFragment extends Fragment {
             });
         }
     }
-    private void updateDataSteps(String type, long startTime, long endTime) {
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
-        if (account == null) {
-            historyTextView.setText("Not signed in");
-            return;
-        }
 
-        if ("Steps".equals(type)) {
-            StepCount stepCount = new StepCount(getActivity(), account, getActivity());
-            stepCount.readStepsForRange(startTime, endTime, new OnSuccessListener<DataReadResponse>() {
-                @Override
-                public void onSuccess(DataReadResponse dataReadResponse) {
-                    int totalSteps = 0;
-                    if (dataReadResponse.getBuckets().size() > 0) {
-                        for (Bucket bucket : dataReadResponse.getBuckets()) {
-                            DataSet dataSet = bucket.getDataSet(DataType.AGGREGATE_STEP_COUNT_DELTA);
-                            for (DataPoint point : dataSet.getDataPoints()) {
-                                for (Field field : point.getDataType().getFields()) {
-                                    int steps = point.getValue(field).asInt();
-                                    totalSteps += steps;
-                                }
-                            }
-                        }
-                    }
-                    historyTextView.setText(String.format("Total steps: %d", totalSteps));
-                }
-            });
-        }
-    }
+
+
+
     private void updateDataWeight(String type, long startTime, long endTime){
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
         if (account == null) {
@@ -382,10 +407,24 @@ public class HistoryFragment extends Fragment {
 
     }
 
-    private long getDateInMillis(int year, int month, int day) {
+    private long[] getDateInMillis(int year, int month, int day) {
+        // Set the calendar to the start of the selected day in local time
         Calendar calendar = Calendar.getInstance();
-        calendar.set(year, month, day);
-        return calendar.getTimeInMillis();
+        calendar.set(year, month, day, 0, 0, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        long startTime = calendar.getTimeInMillis();
+
+        // Convert startTime to UTC
+        TimeZone tz = TimeZone.getDefault();
+        int offsetFromUtc = tz.getOffset(startTime);
+        startTime -= offsetFromUtc;
+
+        // End time is one day (in milliseconds) after start time
+        long endTime = startTime + 24 * 60 * 60 * 1000 - 1;
+
+        // Return the startTime and endTime as an array
+        return new long[] {startTime, endTime};
     }
 
 
