@@ -23,10 +23,10 @@ import android.widget.Toast;
 
 import com.example.healthcoach.R;
 import com.example.healthcoach.recordingapi.BodyFat;
-import com.example.healthcoach.recordingapi.CaloriesExpended;
-import com.example.healthcoach.recordingapi.DistanceDelta;
+import com.example.healthcoach.recordingapi.Calories;
+import com.example.healthcoach.recordingapi.Distance;
 import com.example.healthcoach.recordingapi.Hydration;
-import com.example.healthcoach.recordingapi.StepCountDelta;
+import com.example.healthcoach.recordingapi.StepCount;
 import com.example.healthcoach.recordingapi.Weight;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -217,7 +217,7 @@ public class HistoryFragment extends Fragment {
         }
 
         if ("Kcal".equals(type)) {
-            new CaloriesExpended(getActivity(), account).readCaloriesData(getActivity(), account, startTime, endTime, new OnSuccessListener<DataReadResponse>() {
+            new Calories(getActivity(), account).readCaloriesData(getActivity(), account, startTime, endTime, new OnSuccessListener<DataReadResponse>() {
                 @Override
                 public void onSuccess(DataReadResponse dataReadResponse) {
                     float totalCalories = 0;
@@ -245,7 +245,7 @@ public class HistoryFragment extends Fragment {
         }
 
         if ("Distance".equals(type)) {
-            new DistanceDelta(getActivity(), account).readDistanceData(getActivity(), startTime, endTime, new OnSuccessListener<DataReadResponse>() {
+            new Distance(getActivity(), account).readDistanceData(getActivity(), startTime, endTime, new OnSuccessListener<DataReadResponse>() {
                 @Override
                 public void onSuccess(DataReadResponse dataReadResponse) {
                     float totalDistance = 0;
@@ -271,8 +271,8 @@ public class HistoryFragment extends Fragment {
         }
 
         if ("Steps".equals(type)) {
-            StepCountDelta stepCountDelta = new StepCountDelta(getActivity(), account, getActivity());
-            stepCountDelta.readStepsForRange(startTime, endTime, new OnSuccessListener<DataReadResponse>() {
+            StepCount stepCount = new StepCount(getActivity(), account, getActivity());
+            stepCount.readStepsForRange(startTime, endTime, new OnSuccessListener<DataReadResponse>() {
                 @Override
                 public void onSuccess(DataReadResponse dataReadResponse) {
                     int totalSteps = 0;

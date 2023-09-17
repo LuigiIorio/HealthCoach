@@ -7,7 +7,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.healthcoach.recordingapi.CaloriesExpended;
+import com.example.healthcoach.recordingapi.Calories;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.fitness.Fitness;
@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 
 
-public class CaloriesExpendedViewModel extends ViewModel {
+public class CaloriesViewModel extends ViewModel {
 
     private final MutableLiveData<Float> totalCalories = new MutableLiveData<>(0f);
 
@@ -66,14 +66,14 @@ public class CaloriesExpendedViewModel extends ViewModel {
                     }
                     totalCalories.setValue(sum);
                 })
-                .addOnFailureListener(e -> Log.e("CaloriesExpendedViewModel", "Failed to read data", e));
+                .addOnFailureListener(e -> Log.e("CaloriesViewModel", "Failed to read data", e));
     }
 
     public void fetchCaloriesData(Context context, GoogleSignInAccount googleSignInAccount, Date selectedDate) {
         long startTime = selectedDate.getTime();
         long endTime = startTime + 24 * 60 * 60 * 1000;
 
-        new CaloriesExpended(context, googleSignInAccount).readCaloriesData(context, googleSignInAccount, startTime, endTime, dataReadResponse -> {
+        new Calories(context, googleSignInAccount).readCaloriesData(context, googleSignInAccount, startTime, endTime, dataReadResponse -> {
             float sum = 0;
             for (DataSet dataSet : dataReadResponse.getDataSets()) {
                 for (DataPoint dp : dataSet.getDataPoints()) {

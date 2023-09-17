@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.TypedValue;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -14,9 +13,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.PickVisualMediaRequest;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -41,7 +37,7 @@ public class SignUpInformationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_registration_info);
+        setContentView(R.layout.activity_signup_info);
 
         viewModel = new ViewModelProvider(this).get(SignUpViewModel.class);
         viewModel.retriveUserInformation();

@@ -7,7 +7,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.healthcoach.R;
-import com.example.healthcoach.fragments.FragmentHome;
+import com.example.healthcoach.fragments.HomeFragment;
 import com.example.healthcoach.fragments.ProfileFragment;
 import com.example.healthcoach.fragments.HistoryFragment;
 import com.example.healthcoach.viewmodels.HomeActivityViewModel;
@@ -30,7 +30,7 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.home_activity);
+        setContentView(R.layout.activity_home);
 
         homeActivityViewModel = new ViewModelProvider(this).get(HomeActivityViewModel.class);
         stepViewModel = new ViewModelProvider(this).get(StepViewModel.class);
@@ -39,7 +39,7 @@ public class HomeActivity extends AppCompatActivity {
         homeViewModel = new ViewModelProvider(this).get(HomeActivityViewModel.class);
 
         // Initialize fragments
-        fragment1 = new FragmentHome();
+        fragment1 = new HomeFragment();
         fragment2 = new ProfileFragment();
         fragment3 = new HistoryFragment();
         fragment4 = new SettingFragment();

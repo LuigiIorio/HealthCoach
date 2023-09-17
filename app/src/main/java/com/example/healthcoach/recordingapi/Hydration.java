@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
-import com.example.healthcoach.interfaces.WaterIntakeRepository;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.api.ApiException;
@@ -24,8 +23,7 @@ import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
 
-
-public class Hydration implements WaterIntakeRepository {
+public class Hydration {
 
     public static final int REQUEST_OAUTH_REQUEST_CODE = 1001;
 
@@ -60,6 +58,7 @@ public class Hydration implements WaterIntakeRepository {
                 .setAppPackageName(context.getPackageName())
                 .build();
     }
+
     public void insertWaterIntake(float waterIntake) {
         if (!isUserSignedIn()) {
             Log.e("Hydration", "User is not signed in. Can't insert data.");
@@ -104,7 +103,6 @@ public class Hydration implements WaterIntakeRepository {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(context);
         return (account != null) && GoogleSignIn.hasPermissions(account, fitnessOptions);
     }
-
 
     private boolean hasNecessaryPermissions() {
         return GoogleSignIn.hasPermissions(googleSignInAccount, fitnessOptions);

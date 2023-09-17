@@ -7,29 +7,24 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.healthcoach.viewmodels.LoginActivityViewModel;
-import com.example.healthcoach.viewmodels.StepViewModel;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessOptions;
 import com.google.android.gms.fitness.HistoryClient;
 import com.google.android.gms.fitness.RecordingClient;
-import com.google.android.gms.fitness.data.DataPoint;
-import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataSource;
 import com.google.android.gms.fitness.data.DataType;
-import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.request.DataReadRequest;
 import com.google.android.gms.fitness.result.DataReadResponse;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.Calendar;
-import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 
 
-public class StepCountDelta {
+public class StepCount {
     private GoogleSignInAccount googleSignInAccount;
     private DataSource dataSource;
 
@@ -37,7 +32,7 @@ public class StepCountDelta {
 
 
 
-    public StepCountDelta(Context context, GoogleSignInAccount account, FragmentActivity fragmentActivity) {
+    public StepCount(Context context, GoogleSignInAccount account, FragmentActivity fragmentActivity) {
         this.googleSignInAccount = account;
         this.context = context;
 
@@ -69,13 +64,13 @@ public class StepCountDelta {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Log.d("StepCountDelta", "Step count recording started");
+                        Log.d("StepCount", "Step count recording started");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(Exception e) {
-                        Log.e("StepCountDelta", "Failed to start step count recording", e);
+                        Log.e("StepCount", "Failed to start step count recording", e);
                     }
                 });
     }
@@ -88,13 +83,13 @@ public class StepCountDelta {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Log.d("StepCountDelta", "Step count recording stopped");
+                        Log.d("StepCount", "Step count recording stopped");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(Exception e) {
-                        Log.e("StepCountDelta", "Failed to stop step count recording", e);
+                        Log.e("StepCount", "Failed to stop step count recording", e);
                     }
                 });
     }
@@ -128,11 +123,11 @@ public class StepCountDelta {
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(Exception e) {
-                            Log.e("StepCountDelta", "Failed to read step count for the range", e);
+                            Log.e("StepCount", "Failed to read step count for the range", e);
                         }
                     });
         } else {
-            Log.e("StepCountDelta", "Invalid time range specified");
+            Log.e("StepCount", "Invalid time range specified");
         }
     }
 

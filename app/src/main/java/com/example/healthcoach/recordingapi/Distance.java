@@ -3,7 +3,6 @@ package com.example.healthcoach.recordingapi;
 import android.content.Context;
 import android.util.Log;
 
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessOptions;
@@ -16,12 +15,12 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.concurrent.TimeUnit;
 
-public class DistanceDelta {
+public class Distance {
 
     private GoogleSignInAccount googleSignInAccount;
     private DataSource distanceDeltaDataSource;
 
-    public DistanceDelta(Context context, GoogleSignInAccount account) {
+    public Distance(Context context, GoogleSignInAccount account) {
         this.googleSignInAccount = account;
         FitnessOptions fitnessOptions = FitnessOptions.builder()
                 .addDataType(DataType.TYPE_DISTANCE_DELTA, FitnessOptions.ACCESS_WRITE)
@@ -37,8 +36,8 @@ public class DistanceDelta {
         RecordingClient recordingClient = Fitness.getRecordingClient(context, googleSignInAccount);
 
         recordingClient.subscribe(distanceDeltaDataSource)
-                .addOnSuccessListener(aVoid -> Log.d("DistanceDelta", "Subscribed to distance delta"))
-                .addOnFailureListener(e -> Log.e("DistanceDelta", "Failed to subscribe to distance delta", e));
+                .addOnSuccessListener(aVoid -> Log.d("Distance", "Subscribed to distance delta"))
+                .addOnFailureListener(e -> Log.e("Distance", "Failed to subscribe to distance delta", e));
     }
 
 
@@ -51,7 +50,7 @@ public class DistanceDelta {
         Fitness.getHistoryClient(context, googleSignInAccount)
                 .readData(readRequest)
                 .addOnSuccessListener(listener)
-                .addOnFailureListener(e -> Log.e("DistanceDelta", "Failed to read data", e));
+                .addOnFailureListener(e -> Log.e("Distance", "Failed to read data", e));
     }
 
 
@@ -60,7 +59,7 @@ public class DistanceDelta {
     public void stopRecording(Context context) {
         RecordingClient recordingClient = Fitness.getRecordingClient(context, googleSignInAccount);
         recordingClient.unsubscribe(distanceDeltaDataSource)
-                .addOnSuccessListener(aVoid -> Log.d("DistanceDelta", "Unsubscribed from distance delta"))
-                .addOnFailureListener(e -> Log.e("DistanceDelta", "Failed to unsubscribe from distance delta", e));
+                .addOnSuccessListener(aVoid -> Log.d("Distance", "Unsubscribed from distance delta"))
+                .addOnFailureListener(e -> Log.e("Distance", "Failed to unsubscribe from distance delta", e));
     }
 }

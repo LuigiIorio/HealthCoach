@@ -3,7 +3,6 @@ package com.example.healthcoach.recordingapi;
 import android.content.Context;
 import android.util.Log;
 
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessOptions;
@@ -18,14 +17,14 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import java.util.concurrent.TimeUnit;
 
 
-public class CaloriesExpended {
+public class Calories {
 
     private static final String CALORIES_EXPENDED_DATA_TYPE = "com.google.calories.expended";
 
     private GoogleSignInAccount googleSignInAccount;
     private DataSource dataSource;
 
-    public CaloriesExpended(Context context, GoogleSignInAccount account) {
+    public Calories(Context context, GoogleSignInAccount account) {
         this.googleSignInAccount = account;
         FitnessOptions fitnessOptions = FitnessOptions.builder()
                 .addDataType(DataType.TYPE_CALORIES_EXPENDED, FitnessOptions.ACCESS_WRITE)
@@ -47,20 +46,20 @@ public class CaloriesExpended {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Log.d("CaloriesExpended", "Calories expended recording started");
+                        Log.d("Calories", "Calories expended recording started");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(Exception e) {
-                        Log.e("CaloriesExpended", "Failed to start calories expended recording", e);
+                        Log.e("Calories", "Failed to start calories expended recording", e);
                     }
                 });
     }
 
 
     public void readCaloriesData(Context context, GoogleSignInAccount googleSignInAccount, long startTime, long endTime, OnSuccessListener<DataReadResponse> listener) {
-        Log.d("CaloriesExpended", "Start Time: " + startTime + ", End Time: " + endTime);
+        Log.d("Calories", "Start Time: " + startTime + ", End Time: " + endTime);
 
         DataReadRequest readRequest = new DataReadRequest.Builder()
                 .read(DataType.TYPE_CALORIES_EXPENDED)
@@ -70,12 +69,12 @@ public class CaloriesExpended {
         Fitness.getHistoryClient(context, googleSignInAccount)
                 .readData(readRequest)
                 .addOnSuccessListener(response -> {
-                    Log.d("CaloriesExpended", "Successfully read data.");
+                    Log.d("Calories", "Successfully read data.");
                     listener.onSuccess(response);
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("CaloriesExpended", "Failed to read data", e);
-                    Log.e("CaloriesExpended", "Error Message: " + e.getMessage());
+                    Log.e("Calories", "Failed to read data", e);
+                    Log.e("Calories", "Error Message: " + e.getMessage());
                 });
     }
 
@@ -92,13 +91,13 @@ public class CaloriesExpended {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Log.d("CaloriesExpended", "Calories expended recording stopped");
+                        Log.d("Calories", "Calories expended recording stopped");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(Exception e) {
-                        Log.e("CaloriesExpended", "Failed to stop calories expended recording", e);
+                        Log.e("Calories", "Failed to stop calories expended recording", e);
                     }
                 });
     }

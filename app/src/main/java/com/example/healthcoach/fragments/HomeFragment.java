@@ -1,8 +1,6 @@
 package com.example.healthcoach.fragments;
 
-import android.Manifest;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,38 +11,21 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.anychart.AnyChart;
 import com.anychart.AnyChartView;
-import com.anychart.chart.common.dataentry.DataEntry;
-import com.anychart.chart.common.dataentry.ValueDataEntry;
-import com.anychart.charts.Cartesian;
-import com.anychart.core.cartesian.series.Line;
-import com.anychart.data.Mapping;
-import com.anychart.data.Set;
-import com.anychart.enums.Anchor;
-import com.anychart.enums.MarkerType;
-import com.anychart.enums.TooltipPositionMode;
-import com.anychart.graphics.vector.Stroke;
 import com.example.healthcoach.R;
 import com.example.healthcoach.models.UserProfile;
 import com.example.healthcoach.viewmodels.HomeActivityViewModel;
 import com.example.healthcoach.viewmodels.StepViewModel;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptionsExtension;
 import com.google.android.gms.fitness.FitnessOptions;
 import com.google.android.gms.fitness.data.DataType;
 
-import java.util.ArrayList;
-import java.util.List;
 
-
-public class FragmentHome extends Fragment {
+public class HomeFragment extends Fragment {
 
     private ProgressBar stepsProgressBar, kcalProgressBar, waterProgressBar, bpmProgressBar;
     private TextView totalSteps;
@@ -141,12 +122,12 @@ public class FragmentHome extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Log.d("FragmentHome", "onResume called");
+        Log.d("HomeFragment", "onResume called");
 
         GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(getContext());
 
         if (googleSignInAccount != null) {
-            Log.d("FragmentHome", "User is signed in");
+            Log.d("HomeFragment", "User is signed in");
             homeActivityViewModel.fetchTodaySteps(getContext());
             stepViewModel.startRecordingSteps(getContext());
 
@@ -154,7 +135,7 @@ public class FragmentHome extends Fragment {
                 totalSteps.setText("Steps: " + steps);
             });
         } else {
-            Log.e("FragmentHome", "User is not signed in");
+            Log.e("HomeFragment", "User is not signed in");
         }
     }
 
