@@ -232,6 +232,12 @@ public class SettingFragment extends Fragment {
             return false;
         }
 
+        // Check if new password length is less than 8 characters
+        if (newPassword.length() < 8) {
+            Toast.makeText(this.getContext(), "New password must be at least 8 characters", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
         // Check old password
         if (user.getPassword().equals(oldPassword)) {
             // Check if new password and confirm password match
@@ -241,7 +247,7 @@ public class SettingFragment extends Fragment {
                 viewModel.updatePassword(user.getPassword());
                 return true;
             } else {
-                Toast.makeText(this.getContext(), "Password must be the same", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this.getContext(), "Passwords do not match", Toast.LENGTH_SHORT).show();
                 return false;
             }
         } else {
@@ -249,6 +255,7 @@ public class SettingFragment extends Fragment {
             return false;
         }
     }
+
 
 
 }
