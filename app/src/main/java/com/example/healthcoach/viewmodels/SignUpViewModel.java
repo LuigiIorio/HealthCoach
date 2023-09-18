@@ -26,6 +26,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.EmailAuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -85,6 +86,10 @@ public class SignUpViewModel extends ViewModel {
     }
 
     public void setUser(UserProfile profile, Activity activity) {
+        if(profile.getImage() == null || profile.getImage().isEmpty()) {
+            Toast.makeText(activity, "Please upload an image", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         DatabaseReference usersReference = firebaseDatabase.getReference("users");
         StorageReference imageReference = firebaseStorage.getReference("users");
@@ -95,30 +100,25 @@ public class SignUpViewModel extends ViewModel {
 
         usersReference.child(user.getValue().getUid()).setValue(user.getValue());
 
-
         StorageReference userImageRef = imageReference.child(uid + ".jpg");
 
         Uri imageUri = Uri.parse(user.getValue().getImage());
 
         userImageRef.putFile(imageUri)
                 .addOnSuccessListener(taskSnapshot -> {
-
                     userImageRef.getDownloadUrl().addOnSuccessListener(uri -> {
-
                         String imageUrl = uri.toString();
                         user.getValue().setImage(imageUrl);
-
                         Intent intent = new Intent(activity, HomeActivity.class);
                         activity.startActivity(intent);
                         activity.finish();
-
                     });
                 })
                 .addOnFailureListener(e -> {
                     setUser(profile, activity);
                 });
-
     }
+
 
     /**
      * Crea uno user su Firebase e ne salva i dati nella LiveData user
@@ -129,7 +129,7 @@ public class SignUpViewModel extends ViewModel {
      */
     public void createUser(String email, String password, Activity activity) {
         firebaseAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(task -> {
+                .addOnCompleteListener(activity, task -> {
                     if (task.isSuccessful()) {
                         UserProfile profile = new UserProfile();
                         profile.setMail(email);
@@ -144,23 +144,29 @@ public class SignUpViewModel extends ViewModel {
                                     Intent intent = new Intent(activity, SignUpInformationActivity.class);
                                     activity.startActivity(intent);
                                     activity.finish();
-                        });
-
-
-
-
-
+                                });
                     } else {
-                        // La registrazione ha fallito. Gestisci l'errore.
+                        String errorMessage = "Registration failed.";
                         Exception exception = task.getException();
                         if (exception instanceof FirebaseAuthUserCollisionException) {
-                            // Indirizzo email già in uso.
-                            // Mostra un messaggio Toast all'utente.
-                            Toast.makeText(activity, "The email address is already in use", Toast.LENGTH_SHORT).show();
+                            errorMessage = "The email address is already in use.";
+                        } else if (exception instanceof FirebaseAuthInvalidCredentialsException) {
+                            FirebaseAuthInvalidCredentialsException e = (FirebaseAuthInvalidCredentialsException) exception;
+                            String errorCode = e.getErrorCode();
+                            if ("ERROR_INVALID_EMAIL".equals(errorCode)) {
+                                errorMessage = "The email address is badly formatted.";
+                            } else if ("ERROR_WEAK_PASSWORD".equals(errorCode)) {
+                                errorMessage = "Password should be at least 6 characters.";
+                            }
                         }
+                        Toast.makeText(activity, errorMessage, Toast.LENGTH_SHORT).show();
                     }
                 });
     }
+
+
+
+
 
 
 

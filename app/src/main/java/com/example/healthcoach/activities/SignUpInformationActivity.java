@@ -95,60 +95,64 @@ public class SignUpInformationActivity extends AppCompatActivity {
     private void setupListeners() {
 
         profilePic.setOnClickListener(view -> {
-            // Creazione di un intent per aprire la galleria delle immagini
             Intent intent = new Intent(Intent.ACTION_PICK);
-            intent.setType("image/*"); // Filtraggio solo per file di immagine
-
-            // Avvio dell'attività per selezionare un'immagine
+            intent.setType("image/*");
             startActivityForResult(intent, PICK_IMAGE_REQUEST);
         });
 
         submitButton.setOnClickListener(view -> {
+            String fullName = fullNameText.getText().toString().trim();
+            String weightStr = weightInput.getText().toString().trim();
+            String heightStr = heightInput.getText().toString().trim();
+            String stepsStr = stepsInput.getText().toString().trim();
+            String waterStr = waterInput.getText().toString().trim();
+            String kcalStr = kcalInput.getText().toString().trim();
+            String gender = genderInfo.getSelectedItem().toString().trim();
+
+            if (fullName.isEmpty() || weightStr.isEmpty() || heightStr.isEmpty() || stepsStr.isEmpty() || waterStr.isEmpty() || kcalStr.isEmpty() || gender.isEmpty()) {
+                Toast.makeText(view.getContext(), "All fields must be filled", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
             try {
-
-                String fullName = fullNameText.getText().toString();
-                int weight = Integer.parseInt(weightInput.getText().toString());
-                int height = Integer.parseInt(heightInput.getText().toString());
-                int steps = Integer.parseInt(stepsInput.getText().toString());
-                int water = Integer.parseInt(waterInput.getText().toString());
-                int kcal = Integer.parseInt(kcalInput.getText().toString());
+                int weight = Integer.parseInt(weightStr);
+                int height = Integer.parseInt(heightStr);
+                int steps = Integer.parseInt(stepsStr);
+                int water = Integer.parseInt(waterStr);
+                int kcal = Integer.parseInt(kcalStr);
                 int day = birthdayPicker.getDayOfMonth();
                 int month = birthdayPicker.getMonth();
                 int year = birthdayPicker.getYear();
-                String gender = genderInfo.getSelectedItem().toString();
 
+                UserProfile user = viewModel.getUser().getValue();
 
+                user.setFullName(fullName);
+                user.setWeight(weight);
+                user.setHeight(height);
+                user.setDailySteps(steps);
+                user.setDailyWater(water);
+                user.setDailyKcal(kcal);
+                user.setDay(day);
+                user.setMonth(month);
+                user.setYear(year);
+                user.setGender(gender);
 
-                if(fullName.equals("")) {
-                    Toast.makeText(view.getContext(), "Full Name cannot be empty", Toast.LENGTH_SHORT).show();
-                }
-                else {
-
-                    UserProfile user = viewModel.getUser().getValue();
-
-                    user.setFullName(fullName);
-                    user.setWeight(weight);
-                    user.setHeight(height);
-                    user.setDailySteps(steps);
-                    user.setDailyWater(water);
-                    user.setDailyKcal(kcal);
-                    user.setDay(day);
-                    user.setMonth(month);
-                    user.setYear(year);
-                    user.setGender(gender);
-                    user.setImage(imageUri);
-
-                    viewModel.setUser(user, this);
-
+                if (imageUri != null) {
+                    user.setImage(imageUri.toString());
+                } else {
+                    Toast.makeText(view.getContext(), "Please upload an image", Toast.LENGTH_SHORT).show();
+                    return;
                 }
 
+                viewModel.setUser(user, this);
 
-            } catch (NumberFormatException e) {}
-
-
+            } catch (NumberFormatException e) {
+                Toast.makeText(view.getContext(), "Invalid numerical input", Toast.LENGTH_SHORT).show();
+            }
         });
-
     }
+
+
+
 
 }

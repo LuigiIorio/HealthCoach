@@ -47,40 +47,31 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private void setupListeners() {
-
         confirm.setOnClickListener(view -> {
-
             String email, password, confirmPassword;
             email = emailText.getText().toString().trim();
             password = passwordText.getText().toString();
             confirmPassword = confirmPasswordText.getText().toString();
 
-            if(password.equals(confirmPassword)) {
-
-                if(!email.isEmpty()) {
-                    signUpViewModel.createUser(email, password, this);
-
-                } else
-                    Toast.makeText(this, "Please insert mail", Toast.LENGTH_SHORT).show();
-
+            if (email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+                Toast.makeText(this, "Fields cannot be empty", Toast.LENGTH_SHORT).show();
+                return;
             }
 
-            else {
-
+            if (password.equals(confirmPassword)) {
+                signUpViewModel.createUser(email, password, this);
+            } else {
                 Toast.makeText(this, "Password must be the same", Toast.LENGTH_SHORT).show();
-
             }
-
         });
 
         alreadyRegistered.setOnClickListener(view -> {
-
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
             finish();
-
         });
-
     }
+
+
 
 }
