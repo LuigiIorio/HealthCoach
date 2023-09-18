@@ -1,5 +1,6 @@
 package com.example.healthcoach.fragments;
 
+import com.example.healthcoach.viewmodels.BodyFatViewModel;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -17,6 +18,8 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
 import android.widget.Toast;
@@ -28,6 +31,7 @@ import com.example.healthcoach.recordingapi.Distance;
 import com.example.healthcoach.recordingapi.Hydration;
 import com.example.healthcoach.recordingapi.StepCount;
 import com.example.healthcoach.recordingapi.Weight;
+import com.example.healthcoach.viewmodels.BodyFatViewModel;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.fitness.Fitness;
@@ -46,7 +50,6 @@ import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 
-
 public class HistoryFragment extends Fragment {
     private Hydration hydration;
     private Weight weight;
@@ -60,6 +63,7 @@ public class HistoryFragment extends Fragment {
     private int selectedYear;
     private int selectedMonth;
     private int selectedDay;
+    private BodyFatViewModel bodyFatViewModel;
 
     private static final int PERMISSIONS_REQUEST_CODE = 1;
 
@@ -79,6 +83,9 @@ public class HistoryFragment extends Fragment {
         setupSpinner(view);
         setupFetchDataButton();
         setupInsertDataButton();
+
+        bodyFatViewModel = new ViewModelProvider(this).get(BodyFatViewModel.class);
+        bodyFatViewModel.initialize(getActivity(), GoogleSignIn.getLastSignedInAccount(getActivity()));
 
         return view;
     }
@@ -127,14 +134,10 @@ public class HistoryFragment extends Fragment {
     }
 
     private void insertBodyFatData(float bodyFatValue, long startTime, long endTime) {
-        bodyFat.insertBodyFatData(getActivity(), bodyFatValue, startTime, endTime, new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                Log.d("BodyFat", "Body fat data inserted successfully");
-                Toast.makeText(getActivity(), "Inserted body fat data successfully", Toast.LENGTH_SHORT).show();
-            }
-        });
+        bodyFatViewModel.insertBodyFat(bodyFatValue, startTime, endTime);
+        Toast.makeText(getActivity(), "Inserted body fat data successfully", Toast.LENGTH_SHORT).show();
     }
+
 
     private void insertWeightData(float weightValue, long startTime, long endTime) {
         weight.insertWeightData(weightValue, startTime, endTime, new OnSuccessListener<Void>() {
@@ -353,6 +356,7 @@ public class HistoryFragment extends Fragment {
         }
 
     }
+
     private void updateDataBodyFat(String type, long startTime, long endTime) {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
         if (account == null) {
@@ -366,9 +370,10 @@ public class HistoryFragment extends Fragment {
             startTime -= offsetFromUtc;
             endTime -= offsetFromUtc;
 
-            bodyFat.readLatestBodyFatForDay(getActivity(), account, startTime, endTime, new OnSuccessListener<Float>() {
+            bodyFatViewModel.fetchBodyFatData(new Date(startTime));
+            bodyFatViewModel.getBodyFatData().observe(getViewLifecycleOwner(), new Observer<Float>() {
                 @Override
-                public void onSuccess(Float latestBodyFat) {
+                public void onChanged(Float latestBodyFat) {
                     if (latestBodyFat == 0) {
                         Log.d("updateDataBodyFat", "Latest body fat is 0. This could mean no data or an issue.");
                     }
@@ -377,6 +382,8 @@ public class HistoryFragment extends Fragment {
             });
         }
     }
+
+
     private void updateDataHydration(String type, long startTime, long endTime) {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
         if (account == null) {
