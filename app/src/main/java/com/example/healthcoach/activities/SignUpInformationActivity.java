@@ -20,6 +20,7 @@ import com.example.healthcoach.R;
 import com.example.healthcoach.models.UserProfile;
 import com.example.healthcoach.viewmodels.SignUpViewModel;
 
+
 public class SignUpInformationActivity extends AppCompatActivity {
 
     private static final int PICK_IMAGE_REQUEST = 1;
@@ -101,41 +102,57 @@ public class SignUpInformationActivity extends AppCompatActivity {
         });
 
         submitButton.setOnClickListener(view -> {
-            String fullName = fullNameText.getText().toString().trim();
-            String weightStr = weightInput.getText().toString().trim();
-            String heightStr = heightInput.getText().toString().trim();
-            String stepsStr = stepsInput.getText().toString().trim();
-            String waterStr = waterInput.getText().toString().trim();
-            String kcalStr = kcalInput.getText().toString().trim();
-            String gender = genderInfo.getSelectedItem().toString().trim();
+            String fullName = fullNameText.getText().toString();
+            String weightStr = weightInput.getText().toString();
+            String heightStr = heightInput.getText().toString();
+            String stepsStr = stepsInput.getText().toString();
+            String waterStr = waterInput.getText().toString();
+            String kcalStr = kcalInput.getText().toString();
 
-            if (fullName.isEmpty() || weightStr.isEmpty() || heightStr.isEmpty() || stepsStr.isEmpty() || waterStr.isEmpty() || kcalStr.isEmpty() || gender.isEmpty()) {
-                Toast.makeText(view.getContext(), "All fields must be filled", Toast.LENGTH_SHORT).show();
+            if (fullName.length() < 2 || fullName.length() > 50) {
+                Toast.makeText(view.getContext(), "Full Name must be between 2 and 50 characters.", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             try {
                 int weight = Integer.parseInt(weightStr);
+                if (weight < 30 || weight > 140) {
+                    Toast.makeText(view.getContext(), "Weight must be between 30 and 140.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 int height = Integer.parseInt(heightStr);
+                if (height < 130 || height > 220) {
+                    Toast.makeText(view.getContext(), "Height must be between 130 and 220.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 int steps = Integer.parseInt(stepsStr);
+                if (steps < 1000 || steps > 100000) {
+                    Toast.makeText(view.getContext(), "Daily steps must be between 1000 and 100000.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 int water = Integer.parseInt(waterStr);
+                if (water < 1000 || water > 8000) {
+                    Toast.makeText(view.getContext(), "Daily water must be between 1000 and 8000.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 int kcal = Integer.parseInt(kcalStr);
-                int day = birthdayPicker.getDayOfMonth();
-                int month = birthdayPicker.getMonth();
-                int year = birthdayPicker.getYear();
+                if (kcal < 1000 || kcal > 5000) {
+                    Toast.makeText(view.getContext(), "Daily kcal must be between 1000 and 5000.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
                 UserProfile user = viewModel.getUser().getValue();
-
                 user.setFullName(fullName);
                 user.setWeight(weight);
                 user.setHeight(height);
                 user.setDailySteps(steps);
                 user.setDailyWater(water);
                 user.setDailyKcal(kcal);
-                user.setDay(day);
-                user.setMonth(month);
-                user.setYear(year);
-                user.setGender(gender);
+
 
                 if (imageUri != null) {
                     user.setImage(imageUri.toString());
@@ -144,13 +161,14 @@ public class SignUpInformationActivity extends AppCompatActivity {
                     return;
                 }
 
-                viewModel.setUser(user, this);
 
+                viewModel.setUser(user, this);
             } catch (NumberFormatException e) {
-                Toast.makeText(view.getContext(), "Invalid numerical input", Toast.LENGTH_SHORT).show();
+                Toast.makeText(view.getContext(), "Please fill in all fields.", Toast.LENGTH_SHORT).show();
             }
         });
     }
+
 
 
 
