@@ -20,6 +20,8 @@ import com.example.healthcoach.R;
 import com.example.healthcoach.models.UserProfile;
 import com.example.healthcoach.viewmodels.SignUpViewModel;
 
+import java.util.Calendar;
+
 
 public class SignUpInformationActivity extends AppCompatActivity {
 
@@ -40,14 +42,26 @@ public class SignUpInformationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup_info);
 
+        // Initialize ViewModel and other functionalities
         viewModel = new ViewModelProvider(this).get(SignUpViewModel.class);
         viewModel.retriveUserInformation();
 
+        // Initialize UI elements and listeners
         inizialiseUI();
         setupListeners();
 
-    }
+        // Add the code here to set the maximum date for the DatePicker
+        DatePicker birthDatePicker = findViewById(R.id.birthDatePicker); // Make sure this ID matches the one in your XML
 
+        // Get the current date
+        Calendar calendar = Calendar.getInstance();
+
+        // Subtract 18 years from the current year
+        calendar.add(Calendar.YEAR, -18);
+
+        // Set the maximum selectable date for the DatePicker
+        birthDatePicker.setMaxDate(calendar.getTimeInMillis());
+    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
