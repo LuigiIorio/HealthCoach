@@ -215,35 +215,41 @@ public class SettingFragment extends Fragment {
     }
 
     private boolean checkPassword(UserProfile user) {
+        // Check if user or its properties are null
+        if (user == null || user.getPassword() == null) {
+            Toast.makeText(this.getContext(), "User or password is null", Toast.LENGTH_SHORT).show();
+            return false;
+        }
 
-        if(user.getPassword().equals(oldPasswordInput.getText().toString())) {
+        // Get text from EditText fields
+        String oldPassword = oldPasswordInput.getText().toString();
+        String newPassword = newPasswordInput.getText().toString();
+        String confirmPassword = confirmPasswordInput.getText().toString();
 
-            if(newPasswordInput.getText().toString().equals(confirmPasswordInput.getText().toString())) {
+        // Check if any of the input fields are null or empty
+        if (oldPassword.isEmpty() || newPassword.isEmpty() || confirmPassword.isEmpty()) {
+            Toast.makeText(this.getContext(), "All fields must be filled in", Toast.LENGTH_SHORT).show();
+            return false;
+        }
 
-                user.setPassword(newPasswordInput.getText().toString());
+        // Check old password
+        if (user.getPassword().equals(oldPassword)) {
+            // Check if new password and confirm password match
+            if (newPassword.equals(confirmPassword)) {
+                // Update password
+                user.setPassword(newPassword);
                 viewModel.updatePassword(user.getPassword());
-
                 return true;
-
-            }
-
-            else {
-
+            } else {
                 Toast.makeText(this.getContext(), "Password must be the same", Toast.LENGTH_SHORT).show();
                 return false;
-
             }
-
-        }
-
-        else {
-
+        } else {
             Toast.makeText(this.getContext(), "Old Password does not match", Toast.LENGTH_SHORT).show();
             return false;
-
         }
-
     }
+
 
 }
 
