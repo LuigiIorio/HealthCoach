@@ -34,7 +34,7 @@ import java.util.Locale;
 
 public class HomeFragment extends Fragment {
 
-    private ProgressBar stepsProgressBar, kcalProgressBar, waterProgressBar, bpmProgressBar;
+    private ProgressBar stepsProgressBar, kcalProgressBar, waterProgressBar;
     private TextView totalSteps;
     private TextView hydrationTextView;
     private AnyChartView lineChart;
@@ -51,8 +51,6 @@ public class HomeFragment extends Fragment {
 
 
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-        tvCalories = view.findViewById(R.id.tv_calories);
-
         inizialiseUI(view);
 
         return view;
@@ -77,15 +75,15 @@ public class HomeFragment extends Fragment {
         totalSteps = includedLayout.findViewById(R.id.numberSteps);
 
 
-
+        tvCalories = view.findViewById(R.id.tv_calories);
         kcalProgressBar = view.findViewById(R.id.kcalCircle);
         hydrationTextView = view.findViewById(R.id.hydrationTextView);
         waterProgressBar = view.findViewById(R.id.waterCircle);
-//        bpmProgressBar = view.findViewById(R.id.bpmCircle);
+
 
         //lineChart = view.findViewById(R.id.historyChart);
 
-        homeActivityViewModel.getUser().observe(this, userProfile -> {
+        homeActivityViewModel.getUser().observe(getViewLifecycleOwner(), userProfile -> {
 
             if (homeActivityViewModel.getUser().getValue() != null) {
 
@@ -95,7 +93,6 @@ public class HomeFragment extends Fragment {
                         .addDataType(DataType.TYPE_STEP_COUNT_DELTA, FitnessOptions.ACCESS_READ)
                         .addDataType(DataType.TYPE_HYDRATION, FitnessOptions.ACCESS_READ)
                         .addDataType(DataType.TYPE_CALORIES_EXPENDED, FitnessOptions.ACCESS_READ)
-                        .addDataType(DataType.TYPE_HEART_RATE_BPM, FitnessOptions.ACCESS_READ)
                         .build();
 
                 if (!GoogleSignIn.hasPermissions(GoogleSignIn.getLastSignedInAccount(this.getContext()), fitnessOptions)) {
@@ -112,6 +109,7 @@ public class HomeFragment extends Fragment {
                 homeActivityViewModel.getSteps().observe(getViewLifecycleOwner(), steps -> {
 
                     int percentage = (int) (((steps * 1.0)/profile.getDailySteps()) * 100);
+                    Log.e("Steps", steps+"/"+profile.getDailySteps()+" "+percentage);
                     stepsProgressBar.setProgress(percentage);
 
                 });
@@ -119,14 +117,16 @@ public class HomeFragment extends Fragment {
                 homeActivityViewModel.getWater().observe(getViewLifecycleOwner(), water -> {
 
                     int percentage = (int) (((water * 1.0)/profile.getDailyWater()) * 100);
-                    stepsProgressBar.setProgress(percentage);
+                    Log.e("Water", water+"/"+profile.getDailyWater()+" "+percentage);
+                    waterProgressBar.setProgress(percentage);
 
                 });
 
                 homeActivityViewModel.getKcal().observe(getViewLifecycleOwner(), kcal -> {
 
                     int percentage = (int) (((kcal * 1.0)/profile.getDailyKcal()) * 100);
-                    stepsProgressBar.setProgress(percentage);
+                    Log.e("Kcal", kcal+"/"+profile.getDailyKcal()+" "+percentage);
+                    kcalProgressBar.setProgress(percentage);
 
                 });
 
@@ -134,6 +134,21 @@ public class HomeFragment extends Fragment {
 
         });
 
+
+        // Existing code for hydration
+        homeActivityViewModel.getHydrationData().observe(getViewLifecycleOwner(), hydration -> {
+            hydrationTextView.setText(hydration.intValue()+" ml");
+        });
+
+
+        // Initialize and observe the CaloriesViewModel
+        CaloriesViewModel caloriesViewModel = new ViewModelProvider(this).get(CaloriesViewModel.class);
+        caloriesViewModel.getTotalCalories().observe(getViewLifecycleOwner(), calories -> {
+            tvCalories.setText((int)(calories.getTotalCalories()) + " kcal");
+        });
+
+        // Fetch the calories data
+        caloriesViewModel.fetchCalories(getContext());
 
 
     }
@@ -166,30 +181,6 @@ public class HomeFragment extends Fragment {
         stepViewModel.stopRecordingSteps(getContext());
     }
 
-
-
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        // Existing code for hydration
-        homeActivityViewModel.getHydrationData().observe(getViewLifecycleOwner(), hydration -> {
-            hydrationTextView.setText(String.format(Locale.getDefault(), "%s ml", hydration));
-        });
-
-        // Initialize the TextView for Calories
-        tvCalories = view.findViewById(R.id.tv_calories);
-
-        // Initialize and observe the CaloriesViewModel
-        CaloriesViewModel caloriesViewModel = new ViewModelProvider(this).get(CaloriesViewModel.class);
-        caloriesViewModel.getTotalCalories().observe(getViewLifecycleOwner(), calories -> {
-            tvCalories.setText("Calories: " + calories.getTotalCalories() + " kcal");
-        });
-
-        // Fetch the calories data
-        caloriesViewModel.fetchCalories(getContext());
-    }
 
 
 

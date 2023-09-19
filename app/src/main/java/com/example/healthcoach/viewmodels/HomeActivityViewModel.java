@@ -344,7 +344,7 @@ public class HomeActivityViewModel extends ViewModel {
         Fitness.getHistoryClient(context, googleSignInAccount)
                 .insertData(dataSet)
                 .addOnSuccessListener(unused -> {
-                    water.setValue(water.getValue() + value);
+//                    water.setValue(water.getValue() + value);
                     Log.i("Acqua Input", "Acqua caricata con successo");
                 }).addOnFailureListener(e -> {
                     Log.i("Acqua", "Fallimento");
@@ -386,7 +386,7 @@ public class HomeActivityViewModel extends ViewModel {
         Fitness.getHistoryClient(context, googleSignInAccount)
                 .insertData(dataSet)
                 .addOnSuccessListener(unused -> {
-                    kcal.setValue(kcal.getValue() + value);
+                    //kcal.setValue(kcal.getValue() + value);
                     Log.i("Lavoro upload", "Cantonment con successo!");
                 })
                 .addOnFailureListener(e -> {

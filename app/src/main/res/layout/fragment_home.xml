@@ -27,8 +27,8 @@
 
         <com.google.android.material.progressindicator.CircularProgressIndicator
             android:id="@+id/kcalCircle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="106dp"
+            android:layout_height="125dp"
             android:layout_gravity="center"
             android:layout_marginTop="24dp"
             android:progress="0"
@@ -46,8 +46,12 @@
             android:id="@+id/tv_calories"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Calories: 0 kcal"
-            android:textSize="16sp"/>
+            android:layout_marginTop="8dp"
+            android:text="@string/caloriesValue"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="@+id/kcalCircle"
+            app:layout_constraintStart_toStartOf="@+id/kcalCircle"
+            app:layout_constraintTop_toBottomOf="@+id/kcalCircle" />
 
         <com.google.android.material.progressindicator.CircularProgressIndicator
             android:id="@+id/waterCircle"
@@ -66,17 +70,16 @@
             app:trackCornerRadius="64dp"
             app:trackThickness="5dp" />
 
+
         <TextView
             android:id="@+id/hydrationTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Hydration: 0 ml"
-            app:layout_constraintBottom_toBottomOf="@+id/waterCircle"
+            android:layout_marginTop="8dp"
+            android:text="@string/hydrationValue"
             app:layout_constraintEnd_toEndOf="@+id/waterCircle"
             app:layout_constraintStart_toStartOf="@+id/waterCircle"
-            app:layout_constraintTop_toTopOf="@+id/waterCircle" />
-
-
+            app:layout_constraintTop_toBottomOf="@+id/waterCircle" />
 
         <ImageView
             android:id="@+id/imageView3"

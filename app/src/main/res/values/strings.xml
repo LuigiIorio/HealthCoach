@@ -44,6 +44,8 @@
     <string name="night_mode">Night Mode</string>
     <string name="nickname_age">Nickname (Age)</string>
     <string name="token_google">99729341904-qlls8u6lhkf63fc4n68s2dvt9mnncpg2.apps.googleusercontent.com</string>
+    <string name="caloriesValue">Calories</string>
+    <string name="hydrationValue">Hydration</string>
 
     <!-- Gender values -->
     <string-array name="gender_values">
