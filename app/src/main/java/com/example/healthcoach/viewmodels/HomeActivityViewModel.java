@@ -27,6 +27,7 @@ import com.anychart.graphics.vector.Stroke;
 import com.example.healthcoach.activities.LoginActivity;
 import com.example.healthcoach.models.GoogleFitDailyData;
 import com.example.healthcoach.models.UserProfile;
+import com.example.healthcoach.recordingapi.Hydration;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.fitness.Fitness;
@@ -76,9 +77,20 @@ public class HomeActivityViewModel extends ViewModel {
     private MutableLiveData<Integer> stepCount = new MutableLiveData<>();
     private MutableLiveData<List<GoogleFitDailyData>> history = new MutableLiveData<>();
 
+    private MutableLiveData<Float> hydrationData = new MutableLiveData<>();
+
     public MutableLiveData<Integer> getStepCount() {
         return stepCount;
     }
+
+    public void setHydrationData(float hydration) {
+        hydrationData.setValue(hydration);
+    }
+
+    public LiveData<Float> getHydrationData() {
+        return hydrationData;
+    }
+
 
     private ListenerRegistration userProfileListener;
 
@@ -91,6 +103,28 @@ public class HomeActivityViewModel extends ViewModel {
         fetchUserData();
 
     }
+
+    public void fetchTodayHydration(Context context) {
+        long endTime = System.currentTimeMillis();
+        long startTime = endTime - (24 * 60 * 60 * 1000); // Start from midnight to now
+
+        Hydration hydration = new Hydration(context);
+        hydration.readHydrationData(startTime, endTime, dataReadResponse -> {
+            float totalHydration = 0;
+            for (DataSet dataSet : dataReadResponse.getDataSets()) {
+                for (DataPoint dataPoint : dataSet.getDataPoints()) {
+                    for (Field field : dataPoint.getDataType().getFields()) {
+                        float hydrationValue = dataPoint.getValue(field).asFloat();
+                        totalHydration += hydrationValue;
+                    }
+                }
+            }
+            // Set the total hydration data in ViewModel
+            setHydrationData(totalHydration);
+        });
+    }
+
+
 
     private void fetchUserData() {
 

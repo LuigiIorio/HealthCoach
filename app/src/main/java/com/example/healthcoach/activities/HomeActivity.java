@@ -27,6 +27,8 @@ public class HomeActivity extends AppCompatActivity {
     private HomeActivityViewModel homeActivityViewModel;
     private StepViewModel stepViewModel;
 
+
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,6 +49,9 @@ public class HomeActivity extends AppCompatActivity {
         // Set initial active fragment
         activeFragment = fragment1;
 
+        // Fetch today's hydration data
+        homeActivityViewModel.fetchTodayHydration(this);
+
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(navListener);
 
@@ -59,7 +64,6 @@ public class HomeActivity extends AppCompatActivity {
         fragment4.setRetainInstance(true);
     }
 
-    // Removed the bindViews method as it's not used anymore
 
     private final BottomNavigationView.OnNavigationItemSelectedListener navListener =
             item -> {

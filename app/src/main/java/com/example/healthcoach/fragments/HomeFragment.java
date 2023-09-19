@@ -24,11 +24,14 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.fitness.FitnessOptions;
 import com.google.android.gms.fitness.data.DataType;
 
+import java.util.Locale;
+
 
 public class HomeFragment extends Fragment {
 
     private ProgressBar stepsProgressBar, kcalProgressBar, waterProgressBar, bpmProgressBar;
     private TextView totalSteps;
+    private TextView hydrationTextView;
     private AnyChartView lineChart;
 
     private HomeActivityViewModel homeActivityViewModel;
@@ -53,6 +56,8 @@ public class HomeFragment extends Fragment {
 
 
 
+
+
     private void inizialiseUI(View view) {
 
         View includedLayout = view.findViewById(R.id.include);
@@ -60,7 +65,10 @@ public class HomeFragment extends Fragment {
         stepsProgressBar = includedLayout.findViewById(R.id.circularProgressIndicator);
         totalSteps = includedLayout.findViewById(R.id.numberSteps);
 
+
+
         kcalProgressBar = view.findViewById(R.id.kcalCircle);
+        hydrationTextView = view.findViewById(R.id.hydrationTextView);
         waterProgressBar = view.findViewById(R.id.waterCircle);
 //        bpmProgressBar = view.findViewById(R.id.bpmCircle);
 
@@ -146,5 +154,15 @@ public class HomeFragment extends Fragment {
         super.onPause();
         stepViewModel.stopRecordingSteps(getContext());
     }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        homeActivityViewModel.getHydrationData().observe(getViewLifecycleOwner(), hydration -> {
+            hydrationTextView.setText(String.format(Locale.getDefault(), "%s ml", hydration));
+        });
+    }
+
 
 }

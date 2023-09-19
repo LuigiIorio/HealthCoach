@@ -59,6 +59,15 @@
             app:trackCornerRadius="64dp"
             app:trackThickness="5dp" />
 
+
+        <TextView
+            android:id="@+id/hydrationTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hydration: 0 ml"
+            tools:layout_editor_absoluteX="225dp"
+            tools:layout_editor_absoluteY="135dp" />
+
         <ImageView
             android:id="@+id/imageView3"
             android:layout_width="40dp"

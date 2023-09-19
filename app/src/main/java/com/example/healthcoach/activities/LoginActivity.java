@@ -109,6 +109,7 @@ public class LoginActivity extends AppCompatActivity {
                 fitnessOptions);
     }
 
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -122,7 +123,6 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-
         if (requestCode == RC_SIGN_IN) {
 
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
@@ -133,23 +133,27 @@ public class LoginActivity extends AppCompatActivity {
 
                 viewModel.signInWithGoogle(credential, task1 -> {
                     if (task1.isSuccessful()) {
-                        // Login con Google riuscito
+                        // Login with Google succeeded
                         if (viewModel.isUserLoggedIn()) {
-                            Toast.makeText(this, "Loggato", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this, "Logged In", Toast.LENGTH_SHORT).show();
                             viewModel.firebaseAuthViaGoogle(account.getIdToken(), this);
+
+                            // Request Google Fit permissions here
+                            requestGoogleFitPermission();
                         }
                     } else {
-                        // Gestisci il fallimento del login con Google
-                        Toast.makeText(this, "Non Loggato", Toast.LENGTH_SHORT).show();
+                        // Handle login failure with Google
+                        Toast.makeText(this, "Not Logged In", Toast.LENGTH_SHORT).show();
                     }
                 });
             } catch (ApiException e) {
-                // Gestisci l'errore di accesso con Google
-                Toast.makeText(this, "Errore", Toast.LENGTH_SHORT).show();
+                // Handle login error with Google
+                Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
             }
         }
     }
+
 
 
     private void inizialiseUI() {
