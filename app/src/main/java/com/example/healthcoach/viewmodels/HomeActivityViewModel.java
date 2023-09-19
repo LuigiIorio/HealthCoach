@@ -40,6 +40,7 @@ import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.data.Value;
 import com.google.android.gms.fitness.request.DataReadRequest;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -298,7 +299,7 @@ public class HomeActivityViewModel extends ViewModel {
         // For each data point, specify a start time, end time, and the
         // data value -- in this case, 950 new steps.
         DataPoint dataPoint = DataPoint.builder(dataSource)
-                .setField(getTypeField(DataType.TYPE_HYDRATION), value)
+                .setField(Field.FIELD_VOLUME, (float) value)
                 .setTimestamp(now, TimeUnit.MILLISECONDS)
                 .build();
 
@@ -310,6 +311,9 @@ public class HomeActivityViewModel extends ViewModel {
                 .insertData(dataSet)
                 .addOnSuccessListener(unused -> {
                     water.setValue(water.getValue() + value);
+                    Log.i("Acqua Input", "Acqua caricata con successo");
+                }).addOnFailureListener(e -> {
+                    Log.i("Acqua", "Fallimento");
                 });
 
     }
@@ -337,7 +341,7 @@ public class HomeActivityViewModel extends ViewModel {
         // For each data point, specify a start time, end time, and the
         // data value -- in this case, 950 new steps.
         DataPoint dataPoint = DataPoint.builder(dataSource)
-                .setField(getTypeField(DataType.TYPE_CALORIES_EXPENDED), value)
+                .setField(Field.FIELD_CALORIES, (float) value)
                 .setTimestamp(now, TimeUnit.MILLISECONDS)
                 .build();
 
@@ -349,6 +353,13 @@ public class HomeActivityViewModel extends ViewModel {
                 .insertData(dataSet)
                 .addOnSuccessListener(unused -> {
                     kcal.setValue(kcal.getValue() + value);
+                    Log.i("Lavoro upload", "Cantonment con successo!");
+                })
+                .addOnFailureListener(e -> {
+
+                    Log.i("Lavoro upload", "Caricamento con disprezzo!");
+                    e.printStackTrace();
+
                 });
 
     }
