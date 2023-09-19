@@ -531,7 +531,7 @@ public class HomeActivityViewModel extends ViewModel {
         // Impostazione dell'intervallo di tempo
         Calendar calendar = Calendar.getInstance();
         long endTime = calendar.getTimeInMillis();
-        calendar.add(Calendar.DAY_OF_YEAR, -DAYS_TO_FETCH);
+        calendar.add(Calendar.DAY_OF_YEAR, - DAYS_TO_FETCH + 1);
         long startTime = calendar.getTimeInMillis();
 
         // Creazione della richiesta per i dati di Google Fit
@@ -556,9 +556,13 @@ public class HomeActivityViewModel extends ViewModel {
 
     private void parseBuckets(List<Bucket> buckets) {
 
+        Log.i("Numeber bucket", buckets.size() + "");
+
         for (Bucket bucket : buckets) {
 
             List<DataSet> dataSets = bucket.getDataSets();
+
+            Log.i("Numeber bucket", dataSets.size() + "");
 
             for (DataSet dataSet : dataSets) {
                 for (DataPoint dataPoint : dataSet.getDataPoints()) {
