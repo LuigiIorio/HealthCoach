@@ -573,11 +573,11 @@ public class HomeActivityViewModel extends ViewModel {
                                             dataPoint.getStartTime(TimeUnit.MILLISECONDS)
                             )));
 
-                    if(dataPoint.getDataType() == DataType.TYPE_STEP_COUNT_DELTA)
+                    if(dataPoint.getDataType() == DataType.AGGREGATE_STEP_COUNT_DELTA)
                         data.setSteps(dataPoint.getValue(Field.FIELD_STEPS).asInt());
-                    else if(dataPoint.getDataType() == DataType.TYPE_HYDRATION)
+                    else if(dataPoint.getDataType() == DataType.AGGREGATE_HYDRATION)
                         data.setHydration(dataPoint.getValue(Field.FIELD_VOLUME).asFloat());
-                    else if(dataPoint.getDataType() == DataType.TYPE_CALORIES_EXPENDED)
+                    else if(dataPoint.getDataType() == DataType.AGGREGATE_CALORIES_EXPENDED)
                         data.setCalories(dataPoint.getValue(Field.FIELD_CALORIES).asFloat());
 
                 }
