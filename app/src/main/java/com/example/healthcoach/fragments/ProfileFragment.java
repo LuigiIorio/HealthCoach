@@ -95,7 +95,7 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        viewModel.getUser().observe(this, userProfile -> {
+        viewModel.getUser().observe(getViewLifecycleOwner(), userProfile -> {
             if (userProfile != null) {
                 weight.setText(userProfile.getWeight() + "Kg");
                 height.setText(userProfile.getHeight() + "cm");
@@ -106,22 +106,22 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        updateDailyGoal();
 
-        viewModel.getSteps().observe(this, steps -> {
+        viewModel.getSteps().observe(getViewLifecycleOwner(), steps -> {
             this.steps = steps;
-            updateDailyGoal();
+            viewModel.getWater().observe(getViewLifecycleOwner(), water -> {
+                this.water = water;
+                viewModel.getKcal().observe(getViewLifecycleOwner(), kcal -> {
+                    this.kcal = kcal;
+                    Log.i("Bar", "Sono Qui");
+                    updateDailyGoal();
+                });
+            });
         });
 
-        viewModel.getSteps().observe(this, water -> {
-            this.water = water;
-            updateDailyGoal();
-        });
 
-        viewModel.getSteps().observe(this, kcal -> {
-            this.kcal = kcal;
-            updateDailyGoal();
-        });
+
+
     }
 
 
@@ -183,21 +183,26 @@ public class ProfileFragment extends Fragment {
         if(dailySteps == 0)
             percentageSteps = 0;
         else
-            percentageSteps = (1.0 * steps)/dailySteps;
+            percentageSteps = ((1.0 * steps)/dailySteps) * 100;
 
         if(dailyWater == 0)
             percentageWater = 0;
         else
-            percentageWater = (1.0 * water)/dailyWater;
+            percentageWater = ((1.0 * water)/dailyWater) * 100;
 
         if(dailyKcal == 0)
             percentageKcal = 0;
         else
-            percentageKcal = (1.0 * kcal)/dailyKcal;
+            percentageKcal = ((1.0 * kcal)/dailyKcal) * 100;
 
         percentage = (percentageSteps + percentageWater + percentageKcal)/3;
 
         progressBar.setProgress((int) percentage);
+
+        Log.e("Steps", steps+"/"+dailySteps+" "+percentageSteps);
+        Log.e("Water", water+"/"+dailyWater+" "+percentageWater);
+        Log.e("Kcal", kcal+"/"+dailyKcal+" "+percentageKcal);
+        Log.e("Total Percentage", percentage+ "");
 
     }
 
