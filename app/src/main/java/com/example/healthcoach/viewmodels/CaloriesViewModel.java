@@ -26,9 +26,9 @@ import java.util.concurrent.TimeUnit;
 
 public class CaloriesViewModel extends ViewModel {
 
-    private final MutableLiveData<Float> totalCalories = new MutableLiveData<>(0f);
+    private final MutableLiveData<Calories> totalCalories = new MutableLiveData<>(new Calories(0f));
 
-    public LiveData<Float> getTotalCalories() {
+    public LiveData<Calories> getTotalCalories() {
         return totalCalories;
     }
 
@@ -64,7 +64,7 @@ public class CaloriesViewModel extends ViewModel {
                             }
                         }
                     }
-                    totalCalories.setValue(sum);
+                    totalCalories.setValue(new Calories(sum));
                 })
                 .addOnFailureListener(e -> Log.e("CaloriesViewModel", "Failed to read data", e));
     }
@@ -83,11 +83,21 @@ public class CaloriesViewModel extends ViewModel {
                     }
                 }
             }
-            totalCalories.setValue(sum);
+            totalCalories.setValue(new Calories(sum));
         });
     }
 
 
+
+    public void fetchCalories(Context context) {
+        Fitness.getHistoryClient(context, GoogleSignIn.getLastSignedInAccount(context))
+                .readDailyTotal(DataType.TYPE_CALORIES_EXPENDED)
+                .addOnSuccessListener(dataSet -> {
+                    float totalCaloriesValue = dataSet.isEmpty() ? 0 : dataSet.getDataPoints().get(0).getValue(Field.FIELD_CALORIES).asFloat();
+                    totalCalories.setValue(new Calories(totalCaloriesValue));
+                })
+                .addOnFailureListener(e -> totalCalories.setValue(new Calories(0f)));
+    }
 
 
 }

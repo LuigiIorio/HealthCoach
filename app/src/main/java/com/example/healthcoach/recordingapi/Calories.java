@@ -18,10 +18,14 @@ import java.util.Calendar;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
+
+
 public class Calories {
     private Context context;
     private GoogleSignInAccount googleSignInAccount;
     private DataSource dataSource;
+
+    private float totalCalories;
 
     public Calories(Context context, GoogleSignInAccount account) {
         this.context = context;
@@ -67,4 +71,13 @@ public class Calories {
                 .addOnSuccessListener(aVoid -> Log.d("Calories", "Calories expended recording stopped"))
                 .addOnFailureListener(e -> Log.e("Calories", "Failed to stop calories expended recording", e));
     }
+
+    public Calories(float totalCalories) {
+        this.totalCalories = totalCalories;
+    }
+
+    public float getTotalCalories() {
+        return totalCalories;
+    }
+
 }

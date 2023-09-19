@@ -42,6 +42,13 @@
             app:trackCornerRadius="64dp"
             app:trackThickness="5dp" />
 
+        <TextView
+            android:id="@+id/tv_calories"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Calories: 0 kcal"
+            android:textSize="16sp"/>
+
         <com.google.android.material.progressindicator.CircularProgressIndicator
             android:id="@+id/waterCircle"
             android:layout_width="wrap_content"

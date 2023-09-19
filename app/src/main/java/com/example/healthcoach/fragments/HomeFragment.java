@@ -9,14 +9,18 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.anychart.AnyChartView;
 import com.example.healthcoach.R;
 import com.example.healthcoach.models.UserProfile;
+import com.example.healthcoach.recordingapi.Calories;
+import com.example.healthcoach.viewmodels.CaloriesViewModel;
 import com.example.healthcoach.viewmodels.HomeActivityViewModel;
 import com.example.healthcoach.viewmodels.StepViewModel;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -27,6 +31,7 @@ import com.google.android.gms.fitness.data.DataType;
 import java.util.Locale;
 
 
+
 public class HomeFragment extends Fragment {
 
     private ProgressBar stepsProgressBar, kcalProgressBar, waterProgressBar, bpmProgressBar;
@@ -34,13 +39,19 @@ public class HomeFragment extends Fragment {
     private TextView hydrationTextView;
     private AnyChartView lineChart;
 
+    private TextView tvCalories;
+
     private HomeActivityViewModel homeActivityViewModel;
     private StepViewModel stepViewModel;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
+
+
+
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+        tvCalories = view.findViewById(R.id.tv_calories);
 
         inizialiseUI(view);
 
@@ -155,14 +166,31 @@ public class HomeFragment extends Fragment {
         stepViewModel.stopRecordingSteps(getContext());
     }
 
+
+
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // Existing code for hydration
         homeActivityViewModel.getHydrationData().observe(getViewLifecycleOwner(), hydration -> {
             hydrationTextView.setText(String.format(Locale.getDefault(), "%s ml", hydration));
         });
+
+        // Initialize the TextView for Calories
+        tvCalories = view.findViewById(R.id.tv_calories);
+
+        // Initialize and observe the CaloriesViewModel
+        CaloriesViewModel caloriesViewModel = new ViewModelProvider(this).get(CaloriesViewModel.class);
+        caloriesViewModel.getTotalCalories().observe(getViewLifecycleOwner(), calories -> {
+            tvCalories.setText("Calories: " + calories.getTotalCalories() + " kcal");
+        });
+
+        // Fetch the calories data
+        caloriesViewModel.fetchCalories(getContext());
     }
+
 
 
 }
