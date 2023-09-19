@@ -536,9 +536,9 @@ public class HomeActivityViewModel extends ViewModel {
 
         // Creazione della richiesta per i dati di Google Fit
         DataReadRequest readRequest = new DataReadRequest.Builder()
-                .aggregate(DataType.TYPE_STEP_COUNT_DELTA)
-                .aggregate(DataType.TYPE_HYDRATION)
-                .aggregate(DataType.TYPE_CALORIES_EXPENDED)
+                .aggregate(DataType.AGGREGATE_STEP_COUNT_DELTA)
+                .aggregate(DataType.AGGREGATE_HYDRATION)
+                .aggregate(DataType.AGGREGATE_CALORIES_EXPENDED)
                 .bucketByTime(DAYS_TO_FETCH, TimeUnit.DAYS)
                 .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
                 .build();
