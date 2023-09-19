@@ -59,14 +59,17 @@
             app:trackCornerRadius="64dp"
             app:trackThickness="5dp" />
 
-
         <TextView
             android:id="@+id/hydrationTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Hydration: 0 ml"
-            tools:layout_editor_absoluteX="225dp"
-            tools:layout_editor_absoluteY="135dp" />
+            app:layout_constraintBottom_toBottomOf="@+id/waterCircle"
+            app:layout_constraintEnd_toEndOf="@+id/waterCircle"
+            app:layout_constraintStart_toStartOf="@+id/waterCircle"
+            app:layout_constraintTop_toTopOf="@+id/waterCircle" />
+
+
 
         <ImageView
             android:id="@+id/imageView3"
