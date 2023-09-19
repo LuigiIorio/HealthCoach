@@ -146,6 +146,10 @@ public class ProfileFragment extends Fragment {
 
             }
 
+            workoutSpinner.setSelection(0);
+            timeSpinner.setSelection(0);
+            waterIntake.setText("");
+
         });
 
     }
