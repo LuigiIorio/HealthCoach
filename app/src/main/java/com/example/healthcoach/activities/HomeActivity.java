@@ -23,9 +23,9 @@ public class HomeActivity extends AppCompatActivity {
 
     private Fragment fragment1, fragment2, fragment3, fragment4;
     private Fragment activeFragment;
-    private HomeActivityViewModel homeViewModel;
+
     private HomeActivityViewModel homeActivityViewModel;
-    private StepViewModel stepViewModel;
+
 
 
 
@@ -35,10 +35,6 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         homeActivityViewModel = new ViewModelProvider(this).get(HomeActivityViewModel.class);
-        stepViewModel = new ViewModelProvider(this).get(StepViewModel.class);
-
-        // Initialize ViewModel
-        homeViewModel = new ViewModelProvider(this).get(HomeActivityViewModel.class);
 
         // Initialize fragments
         fragment1 = new HomeFragment();
