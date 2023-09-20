@@ -7,6 +7,7 @@ import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -21,7 +22,9 @@ import com.google.android.gms.fitness.data.DataSource;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.request.DataReadRequest;
+import com.google.android.gms.fitness.request.DataUpdateRequest;
 import com.google.android.gms.fitness.result.DataReadResponse;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.concurrent.TimeUnit;
@@ -33,13 +36,20 @@ public class WeightViewModel extends AndroidViewModel {
     private Context context;
     private MutableLiveData<String> weightError = new MutableLiveData<>();
     private MutableLiveData<Boolean> weightSuccess = new MutableLiveData<>();
-
+    private MutableLiveData<Float> latestWeight = new MutableLiveData<>();
     public static final int REQUEST_OAUTH_REQUEST_CODE = 1004;
+    private DataSource weightDataSource;
 
     public WeightViewModel(Application application) {
         super(application);
         this.context = application.getApplicationContext();
+        this.weightDataSource = new DataSource.Builder()
+                .setAppPackageName(context)
+                .setDataType(DataType.TYPE_WEIGHT)
+                .setType(DataSource.TYPE_RAW)
+                .build();
     }
+
 
     public LiveData<String> getWeightError() {
         return weightError;
@@ -49,7 +59,11 @@ public class WeightViewModel extends AndroidViewModel {
         return weightSuccess;
     }
 
-    public void validateAndSubmitWeight(Context context, String weightInput) {
+    public LiveData<Float> getLatestWeight() {
+        return latestWeight;
+    }
+
+    public void validateAndSubmitWeight(Context context, String weightInput, long startTime, long endTime) {
         if (!weightInput.isEmpty()) {
             try {
                 float weight = Float.parseFloat(weightInput);
@@ -60,7 +74,7 @@ public class WeightViewModel extends AndroidViewModel {
                         promptSignIn(context);
                         return;
                     }
-                    insertWeightDataOrSignInIfNeeded(context, weight);
+                    insertWeightDataOrSignInIfNeeded(context, weight, startTime, endTime);
                     weightSuccess.setValue(true);
                 }
             } catch (NumberFormatException e) {
@@ -88,16 +102,16 @@ public class WeightViewModel extends AndroidViewModel {
                 fitnessOptions
         );
     }
-
-    public void insertWeightDataOrSignInIfNeeded(Context context, float weightValue) {
+    public void insertWeightDataOrSignInIfNeeded(Context context, float weightValue, long startTime, long endTime) {
         if (!isUserSignedIn(context)) {
             promptSignIn(context);
         } else if (!hasFitnessPermission(context)) {
             requestFitnessPermission(context);
         } else {
-            insertWeightData(context, weightValue);
+            insertWeightData(weightValue, startTime, endTime);
         }
     }
+
 
     private boolean hasFitnessPermission(Context context) {
         GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(context);
@@ -121,52 +135,68 @@ public class WeightViewModel extends AndroidViewModel {
         );
     }
 
-    public void insertWeightData(Context context, float weightInKg) {
-        GoogleSignInAccount lastSignedInAccount = GoogleSignIn.getLastSignedInAccount(context);
 
-        FitnessOptions fitnessOptions = FitnessOptions.builder()
-                .addDataType(DataType.TYPE_WEIGHT, FitnessOptions.ACCESS_WRITE)
+    public void insertWeightData(float weightValue, long startTime, long endTime) {
+        Log.d("WeightViewModel", "Attempting to insert weight data");
+        DataPoint weightDataPoint = DataPoint.create(weightDataSource)
+                .setTimeInterval(startTime, endTime, TimeUnit.MILLISECONDS);
+
+        weightDataPoint.getValue(Field.FIELD_WEIGHT).setFloat(weightValue);
+
+        DataSet weightDataSet = DataSet.create(weightDataSource);
+        weightDataSet.add(weightDataPoint);
+
+        DataUpdateRequest request = new DataUpdateRequest.Builder()
+                .setDataSet(weightDataSet)
+                .setTimeInterval(startTime, endTime, TimeUnit.MILLISECONDS)
                 .build();
 
-        if (GoogleSignIn.hasPermissions(lastSignedInAccount, fitnessOptions)) {
-            DataSource weightSource = new DataSource.Builder()
-                    .setDataType(DataType.TYPE_WEIGHT)
-                    .setAppPackageName(context.getPackageName())
-                    .setStreamName("user weight")
-                    .setType(DataSource.TYPE_RAW)
-                    .build();
-
-            DataPoint weightPoint = DataPoint.builder(weightSource)
-                    .setField(Field.FIELD_WEIGHT, weightInKg)
-                    .setTimestamp(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
-                    .build();
-
-            DataSet dataSet = DataSet.builder(weightSource)
-                    .add(weightPoint)
-                    .build();
-
-            Fitness.getHistoryClient(context, lastSignedInAccount)
-                    .insertData(dataSet)
-                    .addOnSuccessListener(unused -> Log.d(TAG, "Weight data inserted!"))
-                    .addOnFailureListener(e -> Log.e(TAG, "There was a problem inserting the weight data.", e));
-        } else {
-            Log.e(TAG, "Permission for weight is not granted.");
-        }
+        Fitness.getHistoryClient(context, GoogleSignIn.getLastSignedInAccount(context))
+                .updateData(request)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("WeightViewModel", "Successfully inserted weight data");
+                        weightSuccess.setValue(true);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e("WeightViewModel", "Failed to insert weight data", e);
+                        weightError.setValue("Failed to insert weight data");
+                    }
+                });
     }
 
-    public void fetchLatestWeight(long startTime, long endTime, OnSuccessListener<DataReadResponse> onSuccessListener) {
+
+    public void fetchLatestWeight(long startTime, long endTime) {
+        Log.d("WeightViewModel", "Attempting to fetch latest weight");
         DataReadRequest readRequest = new DataReadRequest.Builder()
                 .read(DataType.TYPE_WEIGHT)
                 .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
-                .setLimit(1)
-                .enableServerQueries()
                 .build();
 
         Fitness.getHistoryClient(context, GoogleSignIn.getLastSignedInAccount(context))
                 .readData(readRequest)
-                .addOnSuccessListener(onSuccessListener)
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "Failed to read weight data.", e);
+                .addOnSuccessListener(new OnSuccessListener<DataReadResponse>() {
+                    @Override
+                    public void onSuccess(DataReadResponse dataReadResponse) {
+                        Log.d("WeightViewModel", "Successfully fetched latest weight");
+                        DataSet dataSet = dataReadResponse.getDataSet(DataType.TYPE_WEIGHT);
+                        if (!dataSet.getDataPoints().isEmpty()) {
+                            DataPoint lastDataPoint = dataSet.getDataPoints().get(0);
+                            float lastWeight = lastDataPoint.getValue(Field.FIELD_WEIGHT).asFloat();
+                            latestWeight.setValue(lastWeight);
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e("WeightViewModel", "Failed to fetch latest weight data", e);
+                        weightError.setValue("Failed to fetch latest weight data");
+                    }
                 });
     }
 

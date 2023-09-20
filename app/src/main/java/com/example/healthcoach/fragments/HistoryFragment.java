@@ -35,6 +35,7 @@ import com.example.healthcoach.viewmodels.BodyFatViewModel;
 import com.example.healthcoach.viewmodels.CaloriesViewModel;
 import com.example.healthcoach.viewmodels.DistanceViewModel;
 import com.example.healthcoach.viewmodels.StepViewModel;
+import com.example.healthcoach.viewmodels.WeightViewModel;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.fitness.Fitness;
@@ -68,13 +69,14 @@ public class HistoryFragment extends Fragment {
     private int selectedDay;
     private BodyFatViewModel bodyFatViewModel;
 
+    private WeightViewModel weightViewModel;
+
     private static final int PERMISSIONS_REQUEST_CODE = 1;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_history, container, false);
@@ -90,8 +92,11 @@ public class HistoryFragment extends Fragment {
         bodyFatViewModel = new ViewModelProvider(this).get(BodyFatViewModel.class);
         bodyFatViewModel.initialize(getActivity(), GoogleSignIn.getLastSignedInAccount(getActivity()));
 
+        weightViewModel = new ViewModelProvider(this).get(WeightViewModel.class);
+
         return view;
     }
+
 
     private void requestPermissions() {
         String[] permissions = {
@@ -142,15 +147,12 @@ public class HistoryFragment extends Fragment {
     }
 
 
+
     private void insertWeightData(float weightValue, long startTime, long endTime) {
-        weight.insertWeightData(weightValue, startTime, endTime, new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                Log.d("Weight", "Weight data inserted successfully");
-                Toast.makeText(getActivity(), "Inserted weight data successfully", Toast.LENGTH_SHORT).show();
-            }
-        });
+        weightViewModel.insertWeightData(weightValue, startTime, endTime);
     }
+
+
 
 
 
@@ -275,38 +277,23 @@ public class HistoryFragment extends Fragment {
         }
     }
 
-
-    private void updateDataWeight(String type, long startTime, long endTime){
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
-        if (account == null) {
-            historyTextView.setText("Not signed in");
-            return;
-        }
-
+    private void updateDataWeight(String type, long startTime, long endTime) {
         if ("Weight".equals(type)) {
-            weight.readWeightData(startTime, endTime, new OnSuccessListener<DataReadResponse>() {
+            weightViewModel.fetchLatestWeight(startTime, endTime);
+            weightViewModel.getLatestWeight().observe(getViewLifecycleOwner(), new Observer<Float>() {
                 @Override
-                public void onSuccess(DataReadResponse dataReadResponse) {
-                    float latestWeight = 0;
-                    long latestTime = 0;
-                    for (DataSet dataSet : dataReadResponse.getDataSets()) {
-                        for (DataPoint point : dataSet.getDataPoints()) {
-                            for (Field field : point.getDataType().getFields()) {
-                                float weightValue = point.getValue(field).asFloat();
-                                long endTime = point.getEndTime(TimeUnit.MILLISECONDS);
-                                if (endTime > latestTime) {
-                                    latestTime = endTime;
-                                    latestWeight = weightValue;
-                                }
-                            }
-                        }
+                public void onChanged(Float latestWeight) {
+                    if (latestWeight != null) {
+                        Log.d("HistoryFragment", "Latest weight fetched: " + latestWeight);
+                        historyTextView.setText(String.format("Latest weight: %.2f kg", latestWeight));
                     }
-                    historyTextView.setText(String.format("Latest weight: %.2f kg", latestWeight));
                 }
             });
         }
-
     }
+
+
+
 
     private void updateDataBodyFat(String type, long startTime, long endTime) {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());

@@ -31,6 +31,8 @@ public class Weight {
     private Context context; // Store context for further use
     private FitnessOptions fitnessOptions;
 
+
+
     public Weight(Context context) {
         this.context = context;
         this.fitnessOptions = FitnessOptions.builder()
@@ -51,35 +53,6 @@ public class Weight {
                 .addOnSuccessListener(aVoid -> Log.d("Weight", "Weight recording started"))
                 .addOnFailureListener(e -> Log.e("Weight", "Failed to start weight recording", e));
     }
-
-    public void insertWeightData(float weightValue, long startTime, long endTime, OnSuccessListener<Void> onSuccessListener) {
-        GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(context);
-
-        DataSource weightDataSource = new DataSource.Builder()
-                .setDataType(DataType.TYPE_WEIGHT)
-                .setAppPackageName(context.getPackageName())
-                .setStreamName("user weight")
-                .setType(DataSource.TYPE_RAW)
-                .build();
-
-        DataPoint weightDataPoint = DataPoint.builder(weightDataSource)
-                .setField(Field.FIELD_WEIGHT, weightValue)
-                .setTimeInterval(startTime, endTime, TimeUnit.MILLISECONDS)
-                .build();
-
-        DataSet weightDataSet = DataSet.builder(weightDataSource)
-                .add(weightDataPoint)
-                .build();
-
-        Fitness.getHistoryClient(context, googleSignInAccount)
-                .insertData(weightDataSet)
-                .addOnSuccessListener(onSuccessListener)
-                .addOnFailureListener(e -> {
-                    Log.e("Weight", "Failed to insert weight data: " + e.getMessage(), e);
-                });
-    }
-
-
 
     public void refreshGoogleSignInAccount() {
         googleSignInAccount = GoogleSignIn.getAccountForExtension(context, fitnessOptions);
