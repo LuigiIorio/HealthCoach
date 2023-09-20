@@ -216,7 +216,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:text="Height (cm)"
+                android:text="@string/height_cm2"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -280,7 +280,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:text="Daily Water (ml)"
+                android:text="@string/daily_water_ml"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -358,7 +358,7 @@
             android:backgroundTint="@color/green_dark"
             android:paddingHorizontal="16dp"
             android:paddingVertical="16dp"
-            android:text="Submit"
+            android:text="@string/submit2"
             android:textColor="@color/green_light"
             android:textStyle="bold" />
 

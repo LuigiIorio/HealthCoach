@@ -27,7 +27,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Insert Data" />
+                android:text="@string/insert_data2" />
 
             <Spinner
                 android:id="@+id/insertDataTypeSpinner"
@@ -39,14 +39,14 @@
                 android:id="@+id/dataInputEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Enter Data"
+                android:hint="@string/enter_data"
                 android:inputType="numberDecimal" />
 
             <Button
                 android:id="@+id/insertDataButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Insert Data" />
+                android:text="@string/insert_data" />
         </LinearLayout>
 
         <!-- Fetch Data Layout -->
@@ -61,7 +61,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Fetch Data" />
+                android:text="@string/fetch_data" />
 
             <Spinner
                 android:id="@+id/fetchDataTypeSpinner"
@@ -78,13 +78,13 @@
                 android:id="@+id/historyTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="History Data Here" />
+                android:text="@string/history_data_here" />
 
             <Button
                 android:id="@+id/fetchDataButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Fetch Data" />
+                android:text="@string/fetch_data2"/>
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

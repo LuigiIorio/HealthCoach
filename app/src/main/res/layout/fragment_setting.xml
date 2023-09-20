@@ -392,8 +392,8 @@
             android:layout_marginTop="16dp"
             android:background="@drawable/rounded_button"
             android:backgroundTint="?attr/backgroundInsetTop"
-            android:drawableLeft="@drawable/ic_google"
-            android:text="Merge Google"
+            android:drawableStart="@drawable/ic_google"
+            android:text="@string/merge_google"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/signUpTextView" />

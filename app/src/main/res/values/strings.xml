@@ -38,6 +38,21 @@
     <string name="nickname_age">Nickname (Age)</string>
     <string name="caloriesValue">Calories</string>
     <string name="hydrationValue">Hydration</string>
+    <string name="totalsteps">totalSteps</string>
+    <string name="google_login">Google Login</string>
+    <string name="daily_water_ml">Daily Water (ml)</string>
+    <string name="submit2">Submit</string>
+    <string name="height_cm2">Height (cm)</string>
+    <string name="fetch_data">Fetch Data</string>
+    <string name="history_data_here">History Data Here</string>
+    <string name="fetch_data2">Fetch Data</string>
+    <string name="insert_data">Insert Data</string>
+    <string name="enter_data">Enter Data</string>
+    <string name="insert_data2">Insert Data</string>
+    <string name="ml">ml</string>
+    <string name="water_intake">Water Intake</string>
+    <string name="register_activity">Register Activity</string>
+    <string name="merge_google">Merge Google</string>
 
     <!-- Gender values -->
     <string-array name="gender_values">
