@@ -28,11 +28,8 @@ public class Weight {
     private static final int PERMISSION_REQUEST_CODE = 1001;
     private GoogleSignInAccount googleSignInAccount;
     private DataSource dataSource;
-    private Context context; // Store context for further use
+    private Context context;
     private FitnessOptions fitnessOptions;
-
-
-
     public Weight(Context context) {
         this.context = context;
         this.fitnessOptions = FitnessOptions.builder()
@@ -79,13 +76,6 @@ public class Weight {
     private boolean hasNecessaryPermissions() {
         return ContextCompat.checkSelfPermission(context, "android.permission.BODY_SENSORS")
                 == PackageManager.PERMISSION_GRANTED;
-    }
-
-    public void stopRecording() {
-        RecordingClient recordingClient = Fitness.getRecordingClient(context, googleSignInAccount);
-        recordingClient.unsubscribe(dataSource)
-                .addOnSuccessListener(aVoid -> Log.d("Weight", "Weight recording stopped"))
-                .addOnFailureListener(e -> Log.e("Weight", "Failed to stop weight recording", e));
     }
 
     public void readWeightData(long startTime, long endTime, OnSuccessListener<DataReadResponse> onRead) {

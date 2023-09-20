@@ -48,7 +48,6 @@ public class Calories {
                 .addOnFailureListener(e -> Log.e("Calories", "Failed to start calories expended recording", e));
     }
 
-
     public void readCaloriesData(long startTime, long endTime, OnSuccessListener<DataReadResponse> onSuccessListener) {
         HistoryClient historyClient = Fitness.getHistoryClient(context, googleSignInAccount);
 
@@ -62,20 +61,9 @@ public class Calories {
                 .addOnSuccessListener(onSuccessListener)
                 .addOnFailureListener(e -> Log.e("Calories", "Failed to read calories data for the range", e));
     }
-
-
-    public void stopRecording() {
-        RecordingClient recordingClient = Fitness.getRecordingClient(context, googleSignInAccount);
-
-        recordingClient.unsubscribe(dataSource)
-                .addOnSuccessListener(aVoid -> Log.d("Calories", "Calories expended recording stopped"))
-                .addOnFailureListener(e -> Log.e("Calories", "Failed to stop calories expended recording", e));
-    }
-
     public Calories(float totalCalories) {
         this.totalCalories = totalCalories;
     }
-
     public float getTotalCalories() {
         return totalCalories;
     }

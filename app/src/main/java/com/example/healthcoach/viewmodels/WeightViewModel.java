@@ -62,29 +62,6 @@ public class WeightViewModel extends AndroidViewModel {
     public LiveData<Float> getLatestWeight() {
         return latestWeight;
     }
-
-    public void validateAndSubmitWeight(Context context, String weightInput, long startTime, long endTime) {
-        if (!weightInput.isEmpty()) {
-            try {
-                float weight = Float.parseFloat(weightInput);
-                if (weight < 30 || weight > 300) {
-                    weightError.setValue("Please enter a weight between 30 and 300 kg.");
-                } else {
-                    if (!isUserSignedIn(context)) {
-                        promptSignIn(context);
-                        return;
-                    }
-                    insertWeightDataOrSignInIfNeeded(context, weight, startTime, endTime);
-                    weightSuccess.setValue(true);
-                }
-            } catch (NumberFormatException e) {
-                weightError.setValue("Please enter a valid weight.");
-            }
-        } else {
-            weightError.setValue("Weight field cannot be empty.");
-        }
-    }
-
     private boolean isUserSignedIn(Context context) {
         GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(context);
         return googleSignInAccount != null;
@@ -111,7 +88,6 @@ public class WeightViewModel extends AndroidViewModel {
             insertWeightData(weightValue, startTime, endTime);
         }
     }
-
 
     private boolean hasFitnessPermission(Context context) {
         GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(context);

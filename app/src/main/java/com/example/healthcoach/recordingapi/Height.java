@@ -49,30 +49,4 @@ public class Height {
                 .build();
     }
 
-
-    public void insertHeightData(float heightValue) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(System.currentTimeMillis());
-
-        // Create a data point for height.
-        DataPoint dataPoint = DataPoint.builder(heightDataSource)
-                .setField(Field.FIELD_HEIGHT, heightValue)
-                .setTimeInterval(cal.getTimeInMillis(), cal.getTimeInMillis(), TimeUnit.MILLISECONDS)
-                .build();
-
-        // Create a data set using the data point.
-        DataSet dataSet = DataSet.builder(heightDataSource)
-                .add(dataPoint)
-                .build();
-
-        // Insert the height data.
-        Fitness.getHistoryClient(context, GoogleSignIn.getLastSignedInAccount(context))
-                .insertData(dataSet)
-                .addOnSuccessListener(aVoid -> {
-                    Log.d("Height", "Height data inserted successfully");
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("Height", "Failed to insert height data.", e);
-                });
-    }
 }

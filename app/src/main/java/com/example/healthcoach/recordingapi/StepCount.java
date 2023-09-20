@@ -22,15 +22,10 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
-
-
 public class StepCount {
     private GoogleSignInAccount googleSignInAccount;
     private DataSource dataSource;
-
     private Context context;
-
-
 
     public StepCount(Context context, GoogleSignInAccount account, FragmentActivity fragmentActivity) {
         this.googleSignInAccount = account;
@@ -56,44 +51,6 @@ public class StepCount {
                 .setStreamName("StepCountDeltaStream")
                 .build();
     }
-
-    public void startRecording(Context context) {
-        // Subscribe to the data source
-        RecordingClient recordingClient = Fitness.getRecordingClient(context, googleSignInAccount);
-        recordingClient.subscribe(dataSource)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("StepCount", "Step count recording started");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(Exception e) {
-                        Log.e("StepCount", "Failed to start step count recording", e);
-                    }
-                });
-    }
-
-
-    public void stopRecording(Context context) {
-        // Unsubscribe from the data source
-        RecordingClient recordingClient = Fitness.getRecordingClient(context, googleSignInAccount);
-        recordingClient.unsubscribe(dataSource)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("StepCount", "Step count recording stopped");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(Exception e) {
-                        Log.e("StepCount", "Failed to stop step count recording", e);
-                    }
-                });
-    }
-
     public void readStepsForRange(long startTime, long endTime, OnSuccessListener<DataReadResponse> onSuccessListener) {
         HistoryClient historyClient = Fitness.getHistoryClient(context, googleSignInAccount);
 
@@ -106,7 +63,6 @@ public class StepCount {
         long todayStartTime = cal.getTimeInMillis();
 
         if (startTime == todayStartTime) {
-            // Adjust the endTime to current time for today
             endTime = System.currentTimeMillis();
         }
 

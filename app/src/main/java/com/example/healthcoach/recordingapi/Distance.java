@@ -91,12 +91,4 @@ public class Distance {
             Log.e("Distance", "Invalid time range specified");
         }
     }
-
-
-    public void stopRecording() {
-        RecordingClient recordingClient = Fitness.getRecordingClient(context, account);
-        recordingClient.unsubscribe(distanceDeltaDataSource)
-                .addOnSuccessListener(aVoid -> Log.d("Distance", "Unsubscribed from distance delta"))
-                .addOnFailureListener(e -> Log.e("Distance", "Failed to unsubscribe from distance delta", e));
-    }
 }

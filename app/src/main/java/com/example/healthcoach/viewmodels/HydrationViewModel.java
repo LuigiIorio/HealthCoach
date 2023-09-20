@@ -12,8 +12,6 @@ import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.result.DataReadResponse;
 import com.google.android.gms.tasks.OnSuccessListener;
-
-
 public class HydrationViewModel extends ViewModel {
     private final MutableLiveData<Float> totalWaterIntake = new MutableLiveData<>(0f);
     private Hydration repository;

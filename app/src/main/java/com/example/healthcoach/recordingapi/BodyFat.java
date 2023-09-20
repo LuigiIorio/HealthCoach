@@ -74,14 +74,7 @@ public class BodyFat {
             onSuccessListener.onSuccess(latestBodyFat);
         });
     }
-    public DataReadResponse getBodyFatData(long startTime, long endTime) {
-        DataReadRequest readRequest = new DataReadRequest.Builder()
-                .read(DataType.TYPE_BODY_FAT_PERCENTAGE)
-                .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
-                .enableServerQueries()
-                .build();
 
-        Task<DataReadResponse> task = Fitness.getHistoryClient(context, googleSignInAccount).readData(readRequest);
-        return task.getResult();
-    }
+
+
 }

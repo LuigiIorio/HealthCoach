@@ -23,10 +23,6 @@ public class BodyFatViewModel extends ViewModel {
     private BodyFat bodyFat;
     private final MutableLiveData<Float> bodyFatData = new MutableLiveData<>(0f);
 
-    public void initialize(Context context, GoogleSignInAccount account) {
-        this.bodyFat = new BodyFat(context, account);
-    }
-
     public void fetchBodyFatData(Date selectedDate) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(selectedDate);

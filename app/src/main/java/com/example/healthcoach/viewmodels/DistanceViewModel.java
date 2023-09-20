@@ -14,9 +14,6 @@ import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.result.DataReadResponse;
 import com.google.android.gms.tasks.OnSuccessListener;
 import android.content.Context;
-
-
-
 public class DistanceViewModel extends ViewModel {
     private MutableLiveData<Float> distance = new MutableLiveData<>();
 

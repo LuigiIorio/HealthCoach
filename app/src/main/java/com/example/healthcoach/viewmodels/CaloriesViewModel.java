@@ -24,8 +24,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
-
-
 public class CaloriesViewModel extends ViewModel {
     private final MutableLiveData<Calories> totalCalories = new MutableLiveData<>(new Calories(0f));
     public LiveData<Calories> getTotalCalories() {
