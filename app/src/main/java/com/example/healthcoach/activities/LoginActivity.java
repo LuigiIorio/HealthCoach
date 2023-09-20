@@ -84,7 +84,7 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-    private void requestGoogleFitPermission() {
+    public void requestGoogleFitPermission() {
         GoogleSignInOptionsExtension fitnessOptions = FitnessOptions.builder()
                 .addDataType(DataType.TYPE_STEP_COUNT_DELTA, FitnessOptions.ACCESS_WRITE)
                 .addDataType(DataType.TYPE_STEP_COUNT_DELTA, FitnessOptions.ACCESS_READ)
@@ -193,7 +193,9 @@ public class LoginActivity extends AppCompatActivity {
             finish();
         });
 
-        googleLoginButton.setOnClickListener(view -> signInWithGoogle());
+        googleLoginButton.setOnClickListener(view -> {
+            signInWithGoogle();
+        });
 
         viewModel.getLoginResult().observe(this, loginResult -> {
 

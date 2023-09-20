@@ -1,6 +1,7 @@
 package com.example.healthcoach.fragments;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,6 +13,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -25,6 +28,7 @@ import com.example.healthcoach.viewmodels.HomeActivityViewModel;
 import com.example.healthcoach.viewmodels.StepViewModel;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptionsExtension;
 import com.google.android.gms.fitness.FitnessOptions;
 import com.google.android.gms.fitness.data.DataType;
 
@@ -38,11 +42,11 @@ public class HomeFragment extends Fragment {
     private TextView totalSteps;
     private TextView hydrationTextView;
     private AnyChartView lineChart;
-
     private TextView tvCalories;
-
     private HomeActivityViewModel homeActivityViewModel;
     private StepViewModel stepViewModel;
+    private static final int REQUEST_CODE_GOOGLE_FIT_PERMISSIONS = 1;
+    private static final int REQUEST_CODE_ACTIVITY_RECOGNITION = 2001;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -63,6 +67,40 @@ public class HomeFragment extends Fragment {
         stepViewModel = new ViewModelProvider(requireActivity()).get(StepViewModel.class);
     }
 
+
+    public void requestGoogleFitPermission() {
+        GoogleSignInOptionsExtension fitnessOptions = FitnessOptions.builder()
+                .addDataType(DataType.TYPE_STEP_COUNT_DELTA, FitnessOptions.ACCESS_WRITE)
+                .addDataType(DataType.TYPE_STEP_COUNT_DELTA, FitnessOptions.ACCESS_READ)
+                .addDataType(DataType.TYPE_HYDRATION, FitnessOptions.ACCESS_WRITE)
+                .addDataType(DataType.TYPE_HYDRATION, FitnessOptions.ACCESS_READ)
+                .addDataType(DataType.TYPE_WEIGHT, FitnessOptions.ACCESS_WRITE)
+                .addDataType(DataType.TYPE_WEIGHT, FitnessOptions.ACCESS_READ)
+                .addDataType(DataType.TYPE_HEIGHT, FitnessOptions.ACCESS_READ)
+                .addDataType(DataType.TYPE_BODY_FAT_PERCENTAGE, FitnessOptions.ACCESS_READ)
+                .addDataType(DataType.TYPE_DISTANCE_DELTA, FitnessOptions.ACCESS_READ)
+                .addDataType(DataType.TYPE_DISTANCE_DELTA, FitnessOptions.ACCESS_WRITE)
+                .addDataType(DataType.TYPE_CALORIES_EXPENDED, FitnessOptions.ACCESS_READ)
+                .addDataType(DataType.TYPE_CALORIES_EXPENDED, FitnessOptions.ACCESS_WRITE)
+                .build();
+
+        GoogleSignIn.requestPermissions(
+                this,
+                REQUEST_CODE_GOOGLE_FIT_PERMISSIONS,
+                GoogleSignIn.getLastSignedInAccount(this.getContext()),
+                fitnessOptions);
+
+
+        if (ContextCompat.checkSelfPermission(this.getContext(), "android.permission.ACTIVITY_RECOGNITION")
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{"android.permission.ACTIVITY_RECOGNITION"},
+                    REQUEST_CODE_ACTIVITY_RECOGNITION);
+        }
+
+
+
+    }
 
 
 
@@ -89,22 +127,11 @@ public class HomeFragment extends Fragment {
 
                 UserProfile profile = homeActivityViewModel.getUser().getValue();
 
-                FitnessOptions fitnessOptions = FitnessOptions.builder()
-                        .addDataType(DataType.TYPE_STEP_COUNT_DELTA, FitnessOptions.ACCESS_READ)
-                        .addDataType(DataType.TYPE_HYDRATION, FitnessOptions.ACCESS_READ)
-                        .addDataType(DataType.TYPE_CALORIES_EXPENDED, FitnessOptions.ACCESS_READ)
-                        .build();
-
-                if (!GoogleSignIn.hasPermissions(GoogleSignIn.getLastSignedInAccount(this.getContext()), fitnessOptions)) {
-                    GoogleSignIn.requestPermissions(
-                            this,
-                            123,
-                            GoogleSignIn.getLastSignedInAccount(this.getContext()),
-                            fitnessOptions);
+                requestGoogleFitPermission();
 
                     homeActivityViewModel.fetchData(this.getContext(), lineChart);
 
-                }
+
 
                 homeActivityViewModel.getSteps().observe(getViewLifecycleOwner(), steps -> {
 
