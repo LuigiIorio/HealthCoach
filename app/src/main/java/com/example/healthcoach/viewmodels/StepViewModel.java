@@ -6,18 +6,23 @@ import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.healthcoach.recordingapi.StepCount;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptionsExtension;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessOptions;
 import com.google.android.gms.fitness.RecordingClient;
+import com.google.android.gms.fitness.data.Bucket;
+import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
+import com.google.android.gms.fitness.result.DataReadResponse;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
@@ -70,6 +75,29 @@ public class StepViewModel extends ViewModel {
                     // Handle failure here
                 });
     }
+
+    public void readStepsForRange(long startTime, long endTime, Context context) {
+        StepCount stepCount = new StepCount(context, GoogleSignIn.getLastSignedInAccount(context), (FragmentActivity) context);
+        stepCount.readStepsForRange(startTime, endTime, new OnSuccessListener<DataReadResponse>() {
+            @Override
+            public void onSuccess(DataReadResponse dataReadResponse) {
+                int totalSteps = 0;
+                if (dataReadResponse.getBuckets().size() > 0) {
+                    for (Bucket bucket : dataReadResponse.getBuckets()) {
+                        DataSet dataSet = bucket.getDataSet(DataType.AGGREGATE_STEP_COUNT_DELTA);
+                        for (DataPoint point : dataSet.getDataPoints()) {
+                            for (Field field : point.getDataType().getFields()) {
+                                int steps = point.getValue(field).asInt();
+                                totalSteps += steps;
+                            }
+                        }
+                    }
+                }
+                setSteps(totalSteps);
+            }
+        });
+    }
+
 
 
 }

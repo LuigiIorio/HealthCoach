@@ -32,6 +32,7 @@ import com.example.healthcoach.recordingapi.Hydration;
 import com.example.healthcoach.recordingapi.StepCount;
 import com.example.healthcoach.recordingapi.Weight;
 import com.example.healthcoach.viewmodels.BodyFatViewModel;
+import com.example.healthcoach.viewmodels.StepViewModel;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.fitness.Fitness;
@@ -222,47 +223,23 @@ public class HistoryFragment extends Fragment {
             }
         });
     }
+
+
     private void updateDataSteps(String type, long startTime, long endTime) {
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
-        if (account == null) {
-            historyTextView.setText("Not signed in");
-            return;
-        }
+        StepViewModel stepViewModel = new ViewModelProvider(this).get(StepViewModel.class);
 
         if ("Steps".equals(type)) {
-            Log.d("TimeDebug", "Original Start Time: " + new Date(startTime).toString());
-            Log.d("TimeDebug", "Original End Time: " + new Date(endTime).toString());
-
-            // Convert local time to UTC
-            TimeZone tz = TimeZone.getDefault();
-            int offsetFromUtc = tz.getOffset(startTime);
-            startTime -= offsetFromUtc;
-            endTime -= offsetFromUtc;
-
-            Log.d("TimeDebug", "UTC Start Time: " + new Date(startTime).toString());
-            Log.d("TimeDebug", "UTC End Time: " + new Date(endTime).toString());
-
-            StepCount stepCount = new StepCount(getActivity(), account, getActivity());
-            stepCount.readStepsForRange(startTime, endTime, new OnSuccessListener<DataReadResponse>() {
+            stepViewModel.readStepsForRange(startTime, endTime, getActivity());
+            stepViewModel.getSteps().observe(getViewLifecycleOwner(), new Observer<Integer>() {
                 @Override
-                public void onSuccess(DataReadResponse dataReadResponse) {
-                    int totalSteps = 0;
-                    if (dataReadResponse.getBuckets().size() > 0) {
-                        for (Bucket bucket : dataReadResponse.getBuckets()) {
-                            DataSet dataSet = bucket.getDataSet(DataType.AGGREGATE_STEP_COUNT_DELTA);
-                            for (DataPoint point : dataSet.getDataPoints()) {
-                                for (Field field : point.getDataType().getFields()) {
-                                    int steps = point.getValue(field).asInt();
-                                    totalSteps += steps;
-                                }
-                            }
-                        }
-                    }
+                public void onChanged(Integer totalSteps) {
                     historyTextView.setText(String.format("Total steps: %d", totalSteps));
                 }
             });
         }
     }
+
+
     private void updateDataCaloriesExpended(String type, long startTime, long endTime) {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
         if (account == null) {
