@@ -40,6 +40,16 @@ public class SettingFragment extends Fragment {
     private HomeActivityViewModel viewModel;
     private boolean newImage = false;
 
+
+    /**
+     * Inflates the fragment's layout and initializes UI elements and listeners.
+     *
+     * @param inflater           The LayoutInflater object to inflate the fragment's layout.
+     * @param container          If non-null, this is the parent view to attach the fragment's UI.
+     * @param savedInstanceState Previously saved state of the fragment.
+     * @return                   The View for the fragment's UI.
+     */
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
@@ -52,6 +62,14 @@ public class SettingFragment extends Fragment {
 
         return view;
     }
+
+    /**
+     * Handles the result of selecting an image from the gallery.
+     *
+     * @param requestCode The request code originally supplied to startActivityForResult().
+     * @param resultCode  The integer result code returned by the child activity.
+     * @param data        An Intent carrying the result data.
+     */
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -80,6 +98,14 @@ public class SettingFragment extends Fragment {
             }
         }
     }
+
+    /**
+     * Initializes the UI elements in the settings fragment.
+     * Sets up LiveData observers to update profile picture and other UI elements based on data changes.
+     *
+     * @param view The root view of the fragment.
+     */
+
 
     private void inizialiseUI(View view) {
 
@@ -112,6 +138,11 @@ public class SettingFragment extends Fragment {
         }
 
     }
+
+    /**
+     * Sets up listeners for UI elements like profile picture, submit button, Google login button, and logout button.
+     */
+
 
     private void setupListeners() {
 
@@ -159,6 +190,14 @@ public class SettingFragment extends Fragment {
 
     }
 
+    /**
+     * Checks and updates the user's information like weight and height.
+     *
+     * @param user The UserProfile object containing the user's current details.
+     * @return     True if any information is edited, false otherwise.
+     */
+
+
     private boolean checkUserInfo(UserProfile user) {
 
         boolean edited = false;
@@ -184,6 +223,13 @@ public class SettingFragment extends Fragment {
         return edited;
 
     }
+
+    /**
+     * Checks and updates the user's daily goals for steps, water intake, and calories.
+     *
+     * @param user The UserProfile object containing the user's current daily goals.
+     * @return     True if any goal is edited, false otherwise.
+     */
 
     private boolean checkDailyGoal(UserProfile user) {
 
@@ -213,6 +259,14 @@ public class SettingFragment extends Fragment {
         return edited;
 
     }
+
+    /**
+     * Validates and updates the user's password.
+     *
+     * @param user The UserProfile object containing the user's current password.
+     * @return     True if the password is successfully updated, false otherwise.
+     */
+
 
     private boolean checkPassword(UserProfile user) {
         // Check if user or its properties are null

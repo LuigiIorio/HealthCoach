@@ -48,6 +48,15 @@ public class HomeFragment extends Fragment {
     private static final int REQUEST_CODE_GOOGLE_FIT_PERMISSIONS = 1;
     private static final int REQUEST_CODE_ACTIVITY_RECOGNITION = 2001;
 
+
+    /**
+     * Inflates the fragment's layout and initializes the UI elements.
+     *
+     * @param inflater           The LayoutInflater object that can be used to inflate the fragment's layout.
+     * @param container          If non-null, this is the parent view that the fragment's UI should be attached to.
+     * @param savedInstanceState Bundle object containing the activity's previously saved state.
+     * @return                   Return the View for the fragment's UI.
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
@@ -58,12 +67,24 @@ public class HomeFragment extends Fragment {
         return view;
 
     }
+
+
+    /**
+     * Called when the fragment is attached to its parent activity.
+     * Initializes the ViewModel instances that will be shared with the parent activity.
+     *
+     * @param context  The context of the parent activity.
+     */
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         homeActivityViewModel = new ViewModelProvider(requireActivity()).get(HomeActivityViewModel.class);
         stepViewModel = new ViewModelProvider(requireActivity()).get(StepViewModel.class);
     }
 
+    /**
+     * Requests permissions for Google Fit APIs that are required for the app.
+     * Sets the read and write access types for different data types like steps, hydration, etc.
+     */
     public void requestGoogleFitPermission() {
         GoogleSignInOptionsExtension fitnessOptions = FitnessOptions.builder()
                 .addDataType(DataType.TYPE_STEP_COUNT_DELTA, FitnessOptions.ACCESS_WRITE)
@@ -93,6 +114,14 @@ public class HomeFragment extends Fragment {
                     REQUEST_CODE_ACTIVITY_RECOGNITION);
         }
     }
+
+
+    /**
+     * Initializes the UI elements in the fragment.
+     * Sets up LiveData observers to update UI elements based on data changes.
+     *
+     * @param view  The root view of the fragment.
+     */
 
     private void inizialiseUI(View view) {
 
@@ -155,6 +184,12 @@ public class HomeFragment extends Fragment {
 
     }
 
+
+    /**
+     * Called when the fragment becomes visible to the user.
+     * Checks if the user is signed into Google Fit and starts recording steps if so.
+     */
+
     @Override
     public void onResume() {
         super.onResume();
@@ -174,6 +209,12 @@ public class HomeFragment extends Fragment {
             Log.e("HomeFragment", "User is not signed in");
         }
     }
+
+    /**
+     * Called when the fragment is no longer visible to the user.
+     * Stops the recording of steps.
+     */
+
     @Override
     public void onPause() {
         super.onPause();

@@ -45,6 +45,17 @@ public class ProfileFragment extends Fragment {
     private int steps, water, kcal;
     private int dailySteps, dailyWater, dailyKcal;
 
+
+    /**
+     * Inflates the fragment's layout and initializes the UI elements and listeners.
+     * Calls the ViewModel to update fitness values from Google Fit.
+     *
+     * @param inflater           The LayoutInflater object that can be used to inflate the fragment's layout.
+     * @param container          If non-null, this is the parent view that the fragment's UI should be attached to.
+     * @param savedInstanceState Bundle object containing the activity's previously saved state.
+     * @return                   Return the View for the fragment's UI.
+     */
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
@@ -59,6 +70,15 @@ public class ProfileFragment extends Fragment {
         return view;
 
     }
+
+
+    /**
+     * Initializes the UI elements in the profile fragment.
+     * Sets up LiveData observers to update UI elements based on data changes.
+     * This includes profile picture, weight, height, and other user metrics.
+     *
+     * @param view  The root view of the fragment.
+     */
 
     private void inizialiseUI(View view) {
         profilePic = view.findViewById(R.id.profilePic);
@@ -125,6 +145,11 @@ public class ProfileFragment extends Fragment {
     }
 
 
+    /**
+     * Sets up the listener for the submit button.
+     * When clicked, it uploads the user's water intake and workout data.
+     */
+
 
     private void setupListener() {
 
@@ -154,6 +179,14 @@ public class ProfileFragment extends Fragment {
 
     }
 
+    /**
+     * Calculates the age of the user based on the birth date provided in the UserProfile.
+     *
+     * @param user  The UserProfile object containing the user's birth date.
+     * @return      The calculated age of the user.
+     */
+
+
     private int getYears(UserProfile user) {
 
         Calendar today = Calendar.getInstance();
@@ -175,6 +208,11 @@ public class ProfileFragment extends Fragment {
 
 
     }
+
+    /**
+     * Updates the daily goal progress bar based on the user's daily metrics.
+     * It calculates the progress for steps, water intake, and calories, then updates the progress bar.
+     */
 
     private void updateDailyGoal() {
 
@@ -205,6 +243,13 @@ public class ProfileFragment extends Fragment {
         Log.e("Total Percentage", percentage+ "");
 
     }
+
+    /**
+     * Maps the time duration string to its corresponding value.
+     *
+     * @param time  The time duration in string format.
+     * @return      The value mapped to the time string.
+     */
 
     private static int mapTimeToValue(String time) {
         switch (time) {
@@ -238,6 +283,14 @@ public class ProfileFragment extends Fragment {
 
         return 0;
     }
+
+    /**
+     * Maps the training difficulty level to its corresponding kcal value.
+     *
+     * @param training  The training difficulty level in string format.
+     * @return          The kcal value mapped to the training level.
+     */
+
 
     private static int mapTrainingToValue(String training) {
 

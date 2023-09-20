@@ -75,12 +75,30 @@ public class HistoryFragment extends Fragment {
 
     private static final int PERMISSIONS_REQUEST_CODE = 1;
 
+
+    /**
+     * Called when the fragment is created.
+     *
+     * @param savedInstanceState A mapping from String keys to various Parcelable values.
+     */
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 
 
+    /**
+     * Called to inflate the view for the fragment.
+     *
+     * - Initializes ViewModels, UI elements, and event listeners.
+     * - Requests necessary permissions.
+     *
+     * @param inflater The LayoutInflater object that can be used to inflate any views in the fragment.
+     * @param container If non-null, this is the parent view that the fragment's UI should be attached to.
+     * @param savedInstanceState Bundle object containing the activity's previously saved state.
+     * @return Return the View for the fragment's UI, or null.
+     */
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -110,6 +128,10 @@ public class HistoryFragment extends Fragment {
     }
 
 
+    /**
+     * Requests the required permissions for the fragment.
+     */
+
     private void requestPermissions() {
         String[] permissions = {
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -119,6 +141,12 @@ public class HistoryFragment extends Fragment {
             requestPermissions(permissions, PERMISSIONS_REQUEST_CODE);
         }
     }
+
+    /**
+     * Sets up the listener for the data insert button.
+     *
+     * - Handles data insertion based on selected data type and user input.
+     */
 
     private void setupInsertDataButton() {
         insertDataButton.setOnClickListener(new View.OnClickListener() {
@@ -147,17 +175,38 @@ public class HistoryFragment extends Fragment {
     }
 
 
+    /**
+     * Inserts hydration data into the HydrationViewModel and notifies the user.
+     *
+     * @param hydrationValue The value of hydration to be inserted.
+     * @param startTime The start time for the data, in milliseconds.
+     * @param endTime The end time for the data, in milliseconds.
+     */
     private void insertHydrationData(float hydrationValue, long startTime, long endTime) {
         hydrationViewModel.addWater(hydrationValue, startTime, endTime);
         Toast.makeText(getActivity(), "Inserted hydration data successfully", Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * Inserts body fat data into the BodyFatViewModel and notifies the user.
+     *
+     * @param bodyFatValue The value of body fat to be inserted.
+     * @param startTime The start time for the data, in milliseconds.
+     * @param endTime The end time for the data, in milliseconds.
+     */
     private void insertBodyFatData(float bodyFatValue, long startTime, long endTime) {
         bodyFatViewModel.insertBodyFat(bodyFatValue, startTime, endTime);
         Toast.makeText(getActivity(), "Inserted body fat data successfully", Toast.LENGTH_SHORT).show();
     }
 
 
+    /**
+     * Inserts weight data into the WeightViewModel and notifies the user.
+     *
+     * @param weightValue The value of weight to be inserted.
+     * @param startTime The start time for the data, in milliseconds.
+     * @param endTime The end time for the data, in milliseconds.
+     */
 
     private void insertWeightData(float weightValue, long startTime, long endTime) {
         weightViewModel.insertWeightData(weightValue, startTime, endTime);
@@ -167,6 +216,13 @@ public class HistoryFragment extends Fragment {
 
 
 
+    /**
+     * Checks if the application has the required permissions.
+     *
+     * @param context The context of the application.
+     * @param permissions An array of required permissions.
+     * @return true if all permissions are granted, false otherwise.
+     */
 
     private static boolean hasPermissions(Context context, String... permissions) {
         for (String permission : permissions) {
@@ -176,6 +232,10 @@ public class HistoryFragment extends Fragment {
         }
         return true;
     }
+
+    /**
+     * Initializes variables and UI elements for the fragment.
+     */
 
     private void initializeVariables(View view) {
         // Initialize ViewModel and UI components
@@ -201,6 +261,11 @@ public class HistoryFragment extends Fragment {
         selectedDay = calendar.get(Calendar.DAY_OF_MONTH);
     }
 
+    /**
+     * Sets up the UI elements.
+     *
+     * - Configures event listeners and other properties for CalendarView, Spinners, and Buttons.
+     */
 
     private void setupCalendarView(View view) {
         CalendarView calendarView = view.findViewById(R.id.calendarView);
@@ -210,6 +275,15 @@ public class HistoryFragment extends Fragment {
             selectedDay = dayOfMonth;
         });
     }
+
+    /**
+     * Configures the Spinners for data fetching and insertion.
+     *
+     * - Initializes the ArrayAdapter for each Spinner.
+     * - Sets the adapter to the Spinner.
+     *
+     * @param view The View object representing the fragment's layout.
+     */
     private void setupSpinner(View view) {
         ArrayAdapter<CharSequence> fetchAdapter = ArrayAdapter.createFromResource(getActivity(),
                 R.array.data_types, android.R.layout.simple_spinner_item);
@@ -221,6 +295,13 @@ public class HistoryFragment extends Fragment {
         insertAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         insertDataTypeSpinner.setAdapter(insertAdapter);
     }
+
+    /**
+     * Sets up the event listener for the "Fetch Data" button.
+     *
+     * - Determines the selected data type from the Spinner.
+     * - Fetches and updates the corresponding data based on the selected type.
+     */
     private void setupFetchDataButton() {
         fetchDataButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -249,6 +330,13 @@ public class HistoryFragment extends Fragment {
     }
 
 
+    /**
+     * Updates the UI with the latest steps count data.
+     *
+     * @param type The type of data to be fetched ("Steps").
+     * @param startTime The start time for the data, in milliseconds.
+     * @param endTime The end time for the data, in milliseconds.
+     */
     private void updateDataSteps(String type, long startTime, long endTime) {
         StepViewModel stepViewModel = new ViewModelProvider(this).get(StepViewModel.class);
 
@@ -264,6 +352,13 @@ public class HistoryFragment extends Fragment {
     }
 
 
+    /**
+     * Updates the UI with the latest calories data.
+     *
+     * @param type The type of data to be fetched ("Kcal").
+     * @param startTime The start time for the data, in milliseconds.
+     * @param endTime The end time for the data, in milliseconds.
+     */
     private void updateDataCalories(String type, long startTime, long endTime) {
         CaloriesViewModel caloriesViewModel = new ViewModelProvider(this).get(CaloriesViewModel.class);
 
@@ -283,6 +378,13 @@ public class HistoryFragment extends Fragment {
 
 
 
+    /**
+     * Updates the UI with the latest distance data.
+     *
+     * @param type The type of data to be fetched ("Distance").
+     * @param startTime The start time for the data, in milliseconds.
+     * @param endTime The end time for the data, in milliseconds.
+     */
     private void updateDataDistance(String type, long startTime, long endTime) {
         DistanceViewModel distanceViewModel = new ViewModelProvider(this).get(DistanceViewModel.class);
 
@@ -297,6 +399,13 @@ public class HistoryFragment extends Fragment {
         }
     }
 
+    /**
+     * Updates the UI with the latest weight data.
+     *
+     * @param type The type of data to be fetched ("Weight").
+     * @param startTime The start time for the data, in milliseconds.
+     * @param endTime The end time for the data, in milliseconds.
+     */
     private void updateDataWeight(String type, long startTime, long endTime) {
         if ("Weight".equals(type)) {
             weightViewModel.fetchLatestWeight(startTime, endTime);
@@ -312,6 +421,14 @@ public class HistoryFragment extends Fragment {
         }
     }
 
+
+    /**
+     * Updates the UI with the latest body fat data.
+     *
+     * @param type The type of data to be fetched ("BodyFat").
+     * @param startTime The start time for the data, in milliseconds.
+     * @param endTime The end time for the data, in milliseconds.
+     */
     private void updateDataBodyFat(String type, long startTime, long endTime) {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
         if (account == null) {
@@ -339,7 +456,13 @@ public class HistoryFragment extends Fragment {
     }
 
 
-
+    /**
+     * Updates the UI with the latest hydration data.
+     *
+     * @param type The type of data to be fetched ("Hydration").
+     * @param startTime The start time for the data, in milliseconds.
+     * @param endTime The end time for the data, in milliseconds.
+     */
     private void updateDataHydration(String type, long startTime, long endTime) {
         if ("Hydration".equals(type)) {
             TimeZone tz = TimeZone.getDefault();
@@ -358,6 +481,14 @@ public class HistoryFragment extends Fragment {
     }
 
 
+    /**
+     * Gets the start and end time in milliseconds for a given date.
+     *
+     * @param year The year of the date.
+     * @param month The month of the date.
+     * @param day The day of the date.
+     * @return An array containing the start and end times in milliseconds.
+     */
     private long[] getDateInMillis(int year, int month, int day) {
         // Set the calendar to the start of the selected day in local time
         Calendar calendar = Calendar.getInstance();
