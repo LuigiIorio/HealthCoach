@@ -13,7 +13,6 @@
         android:orientation="vertical">
 
         <ImageView
-            android:id="@+id/imageView7"
             android:layout_width="match_parent"
             android:layout_height="150dp"
             android:layout_gravity="center"
@@ -21,7 +20,6 @@
             android:src="@drawable/logo_no_text" />
 
         <TextView
-            android:id="@+id/textView12"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
@@ -83,7 +81,6 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/cardView"
                 android:layout_width="75dp"
                 android:layout_height="75dp"
                 android:layout_margin="5dp"
@@ -126,7 +123,6 @@
             android:layout_height="75dp">
 
             <TextView
-                android:id="@+id/genderTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -194,7 +190,6 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/weightInputLayout"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
@@ -228,7 +223,6 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/heightInputLayout"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
@@ -251,7 +245,6 @@
             android:layout_height="75dp">
 
             <TextView
-                android:id="@+id/steps"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -262,7 +255,6 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/stepsInputLayout"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
@@ -285,7 +277,6 @@
             android:layout_height="75dp">
 
             <TextView
-                android:id="@+id/water"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -296,7 +287,6 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/waterInputLayout"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
@@ -320,7 +310,6 @@
             android:layout_height="75dp">
 
             <TextView
-                android:id="@+id/kcal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -331,7 +320,6 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/kcalInputLayout"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
@@ -351,7 +339,6 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
-            android:id="@+id/textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"

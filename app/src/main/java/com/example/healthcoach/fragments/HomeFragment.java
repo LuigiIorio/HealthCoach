@@ -58,12 +58,12 @@ public class HomeFragment extends Fragment {
         return view;
 
     }
-
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         homeActivityViewModel = new ViewModelProvider(requireActivity()).get(HomeActivityViewModel.class);
         stepViewModel = new ViewModelProvider(requireActivity()).get(StepViewModel.class);
     }
+
     public void requestGoogleFitPermission() {
         GoogleSignInOptionsExtension fitnessOptions = FitnessOptions.builder()
                 .addDataType(DataType.TYPE_STEP_COUNT_DELTA, FitnessOptions.ACCESS_WRITE)
@@ -94,9 +94,6 @@ public class HomeFragment extends Fragment {
         }
     }
 
-
-
-
     private void inizialiseUI(View view) {
 
         View includedLayout = view.findViewById(R.id.include);
@@ -122,8 +119,6 @@ public class HomeFragment extends Fragment {
                 requestGoogleFitPermission();
 
                    // homeActivityViewModel.fetchData(this.getContext(), lineChart);
-
-
 
                 homeActivityViewModel.getSteps().observe(getViewLifecycleOwner(), steps -> {
 
@@ -152,7 +147,6 @@ public class HomeFragment extends Fragment {
             }
 
         });
-
 
         // Existing code for hydration
         homeActivityViewModel.getHydrationData().observe(getViewLifecycleOwner(), hydration -> {
@@ -191,16 +185,10 @@ public class HomeFragment extends Fragment {
             Log.e("HomeFragment", "User is not signed in");
         }
     }
-
-
-
     @Override
     public void onPause() {
         super.onPause();
         stepViewModel.stopRecordingSteps(getContext());
     }
-
-
-
 
 }

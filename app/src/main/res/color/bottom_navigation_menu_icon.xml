@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Icone non selezionate -->
+    <!-- Non-selected icons -->
     <item android:color="?attr/colorOnPrimary" android:state_checked="false" />
-    <!-- Icone selezionate -->
+    <!-- Selected icons -->
     <item android:color="?attr/textFillColor" android:state_checked="true" />
 </selector>

@@ -1,15 +1,9 @@
 <resources>
     <string name="app_name">HealthCoach</string>
     <string name="logout">Logout</string>
-    <string name="select_activity">Select activity</string>
-    <string name="diary">Diary</string>
-    <string name="user_profile">User Profile</string>
-
-    <string name="LoginError">Login Error</string>
 
     <string name="confirm">Confirm</string>
     <string name="login">Login</string>
-    <string name="register">Register</string>
     <string name="registration">Registration</string>
     <string name="mail">Email</string>
     <string name="password">Password</string>
@@ -41,9 +35,7 @@
     <string name="update_password">Update Password</string>
     <string name="daily_goal">Daily Goal</string>
     <string name="user_info">User Info</string>
-    <string name="night_mode">Night Mode</string>
     <string name="nickname_age">Nickname (Age)</string>
-    <string name="token_google">99729341904-qlls8u6lhkf63fc4n68s2dvt9mnncpg2.apps.googleusercontent.com</string>
     <string name="caloriesValue">Calories</string>
     <string name="hydrationValue">Hydration</string>
 
