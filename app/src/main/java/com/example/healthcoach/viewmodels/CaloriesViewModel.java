@@ -12,6 +12,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessOptions;
+import com.google.android.gms.fitness.data.Bucket;
 import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataType;
@@ -29,6 +30,8 @@ import java.util.concurrent.TimeUnit;
 public class CaloriesViewModel extends ViewModel {
 
     private final MutableLiveData<Calories> totalCalories = new MutableLiveData<>(new Calories(0f));
+
+
 
     public LiveData<Calories> getTotalCalories() {
         return totalCalories;
@@ -71,6 +74,8 @@ public class CaloriesViewModel extends ViewModel {
                 .addOnFailureListener(e -> Log.e("CaloriesViewModel", "Failed to read data", e));
     }
 
+
+
     public void fetchCaloriesData(Context context, GoogleSignInAccount googleSignInAccount, Date selectedDate) {
         long startTime = selectedDate.getTime();
         long endTime = startTime + 24 * 60 * 60 * 1000;
@@ -80,7 +85,8 @@ public class CaloriesViewModel extends ViewModel {
             @Override
             public void onSuccess(DataReadResponse dataReadResponse) {
                 float sum = 0;
-                for (DataSet dataSet : dataReadResponse.getDataSets()) {
+                for (Bucket bucket : dataReadResponse.getBuckets()) {
+                    DataSet dataSet = bucket.getDataSet(DataType.TYPE_CALORIES_EXPENDED);
                     for (DataPoint dp : dataSet.getDataPoints()) {
                         for (Field field : dp.getDataType().getFields()) {
                             sum += dp.getValue(field).asFloat();
@@ -91,8 +97,6 @@ public class CaloriesViewModel extends ViewModel {
             }
         });
     }
-
-
 
 
     public void fetchCalories(Context context) {
