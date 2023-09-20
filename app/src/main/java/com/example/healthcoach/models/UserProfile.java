@@ -24,7 +24,27 @@ public class UserProfile implements Serializable {
     private int dailyKcal;
     private String image;
 
-    // Costruttore con tutti i dati
+
+    /**
+     * Constructs a new UserProfile object with all the provided attributes.
+     *
+     * @param mail       The email of the user.
+     * @param password   The password of the user.
+     * @param fullName   The full name of the user.
+     * @param gender     The gender of the user.
+     * @param uid        The unique identifier of the user.
+     * @param day        The birth day of the user.
+     * @param month      The birth month of the user.
+     * @param year       The birth year of the user.
+     * @param weight     The weight of the user in kilograms.
+     * @param height     The height of the user in centimeters.
+     * @param dailySteps The daily step goal of the user.
+     * @param dailyWater The daily water intake goal of the user.
+     * @param dailyKcal  The daily calorie goal of the user.
+     * @param image      The URL or path of the user's profile image.
+     */
+
+
     public UserProfile(String mail, String password, String fullName, String gender, String uid, int day, int month, int year,
                        int weight, int height, int dailySteps, int dailyWater, int dailyKcal, String image) {
         this.mail = mail;
@@ -43,8 +63,15 @@ public class UserProfile implements Serializable {
         this.image = image;
     }
 
-    // Costruttore vuoto
+
     public UserProfile() {}
+
+    /**
+     * Converts the UserProfile object to a Bundle object, allowing it to be passed between activities.
+     *
+     * @return A Bundle object containing the serialized UserProfile.
+     */
+
 
     public Bundle toBundle() {
         Bundle bundle = new Bundle();
@@ -72,6 +99,14 @@ public class UserProfile implements Serializable {
 
 
 
+    /**
+     * Retrieves a UserProfile object from a given Bundle object.
+     *
+     * @param bundle A Bundle object containing a byte array representation of a UserProfile object.
+     * @return       The UserProfile object extracted from the byte array, or null if extraction fails.
+     */
+
+
     public static UserProfile getUserProfile(Bundle bundle) {
 
         byte[] userData = bundle.getByteArray("userProfile");
@@ -91,7 +126,7 @@ public class UserProfile implements Serializable {
 
     }
 
-    // Getter e Setter per ogni variabile
+
 
     public String getMail() {
         return mail;

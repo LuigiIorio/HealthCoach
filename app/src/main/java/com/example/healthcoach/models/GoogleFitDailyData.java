@@ -13,8 +13,6 @@ public class GoogleFitDailyData {
 
     public GoogleFitDailyData() {}
 
-    // Metodi getter e setter per accedere ai dati
-
     public int getSteps() {
         return steps;
     }
