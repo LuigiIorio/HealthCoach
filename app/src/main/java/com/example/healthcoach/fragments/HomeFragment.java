@@ -52,8 +52,6 @@ public class HomeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
 
-
-
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         inizialiseUI(view);
 
@@ -66,8 +64,6 @@ public class HomeFragment extends Fragment {
         homeActivityViewModel = new ViewModelProvider(requireActivity()).get(HomeActivityViewModel.class);
         stepViewModel = new ViewModelProvider(requireActivity()).get(StepViewModel.class);
     }
-
-
     public void requestGoogleFitPermission() {
         GoogleSignInOptionsExtension fitnessOptions = FitnessOptions.builder()
                 .addDataType(DataType.TYPE_STEP_COUNT_DELTA, FitnessOptions.ACCESS_WRITE)
@@ -90,16 +86,12 @@ public class HomeFragment extends Fragment {
                 GoogleSignIn.getLastSignedInAccount(this.getContext()),
                 fitnessOptions);
 
-
         if (ContextCompat.checkSelfPermission(this.getContext(), "android.permission.ACTIVITY_RECOGNITION")
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{"android.permission.ACTIVITY_RECOGNITION"},
                     REQUEST_CODE_ACTIVITY_RECOGNITION);
         }
-
-
-
     }
 
 
