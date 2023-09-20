@@ -37,6 +37,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+
 public class SignUpViewModel extends ViewModel {
 
     private MutableLiveData<UserProfile> user;
@@ -59,6 +60,11 @@ public class SignUpViewModel extends ViewModel {
 
         return user;
     }
+
+    /**
+     * Fetches the user information from Firebase and updates the LiveData object.
+     * Reads user information from the Firebase Realtime Database and sets it in the UserProfile object.
+     */
 
     public void retriveUserInformation() {
 
@@ -84,6 +90,14 @@ public class SignUpViewModel extends ViewModel {
         });
 
     }
+
+    /**
+     * Updates the user profile information and triggers the upload of the profile image to Firebase Storage.
+     * Also navigates to the HomeActivity once the upload is successful.
+     *
+     * @param profile  The UserProfile object containing user details.
+     * @param activity The current activity context.
+     */
 
     public void setUser(UserProfile profile, Activity activity) {
         if(profile.getImage() == null || profile.getImage().isEmpty()) {
@@ -119,14 +133,15 @@ public class SignUpViewModel extends ViewModel {
                 });
     }
 
-
     /**
-     * Crea uno user su Firebase e ne salva i dati nella LiveData user
+     * Creates a new user account with the given email and password via Firebase Authentication.
+     * Upon successful creation, the user's profile is stored in Firebase Realtime Database and the user is redirected to SignUpInformationActivity.
      *
-     * @param email
-     * @param password
-     * @param activity
+     * @param email    The email address for the new user.
+     * @param password The password for the new user.
+     * @param activity The current activity context.
      */
+
     public void createUser(String email, String password, Activity activity) {
         firebaseAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(activity, task -> {
@@ -163,11 +178,5 @@ public class SignUpViewModel extends ViewModel {
                     }
                 });
     }
-
-
-
-
-
-
 
 }

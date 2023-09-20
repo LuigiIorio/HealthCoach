@@ -39,6 +39,12 @@ public class StepViewModel extends ViewModel {
         steps.postValue(stepsCount);
     }
 
+    /**
+     * Initiates step count recording via Google Fit API.
+     * Subscribes to the step count delta data type for recording.
+     *
+     * @param context The application context.
+     */
     public void startRecordingSteps(Context context) {
         GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(context);
         if (googleSignInAccount != null) {
@@ -56,6 +62,12 @@ public class StepViewModel extends ViewModel {
     }
 
 
+    /**
+     * Unsubscribes from step count recording via Google Fit API.
+     * This stops the ongoing step count recording.
+     *
+     * @param context The application context.
+     */
 
     public void stopRecordingSteps(Context context) {
         GoogleSignInOptionsExtension fitnessOptions = FitnessOptions.builder()
@@ -75,6 +87,15 @@ public class StepViewModel extends ViewModel {
                     // Handle failure here
                 });
     }
+
+    /**
+     * Reads the number of steps taken by the user for a specific time range.
+     * Aggregates the steps and updates the LiveData object.
+     *
+     * @param startTime The start time for the range.
+     * @param endTime The end time for the range.
+     * @param context The application context.
+     */
 
     public void readStepsForRange(long startTime, long endTime, Context context) {
         StepCount stepCount = new StepCount(context, GoogleSignIn.getLastSignedInAccount(context), (FragmentActivity) context);

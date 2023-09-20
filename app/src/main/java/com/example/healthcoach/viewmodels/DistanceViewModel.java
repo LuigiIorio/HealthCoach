@@ -14,6 +14,7 @@ import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.result.DataReadResponse;
 import com.google.android.gms.tasks.OnSuccessListener;
 import android.content.Context;
+
 public class DistanceViewModel extends ViewModel {
     private MutableLiveData<Float> distance = new MutableLiveData<>();
 
@@ -24,6 +25,16 @@ public class DistanceViewModel extends ViewModel {
     public void setDistance(float distanceCovered) {
         distance.postValue(distanceCovered);
     }
+
+
+    /**
+     * Reads the distance data for a specified time range from Google Fit.
+     * Updates the LiveData object distance upon successful retrieval.
+     *
+     * @param startTime The start time of the range in milliseconds.
+     * @param endTime The end time of the range in milliseconds.
+     * @param context The application's context.
+     */
 
     public void readDistanceForRange(long startTime, long endTime, Context context) {
         GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(context);

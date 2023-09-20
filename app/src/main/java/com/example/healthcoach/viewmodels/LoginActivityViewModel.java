@@ -36,6 +36,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+
 public class LoginActivityViewModel extends AndroidViewModel {
 
     public static final int RC_SIGN_IN = 9001;
@@ -55,11 +56,13 @@ public class LoginActivityViewModel extends AndroidViewModel {
     }
 
     /**
-     * Esegue il login qualora email e password siano corrette
+     * Attempts to sign in the user using the provided email and password.
+     * Updates the LiveData object 'loginResult' to either SUCCESS or FAILURE based on the result of the operation.
      *
-     * @param email
-     * @param password
+     * @param email    The email address of the user.
+     * @param password The password of the user.
      */
+
     public void loginWithEmailAndPassword(String email, String password) {
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
@@ -71,14 +74,13 @@ public class LoginActivityViewModel extends AndroidViewModel {
                 });
     }
 
-
-
     /**
-     * Controlla che l'account sia già connesso a Google.
-     * Qualora sia connesso avvia la Home Activity e chiude la Login Activity
+     * Checks if the user is already signed in with Google.
      *
-     * @param context
+     * @param context The current activity context.
+     * @return true if the user is already signed in, false otherwise.
      */
+
     public boolean checkSignInStatus(Context context) {
         return GoogleSignIn.getLastSignedInAccount(context) != null;
     }
@@ -87,18 +89,25 @@ public class LoginActivityViewModel extends AndroidViewModel {
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(onCompleteListener);
     }
-
-    // Metodo per verificare se l'utente è già loggato
     public boolean isUserLoggedIn() {
         return mAuth.getCurrentUser() != null;
     }
 
-    // Metodo per effettuare il logout
+
     public void signOut() {
+
         mAuth.signOut();
+
     }
 
-    // Creare e restituire un oggetto di credenziale Firebase con l'ID token di Google
+
+    /**
+     * Generates and returns a Firebase AuthCredential object using Google's ID token.
+     *
+     * @param idToken The ID token from Google.
+     * @return A Firebase AuthCredential object.
+     */
+
     public AuthCredential getGoogleAuthCredential(String idToken) {
         return GoogleAuthProvider.getCredential(idToken, null);
     }
@@ -107,11 +116,28 @@ public class LoginActivityViewModel extends AndroidViewModel {
         return loginResult;
     }
 
+
+    /**
+     * Initializes Google Sign-In client with the specified sign-in options.
+     *
+     * @param activity The current activity.
+     * @param gso Google Sign-In options.
+     */
+
     public void signInWithGoogle(Activity activity, GoogleSignInOptions gso) {
 
         googleSignInClient = GoogleSignIn.getClient(activity, gso);
 
     }
+
+
+    /**
+     * Authenticates the user with Firebase using the Google Sign-In credentials.
+     * Checks the database to either navigate to HomeActivity or update the user profile.
+     *
+     * @param idToken The ID token from Google.
+     * @param activity The current activity.
+     */
 
 
     public void firebaseAuthViaGoogle(String idToken, Activity activity) {
@@ -141,6 +167,13 @@ public class LoginActivityViewModel extends AndroidViewModel {
         });
 
     }
+
+    /**
+     * Checks if the user exists in the database and navigates to the appropriate activity.
+     *
+     * @param activity The current activity.
+     */
+
 
     public void checkDatabaseValues(Activity activity) {
 
@@ -176,6 +209,15 @@ public class LoginActivityViewModel extends AndroidViewModel {
 
     }
 
+
+    /**
+     * Checks if the user exists in the database, updates the user profile if needed,
+     * and navigates to the appropriate activity.
+     *
+     * @param activity The current activity.
+     * @param profile The user profile.
+     */
+
     public void checkDatabaseValues(Activity activity, UserProfile profile) {
 
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("users"); // Riferimento al nodo "users" nel database
@@ -183,7 +225,7 @@ public class LoginActivityViewModel extends AndroidViewModel {
         if(mAuth.getCurrentUser() == null)
             return;
 
-        // Cerca l'utente nel database in base al suo ID
+
         databaseReference.child(mAuth.getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -219,4 +261,6 @@ public class LoginActivityViewModel extends AndroidViewModel {
     public MutableLiveData<FirebaseUser> getUserLiveData() {
         return userLiveData;
     }
+
+
 }

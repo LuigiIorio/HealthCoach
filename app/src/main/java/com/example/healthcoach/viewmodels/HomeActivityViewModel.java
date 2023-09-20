@@ -92,8 +92,6 @@ public class HomeActivityViewModel extends ViewModel {
     public LiveData<Float> getHydrationData() {
         return hydrationData;
     }
-
-
     private ListenerRegistration userProfileListener;
 
     private MutableLiveData<Integer> steps = new MutableLiveData<>();
@@ -106,6 +104,12 @@ public class HomeActivityViewModel extends ViewModel {
 
     }
 
+    /**
+     * Fetches hydration data for the current day from the Google Fit API.
+     * Calculates the total hydration and updates the ViewModel.
+     *
+     * @param context The application context.
+     */
     public void fetchTodayHydration(Context context) {
         long endTime = System.currentTimeMillis();
         long startTime = endTime - (24 * 60 * 60 * 1000); // Start from midnight to now
@@ -127,6 +131,9 @@ public class HomeActivityViewModel extends ViewModel {
     }
 
 
+    /**
+     * Fetches the user's profile data from Firebase and updates the LiveData object.
+     */
 
     private void fetchUserData() {
 
@@ -146,6 +153,14 @@ public class HomeActivityViewModel extends ViewModel {
             }
         });
     }
+
+
+    /**
+     * Fetches the user's profile image URL from Firebase Storage.
+     * Updates the LiveData object with the fetched URL.
+     *
+     * @return LiveData object holding the URL of the profile image.
+     */
 
     public LiveData<Uri> getProfileImage() {
 
@@ -171,6 +186,14 @@ public class HomeActivityViewModel extends ViewModel {
     public LiveData<com.example.healthcoach.viewmodels.Event<Boolean>> getLogoutState() {
         return logoutState;
     }
+
+
+    /**
+     * Fetches step count data for the current day using the Google Fit API.
+     * Calculates the total step count and updates the ViewModel.
+     *
+     * @param context The application context.
+     */
 
     public void fetchTodaySteps(Context context) {
         GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(context);
@@ -221,6 +244,12 @@ public class HomeActivityViewModel extends ViewModel {
         }
     }
 
+    /**
+     * Logs out the current user and navigates to the Login Activity.
+     *
+     * @param activity The current activity.
+     */
+
     public void logoutUser(Activity activity) {
         try {
             FirebaseAuth.getInstance().signOut();
@@ -232,6 +261,12 @@ public class HomeActivityViewModel extends ViewModel {
         }
     }
 
+    /**
+     * Updates the profile picture in Firebase Storage.
+     * Updates the corresponding LiveData object.
+     *
+     * @param uri The URI of the new profile picture.
+     */
     public void updateProfilePic(Uri uri) {
 
         StorageReference imageReference = firebaseStorage.getReference("users")
@@ -245,6 +280,7 @@ public class HomeActivityViewModel extends ViewModel {
         });
 
     }
+
 
     public void updateUser(UserProfile user) {
 
@@ -268,6 +304,14 @@ public class HomeActivityViewModel extends ViewModel {
 
     }
 
+
+
+    /**
+     * Updates fitness values for steps, hydration, and calories.
+     * Shows a toast if the Google account is not found.
+     *
+     * @param context The application context.
+     */
     public void updateFitValues(Context context) {
 
         GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(context);
@@ -285,6 +329,12 @@ public class HomeActivityViewModel extends ViewModel {
 
     }
 
+    /**
+     * Fetches and updates a specific type of fitness data from Google Fit.
+     *
+     * @param context The application context.
+     * @param type The DataType of the fitness data.
+     */
     public void updateFitValue(Context context, DataType type) {
 
         DataReadRequest readRequest = new DataReadRequest.Builder()
@@ -310,14 +360,17 @@ public class HomeActivityViewModel extends ViewModel {
                 });
     }
 
-
+    /**
+     * Uploads a new water intake value to Google Fit.
+     *
+     * @param context The application context.
+     * @param value The amount of water intake.
+     */
     public void uploadWaterIntake(Context context, int value) {
 
         FitnessOptions fitnessOptions = FitnessOptions.builder()
                 .addDataType(DataType.TYPE_HYDRATION, FitnessOptions.ACCESS_WRITE)
                 .build();
-
-
         GoogleSignInAccount googleSignInAccount = GoogleSignIn.getAccountForExtension(context, fitnessOptions);
 
         // Create a data source
@@ -352,6 +405,14 @@ public class HomeActivityViewModel extends ViewModel {
                 });
 
     }
+
+
+    /**
+     * Uploads a new calorie expenditure value to Google Fit.
+     *
+     * @param context The application context.
+     * @param value The amount of calories expended.
+     */
 
     public void uploadKcalUsed(Context context, int value) {
 
@@ -399,6 +460,12 @@ public class HomeActivityViewModel extends ViewModel {
 
     }
 
+    /**
+     * Determines the appropriate Field for a given DataType.
+     *
+     * @param type The DataType for which the Field is needed.
+     * @return The Field corresponding to the DataType.
+     */
     private Field getTypeField(DataType type) {
 
         if (type.equals(DataType.TYPE_STEP_COUNT_DELTA)) {
@@ -408,10 +475,17 @@ public class HomeActivityViewModel extends ViewModel {
         } else if (type.equals(DataType.TYPE_CALORIES_EXPENDED)) {
             return Field.FIELD_CALORIES;
         }
-
         return null;
-
     }
+
+
+
+    /**
+     * Updates the LiveData objects for steps, water, or calories based on the DataType.
+     *
+     * @param type The DataType of the fitness data.
+     * @param value The new Value to set.
+     */
 
     private void updateLiveData(DataType type, Value value) {
 
@@ -425,6 +499,13 @@ public class HomeActivityViewModel extends ViewModel {
 
     }
 
+
+    /**
+     * Gets the start time of the current day in milliseconds.
+     *
+     * @return The start time of the current day.
+     */
+
     private static long getStartTimeOfToday() {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 0);
@@ -434,7 +515,13 @@ public class HomeActivityViewModel extends ViewModel {
         return calendar.getTimeInMillis();
     }
 
-    // Ottieni l'orario di fine di oggi (23:59:59)
+    /**
+     * Gets the end time of the current day in milliseconds.
+     *
+     * @return The end time of the current day.
+     */
+
+
     private static long getEndTimeOfToday() {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 23);
@@ -443,6 +530,13 @@ public class HomeActivityViewModel extends ViewModel {
         calendar.set(Calendar.MILLISECOND, 999);
         return calendar.getTimeInMillis();
     }
+
+    /**
+     * Attempts to merge the current Firebase user with a Google Account.
+     *
+     * @param context The application context.
+     */
+
 
     public void mergeGoogleAccount(Context context) {
 
@@ -458,10 +552,10 @@ public class HomeActivityViewModel extends ViewModel {
                         .addOnCompleteListener(task -> {
                             if (task.isSuccessful()) {
                                 FirebaseUser firebaseUser = task.getResult().getUser();
-                                Log.d(TAG, "Unione riuscita: " + firebaseUser.getUid());
+                                Log.d(TAG, "Merge successful" + firebaseUser.getUid());
                             } else {
                                 Exception exception = task.getException();
-                                Log.w(TAG, "Unione non riuscita", exception);
+                                Log.w(TAG, "Merge was not successful", exception);
                             }
                         });
 
@@ -475,6 +569,14 @@ public class HomeActivityViewModel extends ViewModel {
         }
 
     }
+
+
+    /**
+     * Checks if the current Firebase user account is merged with a Google account.
+     *
+     * @param context The application context.
+     * @return True if the account is merged, false otherwise.
+     */
 
     public boolean checkGoogleMerge(Context context) {
 
@@ -498,17 +600,43 @@ public class HomeActivityViewModel extends ViewModel {
 
     }
 
+    /**
+     * Gets the MutableLiveData object representing the step count.
+     *
+     * @return MutableLiveData object containing step count.
+     */
+
     public MutableLiveData<Integer> getSteps() {
         return steps;
     }
+
+    /**
+     * Gets the MutableLiveData object representing the water intake.
+     *
+     * @return MutableLiveData object containing water intake.
+     */
 
     public MutableLiveData<Integer> getWater() {
         return water;
     }
 
+    /**
+     * Gets the MutableLiveData object representing the calorie count.
+     *
+     * @return MutableLiveData object containing calorie count.
+     */
+
     public MutableLiveData<Integer> getKcal() {
         return kcal;
     }
+
+
+    /**
+     * Fetches and aggregates fitness data for the last seven days.
+     *
+     * @param context The application context.
+     * @param chart The AnyChartView object to be initialized with the data.
+     */
 
     public void fetchLastSevenDaysData(Context context, AnyChartView chart) {
         // Get the account
@@ -583,12 +711,25 @@ public class HomeActivityViewModel extends ViewModel {
         }
     }
 
+    /**
+     * Calculates the number of days ago a given timestamp occurred.
+     *
+     * @param timestamp The timestamp in milliseconds.
+     * @return The number of days ago.
+     */
+
     public int getDaysAgo(long timestamp) {
         long currentTime = System.currentTimeMillis(); // convert to nanoseconds
         long timeDifferenceNanos = currentTime - timestamp;
 
         return (int) TimeUnit.MILLISECONDS.toDays(timeDifferenceNanos);
     }
+
+    /**
+     * Initializes the line chart with data for steps, water, and calories.
+     *
+     * @param lineChart The AnyChartView object to be initialized.
+     */
 
     public void inizialiseLineChart(AnyChartView lineChart) {
 
@@ -677,16 +818,30 @@ public class HomeActivityViewModel extends ViewModel {
 
     }
 
+    /**
+     * Formats a Date object into "DD MMM" format.
+     *
+     * @param date The Date object.
+     * @return A string representing the date in "DD MMM" format.
+     */
     public static String formatToDDMMM(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("dd MMM", Locale.getDefault());
         return sdf.format(date);
     }
 
-    // Metodo per formattare una data nel formato "DD MMM"
+    /**
+     * Formats a Calendar object into "DD MMM" format.
+     *
+     * @param calendar The Calendar object.
+     * @return A string representing the date in "DD MMM" format.
+     */
     public static String formatToDDMMM(Calendar calendar) {
         return formatToDDMMM(calendar.getTime());
     }
 
+    /**
+     * Custom data entry class for the line chart.
+     */
     private class CustomDataEntry extends ValueDataEntry {
 
         CustomDataEntry(String x, Number value, Number value2, Number value3) {

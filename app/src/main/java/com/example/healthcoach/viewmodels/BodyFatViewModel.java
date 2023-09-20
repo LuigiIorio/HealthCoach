@@ -23,6 +23,13 @@ public class BodyFatViewModel extends ViewModel {
     private BodyFat bodyFat;
     private final MutableLiveData<Float> bodyFatData = new MutableLiveData<>(0f);
 
+    /**
+     * Fetches the latest body fat data for a specified date from Google Fit.
+     * Updates the LiveData object bodyFatData upon successful retrieval.
+     *
+     * @param selectedDate The date for which to fetch body fat data.
+     */
+
     public void fetchBodyFatData(Date selectedDate) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(selectedDate);
@@ -42,6 +49,15 @@ public class BodyFatViewModel extends ViewModel {
     public MutableLiveData<Float> getBodyFatData() {
         return bodyFatData;
     }
+
+    /**
+     * Inserts body fat data into Google Fit and updates the LiveData object.
+     * Logs success or failure of the insertion operation.
+     *
+     * @param bodyFatPercentage Body fat percentage to insert.
+     * @param startTime The start time of the record in milliseconds.
+     * @param endTime The end time of the record in milliseconds.
+     */
 
     public void insertBodyFat(float bodyFatPercentage, long startTime, long endTime) {
         boolean success = bodyFat.insertBodyFat(bodyFatPercentage, startTime, endTime);

@@ -24,11 +24,22 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
+
+
 public class CaloriesViewModel extends ViewModel {
     private final MutableLiveData<Calories> totalCalories = new MutableLiveData<>(new Calories(0f));
     public LiveData<Calories> getTotalCalories() {
         return totalCalories;
     }
+
+    /**
+     * Fetches the calories data for a specified date range from Google Fit.
+     * Updates the LiveData object totalCalories upon successful retrieval.
+     *
+     * @param context The application's context.
+     * @param googleSignInAccount The GoogleSignInAccount for authentication.
+     * @param selectedDate The date for which to fetch calories data.
+     */
 
     public void fetchCaloriesData(Context context, GoogleSignInAccount googleSignInAccount, Date selectedDate) {
         long startTime = selectedDate.getTime();

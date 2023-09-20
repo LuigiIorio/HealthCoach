@@ -49,8 +49,6 @@ public class WeightViewModel extends AndroidViewModel {
                 .setType(DataSource.TYPE_RAW)
                 .build();
     }
-
-
     public LiveData<String> getWeightError() {
         return weightError;
     }
@@ -79,6 +77,17 @@ public class WeightViewModel extends AndroidViewModel {
                 fitnessOptions
         );
     }
+
+    /**
+     * Checks user's sign-in and permission status before attempting to insert weight data.
+     * If the user is not signed in or lacks required permissions, corresponding actions are triggered.
+     *
+     * @param context The application context.
+     * @param weightValue The weight value to be inserted.
+     * @param startTime The start time of the weight data.
+     * @param endTime The end time of the weight data.
+     */
+
     public void insertWeightDataOrSignInIfNeeded(Context context, float weightValue, long startTime, long endTime) {
         if (!isUserSignedIn(context)) {
             promptSignIn(context);
@@ -111,6 +120,15 @@ public class WeightViewModel extends AndroidViewModel {
         );
     }
 
+
+    /**
+     * Inserts the weight data into Google Fit using History API.
+     * LiveData objects are updated to signal success or failure in UI.
+     *
+     * @param weightValue The weight value to be inserted.
+     * @param startTime The start time for the weight data.
+     * @param endTime The end time for the weight data.
+     */
 
     public void insertWeightData(float weightValue, long startTime, long endTime) {
         Log.d("WeightViewModel", "Attempting to insert weight data");
@@ -146,6 +164,14 @@ public class WeightViewModel extends AndroidViewModel {
     }
 
 
+    /**
+     * Fetches the latest weight data from Google Fit for a given time range.
+     * Updates the LiveData object with the latest weight value.
+     *
+     * @param startTime The start time for fetching weight data.
+     * @param endTime The end time for fetching weight data.
+     */
+
     public void fetchLatestWeight(long startTime, long endTime) {
         Log.d("WeightViewModel", "Attempting to fetch latest weight");
         DataReadRequest readRequest = new DataReadRequest.Builder()
@@ -175,6 +201,12 @@ public class WeightViewModel extends AndroidViewModel {
                     }
                 });
     }
+
+    /**
+     * Initializes the WeightViewModel with the application context and sets up the weight data source.
+     *
+     * @param context The application context.
+     */
 
     public void initialize(Context context) {
         this.context = context;
