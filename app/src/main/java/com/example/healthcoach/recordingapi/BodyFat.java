@@ -23,6 +23,8 @@ import com.google.android.gms.tasks.Task;
 
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
+
+
 public class BodyFat {
     private Context context;
     private GoogleSignInAccount googleSignInAccount;
@@ -31,6 +33,16 @@ public class BodyFat {
         this.context = context;
         this.googleSignInAccount = account;
     }
+
+    /**
+     * Inserts a body fat percentage record into Google Fit for a specified time interval.
+     * Creates a DataSource, DataSet, and DataPoint to encapsulate the data.
+     *
+     * @param bodyFatPercentage The body fat percentage to insert.
+     * @param startTime The start time of the record in milliseconds.
+     * @param endTime The end time of the record in milliseconds.
+     * @return True if the insertion is successful, false otherwise.
+     */
     public boolean insertBodyFat(float bodyFatPercentage, long startTime, long endTime) {
         DataSource bodyFatSource = new DataSource.Builder()
                 .setAppPackageName(context.getPackageName())
@@ -48,6 +60,15 @@ public class BodyFat {
         return task.isSuccessful();
     }
 
+
+    /**
+     * Retrieves the latest body fat percentage record for a specified day from Google Fit.
+     * Builds a DataReadRequest to query Google Fit and returns the latest value through an OnSuccessListener.
+     *
+     * @param startTime The start time of the day in milliseconds.
+     * @param endTime The end time of the day in milliseconds.
+     * @param onSuccessListener The listener to be called upon successful retrieval of the latest body fat percentage.
+     */
     public void getLatestBodyFatForDay(long startTime, long endTime, OnSuccessListener<Float> onSuccessListener) {
         DataReadRequest readRequest = new DataReadRequest.Builder()
                 .read(DataType.TYPE_BODY_FAT_PERCENTAGE)

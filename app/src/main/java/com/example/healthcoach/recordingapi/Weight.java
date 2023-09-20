@@ -24,12 +24,21 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.concurrent.TimeUnit;
 
+
 public class Weight {
     private static final int PERMISSION_REQUEST_CODE = 1001;
     private GoogleSignInAccount googleSignInAccount;
     private DataSource dataSource;
     private Context context;
     private FitnessOptions fitnessOptions;
+
+    /**
+     * Initializes the Weight object and sets up Google Fit for weight tracking.
+     * Configures the DataSource and checks for necessary permissions before proceeding.
+     *
+     * @param context The application's context.
+     */
+
     public Weight(Context context) {
         this.context = context;
         this.fitnessOptions = FitnessOptions.builder()
@@ -60,6 +69,13 @@ public class Weight {
         return googleSignInAccount != null && GoogleSignIn.hasPermissions(googleSignInAccount, fitnessOptions);
     }
 
+    /**
+     * Checks if the application has the necessary permissions for weight tracking.
+     * If not, requests the permissions from the user.
+     *
+     * @return True if permissions are granted, false otherwise.
+     */
+
     private boolean checkAndRequestPermissions() {
         if (ContextCompat.checkSelfPermission(context, "android.permission.BODY_SENSORS")
                 != PackageManager.PERMISSION_GRANTED) {
@@ -77,6 +93,17 @@ public class Weight {
         return ContextCompat.checkSelfPermission(context, "android.permission.BODY_SENSORS")
                 == PackageManager.PERMISSION_GRANTED;
     }
+
+
+    /**
+     * Reads weight data from Google Fit for a specified time range.
+     * Checks if the user is signed in and has the necessary permissions before proceeding.
+     * On success, returns the data through an OnSuccessListener. On failure, logs an error message.
+     *
+     * @param startTime The start time of the range in milliseconds.
+     * @param endTime The end time of the range in milliseconds.
+     * @param onRead The listener to be called upon successful retrieval of the weight data.
+     */
 
     public void readWeightData(long startTime, long endTime, OnSuccessListener<DataReadResponse> onRead) {
         if (!isUserSignedIn()) {

@@ -37,6 +37,9 @@ public class Hydration {
         setupHydration();
     }
 
+    /**
+     * Sets up FitnessOptions for hydration tracking and configures the Google Sign-In account and data source for hydration.
+     */
     private void setupHydration() {
         fitnessOptions = FitnessOptions.builder()
                 .addDataType(DataType.TYPE_HYDRATION, FitnessOptions.ACCESS_WRITE)
@@ -50,6 +53,10 @@ public class Hydration {
         googleSignInAccount = GoogleSignIn.getAccountForExtension(context, fitnessOptions);
     }
 
+    /**
+     * Configures the data source for hydration tracking in Google Fit.
+     */
+
     private void setupHydrationDataSource() {
         hydrationDataSource = new DataSource.Builder()
                 .setDataType(DataType.TYPE_HYDRATION)
@@ -59,6 +66,15 @@ public class Hydration {
                 .build();
     }
 
+    /**
+     * Inserts water intake data into Google Fit.
+     * Checks if the user is signed in and has the necessary permissions before proceeding.
+     * On success, logs a message. On failure, prompts for sign-in or permissions.
+     *
+     * @param waterIntake The volume of water intake.
+     * @param startTime The start time of the record in milliseconds.
+     * @param endTime The end time of the record in milliseconds.
+     */
     public void insertWaterIntake(float waterIntake, long startTime, long endTime) {
         if (!isUserSignedIn()) {
             Log.e("Hydration", "User is not signed in. Can't insert data.");
@@ -115,6 +131,17 @@ public class Hydration {
                 fitnessOptions
         );
     }
+
+
+    /**
+     * Reads hydration data from Google Fit for a specified time range.
+     * Checks if the user is signed in before proceeding. On success, calls an OnSuccessListener.
+     * On failure, logs an error message.
+     *
+     * @param startTime The start time of the range in milliseconds.
+     * @param endTime The end time of the range in milliseconds.
+     * @param onRead The listener to be called upon successful retrieval of the hydration data.
+     */
 
     public void readHydrationData(long startTime, long endTime, OnSuccessListener<DataReadResponse> onRead) {
         if (!isUserSignedIn()) {

@@ -27,6 +27,11 @@ public class Height {
         setupHeight();
     }
 
+    /**
+     * Configures Google Fit for height tracking by setting up FitnessOptions and DataSource.
+     * Checks if the user has granted the necessary permissions for accessing height data.
+     * If permissions are not granted, logs an error message and returns.
+     */
     private void setupHeight() {
         // Create fitness options with the specific DataType and access type.
         fitnessOptions = FitnessOptions.builder()

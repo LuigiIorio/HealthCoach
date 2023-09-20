@@ -33,6 +33,14 @@ public class Distance {
     private GoogleSignInAccount account;
     private DataSource distanceDeltaDataSource;
 
+
+    /**
+     * Initializes the Distance object and sets up Google Fit recording for distance delta.
+     * Configures the DataSource and subscribes to Google Fit's RecordingClient for tracking distance.
+     *
+     * @param context The application's context.
+     * @param account The GoogleSignInAccount for authentication.
+     */
     public Distance(Context context, GoogleSignInAccount account) {
         this.context = context;
         this.account = account;
@@ -54,6 +62,16 @@ public class Distance {
                 .addOnSuccessListener(aVoid -> Log.d("Distance", "Subscribed to distance delta"))
                 .addOnFailureListener(e -> Log.e("Distance", "Failed to subscribe to distance delta", e));
     }
+
+    /**
+     * Reads the distance data from Google Fit for a specified time range.
+     * Aggregates the data by day and adjusts the time range if today is the day of interest.
+     * Returns the results through an OnSuccessListener or logs an error on failure.
+     *
+     * @param startTime The start time of the range in milliseconds.
+     * @param endTime The end time of the range in milliseconds.
+     * @param onSuccessListener The listener to be called upon successful retrieval of the distance data.
+     */
 
     public void readDistanceData(long startTime, long endTime, OnSuccessListener<DataReadResponse> onSuccessListener) {
         HistoryClient historyClient = Fitness.getHistoryClient(context, account);

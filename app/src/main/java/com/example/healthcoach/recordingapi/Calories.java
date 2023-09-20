@@ -27,6 +27,14 @@ public class Calories {
 
     private float totalCalories;
 
+
+    /**
+     * Initializes the Calories object and sets up Google Fit recording for calories expended.
+     * Configures the DataSource and subscribes to Google Fit's RecordingClient for tracking calories.
+     *
+     * @param context The application's context.
+     * @param account The GoogleSignInAccount for authentication.
+     */
     public Calories(Context context, GoogleSignInAccount account) {
         this.context = context;
         this.googleSignInAccount = account;
@@ -47,6 +55,17 @@ public class Calories {
                 .addOnSuccessListener(aVoid -> Log.d("Calories", "Calories expended recording started"))
                 .addOnFailureListener(e -> Log.e("Calories", "Failed to start calories expended recording", e));
     }
+
+
+
+    /**
+     * Reads the calories data from Google Fit for a specified time range.
+     * Aggregates the data by day and returns the results through an OnSuccessListener.
+     *
+     * @param startTime The start time of the range in milliseconds.
+     * @param endTime The end time of the range in milliseconds.
+     * @param onSuccessListener The listener to be called upon successful retrieval of the calories data.
+     */
 
     public void readCaloriesData(long startTime, long endTime, OnSuccessListener<DataReadResponse> onSuccessListener) {
         HistoryClient historyClient = Fitness.getHistoryClient(context, googleSignInAccount);

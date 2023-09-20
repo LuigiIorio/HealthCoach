@@ -22,11 +22,21 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
+
 public class StepCount {
     private GoogleSignInAccount googleSignInAccount;
     private DataSource dataSource;
     private Context context;
 
+
+    /**
+     * Initializes the StepCount object, setting up Google Fit for step count tracking.
+     * Configures the DataSource and FitnessOptions, and checks if the user is signed in.
+     *
+     * @param context The application's context.
+     * @param account The GoogleSignInAccount for authentication.
+     * @param fragmentActivity The FragmentActivity for ViewModel interaction.
+     */
     public StepCount(Context context, GoogleSignInAccount account, FragmentActivity fragmentActivity) {
         this.googleSignInAccount = account;
         this.context = context;
@@ -51,6 +61,17 @@ public class StepCount {
                 .setStreamName("StepCountDeltaStream")
                 .build();
     }
+
+    /**
+     * Reads the step count data from Google Fit for a specified time range.
+     * Aggregates the data by day and adjusts the time range if today is the day of interest.
+     * Returns the results through an OnSuccessListener or logs an error on failure.
+     *
+     * @param startTime The start time of the range in milliseconds.
+     * @param endTime The end time of the range in milliseconds.
+     * @param onSuccessListener The listener to be called upon successful retrieval of the step count data.
+     */
+
     public void readStepsForRange(long startTime, long endTime, OnSuccessListener<DataReadResponse> onSuccessListener) {
         HistoryClient historyClient = Fitness.getHistoryClient(context, googleSignInAccount);
 
