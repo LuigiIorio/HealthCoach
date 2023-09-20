@@ -5,19 +5,17 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.healthcoach.recordingapi.Hydration;
-
+import com.google.android.gms.fitness.data.DataPoint;
+import com.google.android.gms.fitness.data.DataSet;
+import com.google.android.gms.fitness.data.Field;
+import com.google.android.gms.fitness.result.DataReadResponse;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 public class HydrationViewModel extends ViewModel {
     private final MutableLiveData<Float> totalWaterIntake = new MutableLiveData<>(0f);
-    private Hydration repository;  // Changed the type to Hydration
+    private Hydration repository;
 
-    public HydrationViewModel() {}  // Empty constructor
-
-    public HydrationViewModel(Hydration repository) {
-        this.repository = repository;  // Changed the type to Hydration
-    }
-
-    public void setRepository(Hydration repository) {  // Changed the type to Hydration
+    public void setRepository(Hydration repository) {
         this.repository = repository;
     }
 
@@ -26,12 +24,25 @@ public class HydrationViewModel extends ViewModel {
     }
 
     public void addWater(float intake, long startTime, long endTime) {
+        repository.insertWaterIntake(intake, startTime, endTime);
         totalWaterIntake.setValue(totalWaterIntake.getValue() + intake);
-        if (repository != null) {
-            repository.insertWaterIntake(intake, startTime, endTime); // Insert into data source directly from ViewModel
-        }
     }
 
-
-
+    public void fetchHydrationData(long startTime, long endTime) {
+        repository.readHydrationData(startTime, endTime, new OnSuccessListener<DataReadResponse>() {
+            @Override
+            public void onSuccess(DataReadResponse dataReadResponse) {
+                float totalHydration = 0;
+                for (DataSet dataSet : dataReadResponse.getDataSets()) {
+                    for (DataPoint point : dataSet.getDataPoints()) {
+                        for (Field field : point.getDataType().getFields()) {
+                            float hydrationValue = point.getValue(field).asFloat();
+                            totalHydration += hydrationValue;
+                        }
+                    }
+                }
+                totalWaterIntake.postValue(totalHydration);
+            }
+        });
+    }
 }
