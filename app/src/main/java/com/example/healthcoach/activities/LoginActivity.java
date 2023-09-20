@@ -84,30 +84,7 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-    public void requestGoogleFitPermission() {
-        GoogleSignInOptionsExtension fitnessOptions = FitnessOptions.builder()
-                .addDataType(DataType.TYPE_STEP_COUNT_DELTA, FitnessOptions.ACCESS_WRITE)
-                .addDataType(DataType.TYPE_STEP_COUNT_DELTA, FitnessOptions.ACCESS_READ)
-                .addDataType(DataType.TYPE_HYDRATION, FitnessOptions.ACCESS_WRITE)
-                .addDataType(DataType.TYPE_HYDRATION, FitnessOptions.ACCESS_READ)
-                .addDataType(DataType.TYPE_WEIGHT, FitnessOptions.ACCESS_WRITE)
-                .addDataType(DataType.TYPE_WEIGHT, FitnessOptions.ACCESS_READ)
-                .addDataType(DataType.TYPE_HEIGHT, FitnessOptions.ACCESS_READ)
-                .addDataType(DataType.TYPE_HEIGHT, FitnessOptions.ACCESS_READ)
-                .addDataType(DataType.TYPE_BODY_FAT_PERCENTAGE, FitnessOptions.ACCESS_READ)
-                .addDataType(DataType.TYPE_BODY_FAT_PERCENTAGE, FitnessOptions.ACCESS_READ)
-                .addDataType(DataType.TYPE_DISTANCE_DELTA, FitnessOptions.ACCESS_READ)
-                .addDataType(DataType.TYPE_DISTANCE_DELTA, FitnessOptions.ACCESS_WRITE)
-                .addDataType(DataType.TYPE_CALORIES_EXPENDED, FitnessOptions.ACCESS_READ)
-                .addDataType(DataType.TYPE_CALORIES_EXPENDED, FitnessOptions.ACCESS_WRITE)
-                .build();
 
-        GoogleSignIn.requestPermissions(
-                this,
-                REQUEST_CODE_GOOGLE_FIT_PERMISSIONS,
-                GoogleSignIn.getLastSignedInAccount(this),
-                fitnessOptions);
-    }
 
 
     @Override
@@ -138,8 +115,6 @@ public class LoginActivity extends AppCompatActivity {
                             Toast.makeText(this, "Logged In", Toast.LENGTH_SHORT).show();
                             viewModel.firebaseAuthViaGoogle(account.getIdToken(), this);
 
-                            // Request Google Fit permissions here
-                            requestGoogleFitPermission();
                         }
                     } else {
                         // Handle login failure with Google
