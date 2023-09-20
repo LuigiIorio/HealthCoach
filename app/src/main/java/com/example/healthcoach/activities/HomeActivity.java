@@ -26,9 +26,18 @@ public class HomeActivity extends AppCompatActivity {
 
     private HomeActivityViewModel homeActivityViewModel;
 
-
-
-
+    /**
+     * Initializes the HomeActivity and its associated fragments.
+     *
+     * - Sets up the view model for data manipulation and observation.
+     * - Initializes four different fragments: HomeFragment, ProfileFragment, HistoryFragment, and SettingFragment.
+     * - Sets the initial active fragment to HomeFragment.
+     * - Fetches today's hydration data via the view model.
+     * - Sets up the BottomNavigationView and its event listener for fragment navigation.
+     * - Adds the initial fragment to the container.
+     *
+     * @param savedInstanceState A mapping from String keys to various Parcelable values.
+     */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,6 +70,15 @@ public class HomeActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Handles navigation item clicks in the BottomNavigationView.
+     *
+     * - Switches between different fragments based on the clicked navigation item.
+     * - Replaces the current fragment with the selected fragment.
+     * - Updates the activeFragment variable to keep track of the currently displayed fragment.
+     *
+     * @return true if navigation item is handled, false otherwise.
+     */
     private final BottomNavigationView.OnNavigationItemSelectedListener navListener =
             item -> {
                 Fragment selectedFragment;

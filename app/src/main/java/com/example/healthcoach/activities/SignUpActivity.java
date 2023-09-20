@@ -23,6 +23,15 @@ public class SignUpActivity extends AppCompatActivity {
     private Button confirm;
     private TextView alreadyRegistered;
 
+
+    /**
+     * Initializes the SignUpActivity.
+     *
+     * - Sets up the view model, UI elements, and event listeners.
+     *
+     * @param savedInstanceState A mapping from String keys to various Parcelable values.
+     */
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -36,6 +45,12 @@ public class SignUpActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Initializes the UI elements for SignUpActivity.
+     *
+     * - Finds and references the email, password, confirm password fields, and buttons.
+     */
+
     private void inizialiseUI() {
 
         emailText = findViewById(R.id.emailText);
@@ -45,6 +60,15 @@ public class SignUpActivity extends AppCompatActivity {
         alreadyRegistered = findViewById(R.id.signInTextView);
 
     }
+
+    /**
+     * Sets up event listeners for the UI elements.
+     *
+     * - Handles the registration confirmation process.
+     * - Validates the entered details and initiates user creation.
+     * - Navigates to LoginActivity if user is already registered.
+     */
+
 
     private void setupListeners() {
         confirm.setOnClickListener(view -> {

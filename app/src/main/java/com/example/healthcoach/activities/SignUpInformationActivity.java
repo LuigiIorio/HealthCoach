@@ -36,6 +36,16 @@ public class SignUpInformationActivity extends AppCompatActivity {
     private String imageUri;
 
 
+    /**
+     * Initializes the SignUpInfoActivity.
+     *
+     * - Sets up the view model, UI elements, and event listeners.
+     * - Retrieves user information from the ViewModel.
+     * - Sets the maximum selectable date for the birth date picker.
+     *
+     * @param savedInstanceState A mapping from String keys to various Parcelable values.
+     */
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -62,6 +72,17 @@ public class SignUpInformationActivity extends AppCompatActivity {
         // Set the maximum selectable date for the DatePicker
         birthDatePicker.setMaxDate(calendar.getTimeInMillis());
     }
+
+    /**
+     * Handles the results of external activities initiated from this activity.
+     *
+     * - Processes the image selected for the profile picture.
+     *
+     * @param requestCode The request code initially supplied.
+     * @param resultCode  The result code returned.
+     * @param data        Additional data returned from the activity.
+     */
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -91,6 +112,11 @@ public class SignUpInformationActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Initializes the UI elements for SignUpInfoActivity.
+     *
+     * - Finds and references all relevant fields and buttons for sign-up information.
+     */
     private void inizialiseUI() {
 
         fullNameText = findViewById(R.id.fullNameText);
@@ -106,6 +132,13 @@ public class SignUpInformationActivity extends AppCompatActivity {
         submitButton = findViewById(R.id.submitButton);
 
     }
+
+    /**
+     * Sets up event listeners for the UI elements.
+     *
+     * - Handles profile picture selection.
+     * - Handles form submission, including validation and user information update.
+     */
 
     private void setupListeners() {
 

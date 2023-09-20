@@ -13,15 +13,11 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.healthcoach.R;
 import com.example.healthcoach.viewmodels.ForgotPasswordViewModel;
-
-
 public class ForgotPasswordActivity extends AppCompatActivity {
-
     private EditText emailEditText;
     private Button resetButton;
     private TextView backToLogin;
     private ForgotPasswordViewModel viewModel;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

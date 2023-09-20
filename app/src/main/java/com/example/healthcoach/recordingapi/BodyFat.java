@@ -23,10 +23,7 @@ import com.google.android.gms.tasks.Task;
 
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
-
-
 public class BodyFat {
-
     private Context context;
     private GoogleSignInAccount googleSignInAccount;
 
@@ -34,7 +31,6 @@ public class BodyFat {
         this.context = context;
         this.googleSignInAccount = account;
     }
-
     public boolean insertBodyFat(float bodyFatPercentage, long startTime, long endTime) {
         DataSource bodyFatSource = new DataSource.Builder()
                 .setAppPackageName(context.getPackageName())
@@ -78,8 +74,6 @@ public class BodyFat {
             onSuccessListener.onSuccess(latestBodyFat);
         });
     }
-
-
     public DataReadResponse getBodyFatData(long startTime, long endTime) {
         DataReadRequest readRequest = new DataReadRequest.Builder()
                 .read(DataType.TYPE_BODY_FAT_PERCENTAGE)

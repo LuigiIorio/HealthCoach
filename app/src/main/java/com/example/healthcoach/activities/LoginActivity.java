@@ -54,6 +54,15 @@ public class LoginActivity extends AppCompatActivity {
 
     private ActivityResultLauncher<Intent> googleSignInResultLauncher;
 
+    /**
+     * Initializes the SignUpActivity.
+     *
+     * - Initializes Firebase and the view model.
+     * - Checks the sign-in status and database values.
+     * - Sets up the UI and event listeners.
+     *
+     * @param savedInstanceState A mapping from String keys to various Parcelable values.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,6 +93,16 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Handles the results of external activities initiated from this activity.
+     *
+     * - Handles Google Fit permissions.
+     * - Handles Google Sign-In.
+     *
+     * @param requestCode The request code initially supplied.
+     * @param resultCode  The result code returned.
+     * @param data        Additional data returned from the activity.
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -127,7 +146,11 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-
+    /**
+     * Initializes the UI elements.
+     *
+     * - Finds and references email and password fields, login button, sign-up link, and Google login button.
+     */
     private void inizialiseUI() {
 
         emailEditText = findViewById(R.id.emailText);
@@ -138,6 +161,13 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Sets up event listeners for UI elements.
+     *
+     * - Handles email-password login.
+     * - Handles navigation to Sign-Up and Forgot Password activities.
+     * - Observes login results and navigates accordingly.
+     */
     public void setupListeners() {
 
         loginButton.setOnClickListener(v -> {
@@ -184,6 +214,12 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Initiates Google Sign-In process.
+     *
+     * - Configures Google Sign-In options.
+     * - Initiates Google Sign-In activity.
+     */
     private void signInWithGoogle() {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
