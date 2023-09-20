@@ -1,5 +1,7 @@
 package com.example.healthcoach.viewmodels;
 
+import android.content.Context;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -10,6 +12,7 @@ import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.result.DataReadResponse;
 import com.google.android.gms.tasks.OnSuccessListener;
+
 
 public class HydrationViewModel extends ViewModel {
     private final MutableLiveData<Float> totalWaterIntake = new MutableLiveData<>(0f);
@@ -27,6 +30,11 @@ public class HydrationViewModel extends ViewModel {
         repository.insertWaterIntake(intake, startTime, endTime);
         totalWaterIntake.setValue(totalWaterIntake.getValue() + intake);
     }
+
+    public void initialize(Context context) {
+        this.repository = new Hydration(context);  // Initialize it here
+    }
+
 
     public void fetchHydrationData(long startTime, long endTime) {
         repository.readHydrationData(startTime, endTime, new OnSuccessListener<DataReadResponse>() {

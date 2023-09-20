@@ -7,6 +7,7 @@ import android.util.Log;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import com.example.healthcoach.recordingapi.BodyFat;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
@@ -55,4 +56,10 @@ public class BodyFatViewModel extends ViewModel {
             Log.e("BodyFat", "Failed to insert body fat data");
         }
     }
+
+    public void initialize(Context context) {
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(context);
+        this.bodyFat = new BodyFat(context, account);  // Initialize it here
+    }
+
 }

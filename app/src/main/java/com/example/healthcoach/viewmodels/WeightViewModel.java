@@ -200,5 +200,15 @@ public class WeightViewModel extends AndroidViewModel {
                 });
     }
 
+    public void initialize(Context context) {
+        this.context = context;
+        this.weightDataSource = new DataSource.Builder()
+                .setAppPackageName(context)
+                .setDataType(DataType.TYPE_WEIGHT)
+                .setType(DataSource.TYPE_RAW)
+                .build();  // Initialize it here
+    }
+
+
 
 }

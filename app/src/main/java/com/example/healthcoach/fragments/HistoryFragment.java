@@ -81,6 +81,7 @@ public class HistoryFragment extends Fragment {
     }
 
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_history, container, false);
@@ -95,18 +96,18 @@ public class HistoryFragment extends Fragment {
 
         // Initialize BodyFatViewModel
         bodyFatViewModel = new ViewModelProvider(this).get(BodyFatViewModel.class);
-        bodyFatViewModel.initialize(getActivity(), GoogleSignIn.getLastSignedInAccount(getActivity()));
+        bodyFatViewModel.initialize(getActivity());
 
         // Initialize WeightViewModel
         weightViewModel = new ViewModelProvider(this).get(WeightViewModel.class);
+        weightViewModel.initialize(getActivity());
 
         // Initialize HydrationViewModel
         hydrationViewModel = new ViewModelProvider(this).get(HydrationViewModel.class);
-        hydrationViewModel.setRepository(new Hydration(getActivity()));
+        hydrationViewModel.initialize(getActivity());
 
         return view;
     }
-
 
 
     private void requestPermissions() {
@@ -174,12 +175,18 @@ public class HistoryFragment extends Fragment {
         }
         return true;
     }
-    private void initializeVariables(View view) {
 
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
-        hydration = new Hydration(getActivity());
-        weight = new Weight(getActivity());
-        bodyFat = new BodyFat(getActivity(), account);
+    private void initializeVariables(View view) {
+        // Initialize ViewModel and UI components
+        bodyFatViewModel = new ViewModelProvider(this).get(BodyFatViewModel.class);
+        bodyFatViewModel.initialize(getActivity());
+
+        weightViewModel = new ViewModelProvider(this).get(WeightViewModel.class);
+        weightViewModel.initialize(getActivity());
+
+        hydrationViewModel = new ViewModelProvider(this).get(HydrationViewModel.class);
+        hydrationViewModel.initialize(getActivity());
+
         historyTextView = view.findViewById(R.id.historyTextView);
         dataTypeSpinner = view.findViewById(R.id.fetchDataTypeSpinner);
         fetchDataButton = view.findViewById(R.id.fetchDataButton);
@@ -192,6 +199,8 @@ public class HistoryFragment extends Fragment {
         selectedMonth = calendar.get(Calendar.MONTH);
         selectedDay = calendar.get(Calendar.DAY_OF_MONTH);
     }
+
+
     private void setupCalendarView(View view) {
         CalendarView calendarView = view.findViewById(R.id.calendarView);
         calendarView.setOnDateChangeListener((view1, year, month, dayOfMonth) -> {
