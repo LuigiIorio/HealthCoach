@@ -58,6 +58,7 @@ import com.google.firebase.storage.StorageReference;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -473,10 +474,6 @@ public class HomeActivityViewModel extends ViewModel {
 
         }
 
-
-
-
-
     }
 
     public boolean checkGoogleMerge(Context context) {
@@ -513,83 +510,84 @@ public class HomeActivityViewModel extends ViewModel {
         return kcal;
     }
 
-    public void fetchData(Context context, AnyChartView lineChart) {
+    public void fetchLastSevenDaysData(Context context, AnyChartView chart) {
+        // Get the account
+        GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(context);
 
-        if (GoogleSignIn.getLastSignedInAccount(context) == null)
+        if (googleSignInAccount == null)
             return;
 
-        if (history.getValue() == null) {
+        if(history.getValue() == null) {
+            List<GoogleFitDailyData> datas = new ArrayList<>();
 
-            List<GoogleFitDailyData> data = new ArrayList<>();
-            for (int i = 0; i < 7; i++)
-                data.add(new GoogleFitDailyData());
+            for(int i = 0; i < 7; i++)
+                datas.add(new GoogleFitDailyData());
 
-            history.setValue(data);
-
+            history.setValue(datas);
         }
 
-        // Impostazione dell'intervallo di tempo
-        Calendar calendar = Calendar.getInstance();
-        long endTime = calendar.getTimeInMillis();
-        calendar.add(Calendar.DAY_OF_YEAR, - DAYS_TO_FETCH + 1);
-        long startTime = calendar.getTimeInMillis();
 
-        // Creazione della richiesta per i dati di Google Fit
-        DataReadRequest readRequest = new DataReadRequest.Builder()
-                .aggregate(DataType.AGGREGATE_STEP_COUNT_DELTA)
-                .aggregate(DataType.AGGREGATE_HYDRATION)
-                .aggregate(DataType.AGGREGATE_CALORIES_EXPENDED)
-                .bucketByTime(DAYS_TO_FETCH, TimeUnit.DAYS)
-                .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
-                .build();
+        // Define the data types to read
+        List<DataType> dataTypes = Arrays.asList(
+                DataType.TYPE_STEP_COUNT_DELTA,
+                DataType.AGGREGATE_HYDRATION,
+                DataType.TYPE_CALORIES_EXPENDED
+        );
 
-        HistoryClient historyClient = Fitness.getHistoryClient(context, GoogleSignIn.getLastSignedInAccount(context));
-
-        // Eseguire la richiesta
-        historyClient.readData(readRequest)
-                .addOnSuccessListener(dataReadResult -> {
-                    List<Bucket> buckets = dataReadResult.getBuckets();
-                    parseBuckets(buckets);
-                    inizialiseLineChart(lineChart);
-                });
-    }
-
-    private void parseBuckets(List<Bucket> buckets) {
-
-        Log.i("Numeber bucket", buckets.size() + "");
-
-        for (Bucket bucket : buckets) {
-
-            List<DataSet> dataSets = bucket.getDataSets();
-
-            Log.i("Numeber bucket", dataSets.size() + "");
-
-            for (DataSet dataSet : dataSets) {
-                for (DataPoint dataPoint : dataSet.getDataPoints()) {
-
-                    GoogleFitDailyData data = history.getValue()
-                            .get((int) (DAYS_TO_FETCH - 1 - calculateDaysSince(
-                                    dataPoint.getEndTime(TimeUnit.MILLISECONDS) -
-                                            dataPoint.getStartTime(TimeUnit.MILLISECONDS)
-                            )));
-
-                    if(dataPoint.getDataType() == DataType.AGGREGATE_STEP_COUNT_DELTA)
-                        data.setSteps(dataPoint.getValue(Field.FIELD_STEPS).asInt());
-                    else if(dataPoint.getDataType() == DataType.AGGREGATE_HYDRATION)
-                        data.setHydration(dataPoint.getValue(Field.FIELD_VOLUME).asFloat());
-                    else if(dataPoint.getDataType() == DataType.AGGREGATE_CALORIES_EXPENDED)
-                        data.setCalories(dataPoint.getValue(Field.FIELD_CALORIES).asFloat());
-
-                }
-            }
+        if (googleSignInAccount == null) {
+            Log.e("GoogleFit", "User is not signed in");
+            return;
         }
 
+        for (DataType dataType : dataTypes) {
+            // Set the date from 7 days ago to now
+            long endTime = System.currentTimeMillis();
+            long startTime = endTime - (7 * 24 * 60 * 60 * 1000);
+
+            DataReadRequest readRequest = new DataReadRequest.Builder()
+                    .aggregate(dataType, dataType.getAggregateType())
+                    .bucketByTime(1, TimeUnit.DAYS)
+                    .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+                    .build();
+
+            Fitness.getHistoryClient(context, googleSignInAccount)
+                    .readData(readRequest)
+                    .addOnSuccessListener(dataReadResponse -> {
+                        for (Bucket bucket : dataReadResponse.getBuckets()) {
+                            List<DataSet> dataSets = bucket.getDataSets();
+                            for (DataSet dataSet : dataSets) {
+                                for (DataPoint dp : dataSet.getDataPoints()) {
+                                    for (Field field : dp.getDataType().getFields()) {
+
+                                        int daysAgo = getDaysAgo(dp.getTimestamp(TimeUnit.MILLISECONDS));
+
+                                        if (dp.getDataType().equals(DataType.TYPE_STEP_COUNT_DELTA)) {
+                                            history.getValue().get(6 - daysAgo).setSteps(dp.getValue(field).asInt());
+                                        } else if (dp.getDataType().equals(DataType.AGGREGATE_HYDRATION)) {
+                                            history.getValue().get(6 - daysAgo).setHydration((int)dp.getValue(field).asFloat());
+                                        } else if (dp.getDataType().equals(DataType.TYPE_CALORIES_EXPENDED)) {
+                                            history.getValue().get(6 - daysAgo).setCalories((int)(dp.getValue(field).asFloat() - 1000));
+                                        }
+
+                                    }
+                                }
+                            }
+                        }
+
+                        inizialiseLineChart(chart);
+
+                    });
+
+
+
+        }
     }
 
-    public static long calculateDaysSince(long timestampInMillis) {
-        long currentTimeInMillis = System.currentTimeMillis();
-        long timeDifference = currentTimeInMillis - timestampInMillis;
-        return TimeUnit.MILLISECONDS.toDays(timeDifference);
+    public int getDaysAgo(long timestamp) {
+        long currentTime = System.currentTimeMillis(); // convert to nanoseconds
+        long timeDifferenceNanos = currentTime - timestamp;
+
+        return (int) TimeUnit.MILLISECONDS.toDays(timeDifferenceNanos);
     }
 
     public void inizialiseLineChart(AnyChartView lineChart) {
@@ -613,10 +611,10 @@ public class HomeActivityViewModel extends ViewModel {
         List<DataEntry> seriesData = new ArrayList<>();
         UserProfile user = userProfileLiveData.getValue();
 
-        for(int i = history.getValue().size() - 1; i >= 0; i--) {
+        for(int i = 0; i < history.getValue().size(); i++) {
 
             Calendar calendar = Calendar.getInstance();
-            calendar.add(Calendar.DAY_OF_YEAR, -i);
+            calendar.add(Calendar.DAY_OF_YEAR, i - 6);
 
             GoogleFitDailyData data = history.getValue().get(i);
 
@@ -624,7 +622,7 @@ public class HomeActivityViewModel extends ViewModel {
                     formatToDDMMM(calendar),
                     (data.getSteps() / user.getDailySteps()) * 100,
                     (data.getHydration() / user.getDailyWater()) * 100,
-                    (data.getCalories() / user.getDailyKcal()) * 100
+                    ((data.getCalories()) / user.getDailyKcal()) * 100
             ));
 
         }

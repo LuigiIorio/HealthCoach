@@ -116,9 +116,9 @@ public class HomeFragment extends Fragment {
 
                 UserProfile profile = homeActivityViewModel.getUser().getValue();
 
-                requestGoogleFitPermission();
+                homeActivityViewModel.updateFitValues(this.getContext());
 
-                   // homeActivityViewModel.fetchData(this.getContext(), lineChart);
+                requestGoogleFitPermission();
 
                 homeActivityViewModel.getSteps().observe(getViewLifecycleOwner(), steps -> {
 
@@ -133,35 +133,24 @@ public class HomeFragment extends Fragment {
                     int percentage = (int) (((water * 1.0)/profile.getDailyWater()) * 100);
                     Log.e("Water", water+"/"+profile.getDailyWater()+" "+percentage);
                     waterProgressBar.setProgress(percentage);
+                    hydrationTextView.setText(water +" ml");
 
                 });
 
                 homeActivityViewModel.getKcal().observe(getViewLifecycleOwner(), kcal -> {
 
-                    int percentage = (int) (((kcal * 1.0)/profile.getDailyKcal()) * 100);
+                    int percentage = (int) ((((kcal - 1000) * 1.0)/profile.getDailyKcal()) * 100);
                     Log.e("Kcal", kcal+"/"+profile.getDailyKcal()+" "+percentage);
                     kcalProgressBar.setProgress(percentage);
+                    tvCalories.setText((int)(kcal - 1000) + " kcal");
 
                 });
+
+                homeActivityViewModel.fetchLastSevenDaysData(this.getContext(), lineChart);
 
             }
 
         });
-
-        // Existing code for hydration
-        homeActivityViewModel.getHydrationData().observe(getViewLifecycleOwner(), hydration -> {
-            hydrationTextView.setText(hydration.intValue()+" ml");
-        });
-
-
-        // Initialize and observe the CaloriesViewModel
-        CaloriesViewModel caloriesViewModel = new ViewModelProvider(this).get(CaloriesViewModel.class);
-        caloriesViewModel.getTotalCalories().observe(getViewLifecycleOwner(), calories -> {
-            tvCalories.setText((int)(calories.getTotalCalories()) + " kcal");
-        });
-
-        // Fetch the calories data
-        caloriesViewModel.fetchCalories(getContext());
 
 
     }
