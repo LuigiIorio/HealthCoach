@@ -32,6 +32,7 @@ import com.example.healthcoach.recordingapi.Hydration;
 import com.example.healthcoach.recordingapi.StepCount;
 import com.example.healthcoach.recordingapi.Weight;
 import com.example.healthcoach.viewmodels.BodyFatViewModel;
+import com.example.healthcoach.viewmodels.CaloriesViewModel;
 import com.example.healthcoach.viewmodels.DistanceViewModel;
 import com.example.healthcoach.viewmodels.StepViewModel;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -217,7 +218,7 @@ public class HistoryFragment extends Fragment {
                 } else if ("Steps".equals(selectedType)) {
                     updateDataSteps(selectedType, startTime, endTime);
                 } else if ("Kcal".equals(selectedType)) {
-                    updateDataCaloriesExpended(selectedType, startTime, endTime);
+                    updateDataCalories(selectedType, startTime, endTime);
                 } else if ("Distance".equals(selectedType)) {
                     updateDataDistance(selectedType, startTime, endTime);
                 }
@@ -241,38 +242,24 @@ public class HistoryFragment extends Fragment {
     }
 
 
-    private void updateDataCaloriesExpended(String type, long startTime, long endTime) {
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
-        if (account == null) {
-            historyTextView.setText("Not signed in");
-            return;
-        }
+    private void updateDataCalories(String type, long startTime, long endTime) {
+        CaloriesViewModel caloriesViewModel = new ViewModelProvider(this).get(CaloriesViewModel.class);
 
+        // Observe the LiveData first
+        caloriesViewModel.getTotalCalories().observe(getViewLifecycleOwner(), new Observer<Calories>() {
+            @Override
+            public void onChanged(Calories calories) {
+                historyTextView.setText(String.format("Total Calories Burnt: %.2f kcal", calories.getTotalCalories()));
+            }
+        });
+
+        // Now trigger the data fetching
         if ("Kcal".equals(type)) {
-            new Calories(getActivity(), account).readCaloriesData(startTime, endTime, new OnSuccessListener<DataReadResponse>() {
-                @Override
-                public void onSuccess(DataReadResponse dataReadResponse) {
-                    float totalCalories = 0;
-                    if (dataReadResponse.getBuckets().size() > 0) {
-                        for (Bucket bucket : dataReadResponse.getBuckets()) {
-                            DataSet dataSet = bucket.getDataSet(DataType.AGGREGATE_CALORIES_EXPENDED);
-                            for (DataPoint point : dataSet.getDataPoints()) {
-                                for (Field field : point.getDataType().getFields()) {
-                                    float calories = point.getValue(field).asFloat();
-                                    totalCalories += calories;
-                                }
-                            }
-                        }
-                    }
-                    if (totalCalories == 0) {
-                        historyTextView.setText("No data available for the selected date");
-                    } else {
-                        historyTextView.setText(String.format("Total Calories Expended: %.2f kcal", totalCalories));
-                    }
-                }
-            });
+            caloriesViewModel.fetchCaloriesData(getActivity(), GoogleSignIn.getLastSignedInAccount(getActivity()), new Date(startTime));
         }
     }
+
+
 
     private void updateDataDistance(String type, long startTime, long endTime) {
         DistanceViewModel distanceViewModel = new ViewModelProvider(this).get(DistanceViewModel.class);

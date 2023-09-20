@@ -17,6 +17,8 @@ import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.request.DataReadRequest;
+import com.google.android.gms.fitness.result.DataReadResponse;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -74,18 +76,22 @@ public class CaloriesViewModel extends ViewModel {
         long endTime = startTime + 24 * 60 * 60 * 1000;
 
         Calories caloriesInstance = new Calories(context, googleSignInAccount);
-        caloriesInstance.readCaloriesData(startTime, endTime, dataReadResponse -> {
-            float sum = 0;
-            for (DataSet dataSet : dataReadResponse.getDataSets()) {
-                for (DataPoint dp : dataSet.getDataPoints()) {
-                    for (Field field : dp.getDataType().getFields()) {
-                        sum += dp.getValue(field).asFloat();
+        caloriesInstance.readCaloriesData(startTime, endTime, new OnSuccessListener<DataReadResponse>() {
+            @Override
+            public void onSuccess(DataReadResponse dataReadResponse) {
+                float sum = 0;
+                for (DataSet dataSet : dataReadResponse.getDataSets()) {
+                    for (DataPoint dp : dataSet.getDataPoints()) {
+                        for (Field field : dp.getDataType().getFields()) {
+                            sum += dp.getValue(field).asFloat();
+                        }
                     }
                 }
+                totalCalories.setValue(new Calories(sum));
             }
-            totalCalories.setValue(new Calories(sum));
         });
     }
+
 
 
 
@@ -98,6 +104,8 @@ public class CaloriesViewModel extends ViewModel {
                 })
                 .addOnFailureListener(e -> totalCalories.setValue(new Calories(0f)));
     }
+
+
 
 
 }
