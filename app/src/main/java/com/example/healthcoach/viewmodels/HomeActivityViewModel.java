@@ -549,7 +549,7 @@ public class HomeActivityViewModel extends ViewModel {
         historyClient.readData(readRequest)
                 .addOnSuccessListener(dataReadResult -> {
                     List<Bucket> buckets = dataReadResult.getBuckets();
-                    //parseBuckets(buckets);
+                    parseBuckets(buckets);
                     inizialiseLineChart(lineChart);
                 });
     }

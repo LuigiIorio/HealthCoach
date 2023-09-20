@@ -161,6 +161,7 @@ public class HistoryFragment extends Fragment {
 
     private void insertWeightData(float weightValue, long startTime, long endTime) {
         weightViewModel.insertWeightData(weightValue, startTime, endTime);
+        Toast.makeText(getActivity(), "Inserted weight data successfully", Toast.LENGTH_SHORT).show();
     }
 
 

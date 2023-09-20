@@ -129,7 +129,7 @@ public class HomeFragment extends Fragment {
 
                 requestGoogleFitPermission();
 
-                    homeActivityViewModel.fetchData(this.getContext(), lineChart);
+                   // homeActivityViewModel.fetchData(this.getContext(), lineChart);
 
 
 
