@@ -32,6 +32,7 @@ import com.example.healthcoach.recordingapi.Hydration;
 import com.example.healthcoach.recordingapi.StepCount;
 import com.example.healthcoach.recordingapi.Weight;
 import com.example.healthcoach.viewmodels.BodyFatViewModel;
+import com.example.healthcoach.viewmodels.DistanceViewModel;
 import com.example.healthcoach.viewmodels.StepViewModel;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -272,36 +273,22 @@ public class HistoryFragment extends Fragment {
             });
         }
     }
-    private void updateDataDistance(String type, long startTime, long endTime) {
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
-        if (account == null) {
-            historyTextView.setText("Not signed in");
-            return;
-        }
 
-        // (your existing code for time conversion and other operations...)
+    private void updateDataDistance(String type, long startTime, long endTime) {
+        DistanceViewModel distanceViewModel = new ViewModelProvider(this).get(DistanceViewModel.class);
 
         if ("Distance".equals(type)) {
-            new Distance(getActivity(), account).readDistanceData(startTime, endTime, new OnSuccessListener<DataReadResponse>() {
+            distanceViewModel.readDistanceForRange(startTime, endTime, getActivity());
+            distanceViewModel.getDistance().observe(getViewLifecycleOwner(), new Observer<Float>() {
                 @Override
-                public void onSuccess(DataReadResponse dataReadResponse) {
-                    float totalDistance = 0;
-                    if (dataReadResponse.getBuckets().size() > 0) {
-                        for (Bucket bucket : dataReadResponse.getBuckets()) {
-                            DataSet dataSet = bucket.getDataSet(DataType.AGGREGATE_DISTANCE_DELTA);
-                            for (DataPoint point : dataSet.getDataPoints()) {
-                                for (Field field : point.getDataType().getFields()) {
-                                    float distance = point.getValue(field).asFloat();
-                                    totalDistance += distance;
-                                }
-                            }
-                        }
-                    }
+                public void onChanged(Float totalDistance) {
                     historyTextView.setText(String.format("Total Distance Covered: %.2f meters", totalDistance));
                 }
             });
         }
     }
+
+
     private void updateDataWeight(String type, long startTime, long endTime){
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
         if (account == null) {

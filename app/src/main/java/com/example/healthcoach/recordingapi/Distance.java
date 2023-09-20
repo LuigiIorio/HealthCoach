@@ -27,6 +27,7 @@ import java.util.Calendar;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
+
 public class Distance {
     private Context context;
     private GoogleSignInAccount account;
