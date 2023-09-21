@@ -269,11 +269,14 @@ public class SettingFragment extends Fragment {
 
 
     private boolean checkPassword(UserProfile user) {
+
+
         // Check if user or its properties are null
+        /*
         if (user == null || user.getPassword() == null) {
             Toast.makeText(this.getContext(), "User or password is null", Toast.LENGTH_SHORT).show();
             return false;
-        }
+        } */
 
         // Get text from EditText fields
         String oldPassword = oldPasswordInput.getText().toString();
