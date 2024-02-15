@@ -1,14 +1,14 @@
 # **HealthCoach: An Android Application for Enhancing Physical Health**
 
 ## Overview
-HealthCoach is a mobile application designed to help users improve their physical health by providing personalized fitness plans, tracking exercise routines, and offering nutrition advice. This app aims to make fitness goals more achievable and enjoyable for users of all fitness levels.
+HealthCoach is an Android application designed to enhance physical health. It allows users to record their steps and activity data using smartphone sensors, as well as manually input other data such as water intake and weight. The app is based on the Google Fit platform.
 
 ## Features
-- **Personalized Fitness Plans:** Tailored workout routines based on user's fitness goals and preferences.
-- **Exercise Tracking:** Keep track of your workouts, sets, reps, and progress.
-- **Nutrition Guidance:** Access to nutritional information and meal planning to support your fitness journey.
-- **Progress Tracking:** Monitor your fitness progress with charts and statistics.
-- **Community Support:** Connect with other users, share progress, and motivate each other.
+- **Automatic Step Tracking:** The number of steps taken during the day is automatically recorded.
+- **Personalized Goals:** Users can set personalized goals and track their progress.
+- **Insightful Analytics:** Users can have an overview of their habits through customized graphs.
+- **Various Physical Activities:** Users can record different types of physical activities within the app.
+
 
 ## Technologies Used
 - **Android SDK:** The app is developed using Java/Kotlin with the Android Software Development Kit.
