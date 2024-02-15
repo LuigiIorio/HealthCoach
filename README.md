@@ -7,6 +7,7 @@ HealthCoach is an Android application designed to enhance physical health. It al
 ## Screenshots
 
 ![Screenshot 1](screenshots/img1.png)
+
 ![Screenshot 2](screenshots/img2.png)
 
 
@@ -22,8 +23,9 @@ HealthCoach is an Android application designed to enhance physical health. It al
 - **Android Language (Java):** Development of the app is carried out using Java with the Android Software Development Kit.
 - **Google Fit Platform and API:** Integrated to track physical activity and collect health data.
 - **Firebase Services:** Utilized for various functionalities including:
-  - **Firebase Storage:** Offers robust solutions for storing and retrieving multimedia files. Integrates seamlessly with other Firebase services for cohesive development. Organizes data into buckets and objects for easy access.
-  - **Firebase Realtime Database:** Provides instant synchronization of structured data in JSON format across all devices. Ideal for quick and reliable access to updated data. Enhances versatility and usefulness through integration with Firebase services.
+  - **Firebase Authentication:** Firebase is used for user authentication, supporting login with email/password or Google account credentials.
+  - **Firebase Realtime Database:** Firebase Realtime Database stores JSON data about the user, ensuring data integrity and security. This data cannot be manipulated with the Google Fit API.
+  - **Firebase Storage:** Firebase Storage is utilized for storing user profile pictures.
 - **AnyChart:** Used for generating customizable and interactive charts to visualize data.
 - **Glide:** Employed for efficient image loading and caching within the app.
 
@@ -34,4 +36,4 @@ HealthCoach is an Android application designed to enhance physical health. It al
 3. Run the app on an emulator or physical device.
 
 ## Contact
-For questions or support, contact [Your Name](mailto:youremail@example.com).
+For questions or support, contact [Luigi Iorio](mailto:luigi.iorio.dev@gmail.com).
